@@ -10,14 +10,21 @@ clhs <- function(
   w1 = 1, # weight for continuous data
   w2 = 1, # weight for corelation among data
   w3 = 1 # weight for object data
-) {
+  ) {
 
-  # Factor data
+  # Detection of any factor data
   i_factor <- which(sapply(x, class) %in% c("factor", "character"))
   n_factor <- length(i_factor)
   if (n_factor > 0) {
-    xobj <- x[, i_factor, drop = FALSE]
-    vobj <- levels(xobj)
+    data_continuous <- x[, -1*i_factor, drop = FALSE]
+    data_factor <- x[, i_factor, drop = FALSE]
+    # Creating a list storing the levels of each factor
+    factor_levels <- apply(data_factor, 2, function(x) {
+      ifelse(is.factor(x), res <- levels(x), res <-levels(factor(x)))
+      res}
+    )
+  } else {
+    data_continuous <- x
   }
 
   # annealing schedule
@@ -25,29 +32,14 @@ clhs <- function(
   tdecrease <- 0.95
   metrop <- 1
 
-  n_data <- nrow(x)
-  n_variables <- ncol(x)
+  n_data <- nrow(data_continuous) # Number of individuals in the data set
+  n_cont_variables <- ncol(data_continuous) # Number of continuous variables
 
   # the edge of the strata
-#   step <- 100/size
-#   Pl <- seq(0, 100, by = step)
-#   pc <- (seq(0.5, n_data) - 0.5) / n_data
-
-  xedge <- matrix(NA, ncol = n_variables, nrow = size + 1)
-  for (j in 1:n_variables){
-    xedge[, j] <- quantile(x[, j], probs = seq(0, 1, length.out = size + 1))
-#     Y <- sort(x[,j])
-#     I <- order(x[,j])
-#       xquant(I,j)=pc';
-  }
-
-#   browser()
-
-  # target value
-#   ibest <- matrix(1, ncol = n_variables, nrow = size)
+  xedge <- apply(data_continuous, 1, function(x) quantile(x, probs = seq(0, 1, length.out = size + 1)))
 
   # data correlation
-  corr <- cor(x)
+  cor_mat <- cor(x)
 
   # for object/class variable
   if (n_factor == 0) {
@@ -57,12 +49,12 @@ clhs <- function(
       xobs <- NULL
   }
   else {
-      nobj <- length(vobj)
+      nobj <- length(factor_levels)
       # For each class value (?)
 #       for (j in 1:nobj) {
-#         cobj[j] <- sum(xobj == vobj[j])
+#         cobj[j] <- sum(data_factor == factor_levels[j])
 #       }
-      cobj <- table(xobj)
+      cobj <- table(data_factor)
       cobj <- (cobj/n_data)*size # target value
   }
 
@@ -73,11 +65,11 @@ clhs <- function(
   iunsam <- idat[(size + 1) : n_data]
   xsam <- x[ipick, ]
   if (nobj > 0)
-    xobs <- xobj[ipick, ]
+    xobs <- data_factor[ipick, ]
 
 
   # objective function
-  res <- lhs_obj(size = size, n_variables = n_variables, xsam = xsam, xobs = xobs, xedge = xedge, corr = corr)
+  res <- lhs_obj(size = size, n_cont_variables = n_cont_variables, xsam = xsam, xobs = xobs, xedge = xedge, cor_mat = cor_mat)
   obj <- res$obj
   isam <- res$isam
   dif <- res$dif
@@ -104,7 +96,7 @@ clhs <- function(
       iunsam[1] <- jch
       xsam[iw[1], ] <- x[ich, ]
       if (nobj > 0) {
-        xobs[iw[1], ] <- xobj[ich, ]
+        xobs[iw[1], ] <- data_factor[ich, ]
       }
     }
     else {
@@ -120,12 +112,12 @@ clhs <- function(
       iunsam[1:nworse] <- jch
       xsam[iworse, ] <- x[kch, ]
       if (nobj > 0) {
-        xobs[iworse, ] <- xobj[kch, ]
+        xobs[iworse, ] <- data_factor[kch, ]
       }
     }
 
     # calc obj
-    res <- lhs_obj(size = size, n_variables = n_variables, xsam = xsam, xobs = xobs, xedge = xedge, corr = corr)
+    res <- lhs_obj(size = size, n_cont_variables = n_cont_variables, xsam = xsam, xobs = xobs, xedge = xedge, cor_mat = cor_mat)
     obj <- res$obj
     isam <- res$isam
     dif <- res$dif
@@ -148,7 +140,7 @@ clhs <- function(
       iunsam <- iusave
       xsam <- x[ipick, ]
       if (nobj > 0) {
-        xobs <- xobj[ipick, ]
+        xobs <- data_factor[ipick, ]
       }
       obj <- objsave
       dif <- dsave
@@ -160,7 +152,7 @@ clhs <- function(
     }
 
     # calc the final obj function
-    res <- lhs_obj(size = size, n_variables = n_variables, xsam = xsam, xobs = xobs, xedge = xedge, corr = corr)
+    res <- lhs_obj(size = size, n_cont_variables = n_cont_variables, xsam = xsam, xobs = xobs, xedge = xedge, cor_mat = cor_mat)
     obj <- res$obj
     isam <- res$isam
     dif <- res$dif
@@ -178,21 +170,21 @@ randperm <- function(x, ...) {
 
 lhs_obj <- function(
   size,
-  n_variables,
+  n_cont_variables,
   xsam,
   xobs,
   xedge,
   w1 = 1,
   w2 = 1,
-  corr,
+  cor_mat,
   w3 = 1#,
-#   vobj,
+#   factor_levels,
 #   cobj
   ) {
 
   # data in quantiles
-  hsam <- isam <- matrix(NA, ncol = n_variables, nrow = size)
-  for (j in 1:n_variables) {
+  hsam <- isam <- matrix(NA, ncol = n_cont_variables, nrow = size)
+  for (j in 1:n_cont_variables) {
     hsam[, j] <- hist(xsam[, j], breaks = xedge[, j], plot = FALSE)$counts
     isam[, j] <- hsam[1:size, j]
   }
@@ -200,12 +192,12 @@ lhs_obj <- function(
 
   # correlation
   csam <- cor(xsam)
-  dc <- sum(sum(abs(corr - csam)))
+  dc <- sum(sum(abs(cor_mat - csam)))
 
 #   # object data
-#   nobj <- length(vobj)
+#   nobj <- length(factor_levels)
 #   for (j in 1:nobj) {
-#     iobj[j] <- sum(xobs == vobj[j])
+#     iobj[j] <- sum(xobs == factor_levels[j])
 #   }
 #   do <- sum(abs(iobj - cobj))
 
