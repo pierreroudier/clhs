@@ -171,18 +171,13 @@ clhs <- function(
       setTxtProgressBar(pb, i)
   }
 
-  # calc the final obj function
-  res <- lhs_obj(size = size, n_cont_variables = n_cont_variables, data_continuous_sampled = data_continuous_sampled, data_factor_sampled = data_factor_sampled, xedge = xedge, cor_mat = cor_mat)
-  obj <- res$obj
-#     isam <- res$isam
-  dif <- res$dif
-#     iobj <- res$iobj
-
   # Close progress bar
   if (progress)
     close(pb)
 
-  list(i_sampled, data_continuous_sampled, obj_values)
+  res <- list(index_samples = i_sampled, sampled_data = data_continuous_sampled, obj_function = obj_values)
+  class(res) <- "cLHS_result"
+  res
 }
 
 ## objective function for LHS
@@ -223,4 +218,10 @@ lhs_obj <- function(
 
   obj <- w1*sum(dif) + w2*dc #+ w3*do
   list(obj = obj, isam = isam, dif = dif)
+}
+
+## Basic plotting function
+
+plot.cLHS_result <- function(x, ...) {
+  plot(1:length(x$obj_function), x$obj_function, type = 'l', xlab = "Iteration", ylab = "Energy function", ...)
 }
