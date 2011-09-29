@@ -166,11 +166,6 @@ clhs <- function(
   list(i_sampled, data_continuous_sampled, obj_values)
 }
 
-## Random permutations
-randperm <- function(x, ...) {
-  sample(x, size = length(x), replace = FALSE, ...)
-}
-
 ## objective function for LHS
 
 lhs_obj <- function(
