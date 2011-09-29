@@ -194,7 +194,7 @@ lhs_obj <- function(
     isam[, j] <- hsam[1:size, j]
   }
 
-  dif <- sum(abs(isam - 1))
+  dif <- rowSums(abs(isam - 1))
 
   # correlation of continuous data
   csam <- cor(data_continuous_sampled)
@@ -207,6 +207,6 @@ lhs_obj <- function(
 #   }
 #   do <- sum(abs(iobj - cobj))
 
-  obj <- w1*dif + w2*dc #+ w3*do
+  obj <- w1*sum(dif) + w2*dc #+ w3*do
   list(obj = obj, isam = isam, dif = dif)
 }
