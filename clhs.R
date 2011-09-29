@@ -36,10 +36,10 @@ clhs <- function(
   n_cont_variables <- ncol(data_continuous) # Number of continuous variables
 
   # the edge of the strata
-  xedge <- apply(data_continuous, 1, function(x) quantie(x, probs = seq(0, 1, length.out = size + 1)))
+  xedge <- apply(data_continuous, 2, function(x) quantile(x, probs = seq(0, 1, length.out = size + 1)))
 
   # data correlation
-  cor_mat <- cor(x)
+  cor_mat <- cor(data_continuous)
 
   # for object/class variable
   if (n_factor == 0) {
@@ -58,7 +58,7 @@ clhs <- function(
   # initialise, pick randomly
   n_remainings <- n_data - size # number of individuals remaining unsampled
   i_sampled <- sample(1:n_data, size = size, replace = FALSE) # individuals randomly chosen
-  i_unsampled <- setdiff(1:size, i_sampled) # individuals remaining unsampled
+  i_unsampled <- setdiff(1:n_data, i_sampled) # individuals remaining unsampled
   data_continuous_sampled <- data_continuous[i_sampled, ] # sampled continuous data
 
   if (n_factor > 0)
@@ -79,11 +79,12 @@ clhs <- function(
     idx <- randperm(1:n_remainings)
     i_unsampled <- i_unsampled[idx]
 
-    # storing stuff
-    objsave <- obj
-    isave <- i_sampled
-    iusave <- i_unsampled
-    dsave <- dif
+    # storing current values
+    current <- list()
+    current$obj <- obj
+    current$i_sampled <- i_sampled
+    current$i_unsampled <- i_unsampled
+    current$dif <- dif
 
     if (runif(1) < 0.5) {
       # pick a random sample & swap with reservoir
@@ -92,7 +93,9 @@ clhs <- function(
       jch <- i_sampled[iw[1]]
       i_sampled[iw[1]] <- ich
       i_unsampled[1] <- jch
-      data_continuous_sampled[iw[1], ] <- x[ich, ]
+
+      # creating new data sampled
+      data_continuous_sampled[iw[1], ] <- data_continuous[ich, ]
       if (n_factor > 0) {
         data_factor_sampled[iw[1], ] <- data_factor[ich, ]
       }
@@ -104,11 +107,13 @@ clhs <- function(
       nworse <- length(iworse)
 
       # swap with reservoir
-      jch <- i_sampled[iworse]
-      kch <- i_unsampled[1:nworse]
-      i_sampled[iworse] <- kch
-      i_unsampled[1:nworse] <- jch
-      data_continuous_sampled[iworse, ] <- x[kch, ]
+      jch <- i_sampled[iworse] # will be removed
+      kch <- i_unsampled[1:nworse] # will take their place
+      i_sampled[iworse] <- kch # replacing worst sampled by new pick
+      i_unsampled[1:nworse] <- jch # replacing the worst pick in the reservoir
+
+      # creating new data sampled
+      data_continuous_sampled[iworse, ] <- data_continuous[kch, ]
       if (n_factor > 0) {
         data_factor_sampled[iworse, ] <- data_factor[kch, ]
       }
@@ -116,13 +121,14 @@ clhs <- function(
 
     # calc obj
     res <- lhs_obj(size = size, n_cont_variables = n_cont_variables, data_continuous_sampled = data_continuous_sampled, data_factor_sampled = data_factor_sampled, xedge = xedge, cor_mat = cor_mat)
+
     obj <- res$obj
 #     isam <- res$isam
     dif <- res$dif
 #     iobj <- res$iobj
 
     #  compare with previous iterations
-    de <- obj - objsave
+    de <- obj - current$obj
     metrop <- exp(-1*de/temp) + runif(1)*temp
 
     if (obj == 0) {
@@ -134,14 +140,14 @@ clhs <- function(
     }
     else {
       # revert, no changes
-      i_sampled <- isave
-      i_unsampled <- iusave
-      data_continuous_sampled <- x[i_sampled, ]
+      i_sampled <- current$i_sampled
+      i_unsampled <- current$i_unsampled
+      data_continuous_sampled <- data_continuous[i_sampled, ]
       if (n_factor > 0) {
         data_factor_sampled <- data_factor[i_sampled, ]
       }
-      obj <- objsave
-      dif <- dsave
+      obj <- current$obj
+      dif <- current$dif
     }
 
     obj_values[i] <- obj
@@ -186,6 +192,7 @@ lhs_obj <- function(
     hsam[, j] <- hist(data_continuous_sampled[, j], breaks = xedge[, j], plot = FALSE)$counts
     isam[, j] <- hsam[1:size, j]
   }
+
   dif <- sum(abs(isam - 1))
 
   # correlation of continuous data
@@ -199,7 +206,6 @@ lhs_obj <- function(
 #   }
 #   do <- sum(abs(iobj - cobj))
 
-  obj <- w1*sum(dif) + w2*dc #+ w3*do
-
+  obj <- w1*dif + w2*dc #+ w3*do
   list(obj = obj, isam = isam, dif = dif)
 }
