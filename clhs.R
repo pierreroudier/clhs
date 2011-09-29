@@ -13,7 +13,7 @@ clhs <- function(
   ) {
 
   # Detection of any factor data
-  i_factor <- which(sapply(x, class) %in% c("factor", "character"))
+  i_factor <- which(!sapply(x, is.numeric))
   n_factor <- length(i_factor)
   if (n_factor > 0) {
     data_continuous <- x[, -1*i_factor, drop = FALSE]
@@ -43,10 +43,7 @@ clhs <- function(
 
   # for object/class variable
   if (n_factor == 0) {
-      nobj <- 0
-      cobj <- 0
-      w3 <- 0
-      xobs <- NULL
+    xobs <- NULL
   }
   else {
       nobj <- length(factor_levels)
@@ -64,7 +61,8 @@ clhs <- function(
   ipick <- idat[1 : size]
   iunsam <- idat[(size + 1) : n_data]
   xsam <- x[ipick, ]
-  if (nobj > 0)
+
+  if (n_factor > 0)
     xobs <- data_factor[ipick, ]
 
 
@@ -95,7 +93,7 @@ clhs <- function(
       ipick[iw[1]] <- ich
       iunsam[1] <- jch
       xsam[iw[1], ] <- x[ich, ]
-      if (nobj > 0) {
+      if (n_factor > 0) {
         xobs[iw[1], ] <- data_factor[ich, ]
       }
     }
@@ -111,7 +109,7 @@ clhs <- function(
       ipick[iworse] <- kch
       iunsam[1:nworse] <- jch
       xsam[iworse, ] <- x[kch, ]
-      if (nobj > 0) {
+      if (n_factor > 0) {
         xobs[iworse, ] <- data_factor[kch, ]
       }
     }
@@ -139,7 +137,7 @@ clhs <- function(
       ipick <- isave
       iunsam <- iusave
       xsam <- x[ipick, ]
-      if (nobj > 0) {
+      if (n_factor > 0) {
         xobs <- data_factor[ipick, ]
       }
       obj <- objsave
