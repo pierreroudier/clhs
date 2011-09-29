@@ -7,9 +7,11 @@ clhs <- function(
   x, # Continuous data
   size, # Number of samples you want
   n = 10000, # Number of max iterations
+  tdecrease = 0.95,
   w1 = 1, # weight for continuous data
   w2 = 1, # weight for corelation among data
-  w3 = 1 # weight for object data
+  w3 = 1, # weight for object data
+  progress = TRUE # progress bar
   ) {
 
   # Detection of any factor data
@@ -29,8 +31,7 @@ clhs <- function(
 
   # annealing schedule
   temp <- 1
-  tdecrease <- 0.95
-  metrop <- 1
+  metropolis <- 1
 
   n_data <- nrow(data_continuous) # Number of individuals in the data set
   n_cont_variables <- ncol(data_continuous) # Number of continuous variables
@@ -75,6 +76,10 @@ clhs <- function(
   # vector storing the values of the objective function
   obj_values <- vector(mode = 'numeric', length = n)
 
+  # progress bar
+  if (progress)
+    pb <- txtProgressBar(min = 1, max = n, style = 3)
+
   for (i in 1:n) {
 
     # storing current values
@@ -88,7 +93,7 @@ clhs <- function(
       # pick a random sample & swap with reservoir
       idx_unsampled <- sample(1:n_remainings, size = 1)
       idx_sampled <- sample(1:size, size = 1)
-      # Retrieing indices values
+      # Retrieving indices values
       spl_unsampled <- i_unsampled[idx_unsampled]
       spl_sampled <- i_sampled[idx_sampled]
       # Swap these:
@@ -104,19 +109,19 @@ clhs <- function(
     else {
       # remove the worse sampled & resample
       worse <- max(dif)
-      iworse <- which(dif == worse)
-      nworse <- length(iworse)
+      i_worse <- which(dif == worse)
+      n_worse <- length(i_worse)
 
       # swap with reservoir
-      jch <- i_sampled[iworse] # will be removed
-      kch <- i_unsampled[1:nworse] # will take their place
-      i_sampled[iworse] <- kch # replacing worst sampled by new pick
-      i_unsampled[1:nworse] <- jch # replacing the worst pick in the reservoir
+      spl_removed <- i_sampled[i_worse] # will be removed from the sampled set
+      idx_added <- sample(1:n_remainings, size = n_worse) # will take their place
+      i_sampled[i_worse] <- i_unsampled[idx_added] # replacing worst sampled by new pick
+      i_unsampled[1:n_worse] <- spl_removed # replacing the worst pick in the reservoir
 
       # creating new data sampled
-      data_continuous_sampled[iworse, ] <- data_continuous[kch, ]
+      data_continuous_sampled[i_worse, ] <- data_continuous[idx_added, ]
       if (n_factor > 0) {
-        data_factor_sampled[iworse, ] <- data_factor[kch, ]
+        data_factor_sampled[i_worse, ] <- data_factor[idx_added, ]
       }
     }
 
@@ -128,19 +133,21 @@ clhs <- function(
     dif <- res$dif
 #     iobj <- res$iobj
 
-    #  compare with previous iterations
-    de <- obj - current$obj
-    metrop <- exp(-1*de/temp) + runif(1)*temp
+    # Compare with previous iterations
+    delta_obj <- obj - current$obj
+    metropolis <- exp(-1*delta_obj/temp) + runif(1)*temp
 
+    # If the optimum has been reached
     if (obj == 0) {
       obj_values[i] <- obj
       break
     }
 
-    if (de <=0 | runif(1) < metrop) {# accept change
-    }
-    else {
-      # revert, no changes
+    # Revert change
+    if (delta_obj > 0 & runif(1) >= metropolis) {
+#     if (delta_obj <=0 | runif(1) < metropolis) {# accept change
+#      }
+#     else {
       i_sampled <- current$i_sampled
       i_unsampled <- current$i_unsampled
       data_continuous_sampled <- data_continuous[i_sampled, ]
@@ -151,18 +158,30 @@ clhs <- function(
       dif <- current$dif
     }
 
+    # Storing the objective function value of the current iteration
     obj_values[i] <- obj
-    if ((i %% 10) ==0) {
+
+    # Temperature decrease
+    if ((i %% 10) == 0) {
       temp <- temp*tdecrease
     }
 
-    # calc the final obj function
-    res <- lhs_obj(size = size, n_cont_variables = n_cont_variables, data_continuous_sampled = data_continuous_sampled, data_factor_sampled = data_factor_sampled, xedge = xedge, cor_mat = cor_mat)
-    obj <- res$obj
-#     isam <- res$isam
-    dif <- res$dif
-#     iobj <- res$iobj
+    # Update progress bar
+    if (progress)
+      setTxtProgressBar(pb, i)
   }
+
+  # calc the final obj function
+  res <- lhs_obj(size = size, n_cont_variables = n_cont_variables, data_continuous_sampled = data_continuous_sampled, data_factor_sampled = data_factor_sampled, xedge = xedge, cor_mat = cor_mat)
+  obj <- res$obj
+#     isam <- res$isam
+  dif <- res$dif
+#     iobj <- res$iobj
+
+  # Close progress bar
+  if (progress)
+    close(pb)
+
   list(i_sampled, data_continuous_sampled, obj_values)
 }
 
