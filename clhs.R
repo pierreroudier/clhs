@@ -76,8 +76,6 @@ clhs <- function(
   obj_values <- vector(mode = 'numeric', length = n)
 
   for (i in 1:n) {
-    idx <- randperm(1:n_remainings)
-    i_unsampled <- i_unsampled[idx]
 
     # storing current values
     current <- list()
@@ -88,16 +86,19 @@ clhs <- function(
 
     if (runif(1) < 0.5) {
       # pick a random sample & swap with reservoir
-      iw <- randperm(1:size)
-      ich <- i_unsampled[1]
-      jch <- i_sampled[iw[1]]
-      i_sampled[iw[1]] <- ich
-      i_unsampled[1] <- jch
+      idx_unsampled <- sample(1:n_remainings, size = 1)
+      idx_sampled <- sample(1:size, size = 1)
+      # Retrieing indices values
+      spl_unsampled <- i_unsampled[idx_unsampled]
+      spl_sampled <- i_sampled[idx_sampled]
+      # Swap these:
+      i_sampled[idx_sampled] <- spl_unsampled
+      i_unsampled[idx_unsampled] <- spl_sampled
 
       # creating new data sampled
-      data_continuous_sampled[iw[1], ] <- data_continuous[ich, ]
+      data_continuous_sampled[idx_sampled, ] <- data_continuous[idx_unsampled, ]
       if (n_factor > 0) {
-        data_factor_sampled[iw[1], ] <- data_factor[ich, ]
+        data_factor_sampled[idx_sampled, ] <- data_factor[idx_unsampled, ]
       }
     }
     else {
