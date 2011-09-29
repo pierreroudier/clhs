@@ -6,7 +6,7 @@
 clhs <- function(
   x, # Continuous data
   size, # Number of samples you want
-  niter = 10000, # Number of max iterations
+  n = 10000, # Number of max iterations
   w1 = 1, # weight for continuous data
   w2 = 1, # weight for corelation among data
   w3 = 1 # weight for object data
@@ -36,14 +36,14 @@ clhs <- function(
   n_cont_variables <- ncol(data_continuous) # Number of continuous variables
 
   # the edge of the strata
-  xedge <- apply(data_continuous, 1, function(x) quantile(x, probs = seq(0, 1, length.out = size + 1)))
+  xedge <- apply(data_continuous, 1, function(x) quantie(x, probs = seq(0, 1, length.out = size + 1)))
 
   # data correlation
   cor_mat <- cor(x)
 
   # for object/class variable
   if (n_factor == 0) {
-    xobs <- NULL
+    data_factor_sampled <- NULL
   }
   else {
       nobj <- length(factor_levels)
@@ -56,45 +56,45 @@ clhs <- function(
   }
 
   # initialise, pick randomly
-  nunsam <- n_data - size
-  idat <- randperm(1:n_data)
-  ipick <- idat[1 : size]
-  iunsam <- idat[(size + 1) : n_data]
-  xsam <- x[ipick, ]
+  n_remainings <- n_data - size # number of individuals remaining unsampled
+  i_sampled <- sample(1:n_data, size = size, replace = FALSE) # individuals randomly chosen
+  i_unsampled <- setdiff(1:size, i_sampled) # individuals remaining unsampled
+  data_continuous_sampled <- data_continuous[i_sampled, ] # sampled continuous data
 
   if (n_factor > 0)
-    xobs <- data_factor[ipick, ]
-
+    data_factor_sampled <- data_factor[i_sampled, ] # sampled factor data
 
   # objective function
-  res <- lhs_obj(size = size, n_cont_variables = n_cont_variables, xsam = xsam, xobs = xobs, xedge = xedge, cor_mat = cor_mat)
-  obj <- res$obj
-  isam <- res$isam
-  dif <- res$dif
+  res <- lhs_obj(size = size, n_cont_variables = n_cont_variables, data_continuous_sampled = data_continuous_sampled, data_factor_sampled = data_factor_sampled, xedge = xedge, cor_mat = cor_mat)
+
+  obj <- res$obj # value of the objective function
+#   isam <- res$isam
+  dif <- res$dif #
 #   iobj <- res$iobj
 
-  obj_values <- list()
+  # vector storing the values of the objective function
+  obj_values <- vector(mode = 'numeric', length = n)
 
-  for (il in 1:niter) {
-    idx <- randperm(1:nunsam)
-    iunsam <- iunsam[idx]
+  for (i in 1:n) {
+    idx <- randperm(1:n_remainings)
+    i_unsampled <- i_unsampled[idx]
 
     # storing stuff
     objsave <- obj
-    isave <- ipick
-    iusave <- iunsam
+    isave <- i_sampled
+    iusave <- i_unsampled
     dsave <- dif
 
     if (runif(1) < 0.5) {
       # pick a random sample & swap with reservoir
       iw <- randperm(1:size)
-      ich <- iunsam[1]
-      jch <- ipick[iw[1]]
-      ipick[iw[1]] <- ich
-      iunsam[1] <- jch
-      xsam[iw[1], ] <- x[ich, ]
+      ich <- i_unsampled[1]
+      jch <- i_sampled[iw[1]]
+      i_sampled[iw[1]] <- ich
+      i_unsampled[1] <- jch
+      data_continuous_sampled[iw[1], ] <- x[ich, ]
       if (n_factor > 0) {
-        xobs[iw[1], ] <- data_factor[ich, ]
+        data_factor_sampled[iw[1], ] <- data_factor[ich, ]
       }
     }
     else {
@@ -104,20 +104,20 @@ clhs <- function(
       nworse <- length(iworse)
 
       # swap with reservoir
-      jch <- ipick[iworse]
-      kch <- iunsam[1:nworse]
-      ipick[iworse] <- kch
-      iunsam[1:nworse] <- jch
-      xsam[iworse, ] <- x[kch, ]
+      jch <- i_sampled[iworse]
+      kch <- i_unsampled[1:nworse]
+      i_sampled[iworse] <- kch
+      i_unsampled[1:nworse] <- jch
+      data_continuous_sampled[iworse, ] <- x[kch, ]
       if (n_factor > 0) {
-        xobs[iworse, ] <- data_factor[kch, ]
+        data_factor_sampled[iworse, ] <- data_factor[kch, ]
       }
     }
 
     # calc obj
-    res <- lhs_obj(size = size, n_cont_variables = n_cont_variables, xsam = xsam, xobs = xobs, xedge = xedge, cor_mat = cor_mat)
+    res <- lhs_obj(size = size, n_cont_variables = n_cont_variables, data_continuous_sampled = data_continuous_sampled, data_factor_sampled = data_factor_sampled, xedge = xedge, cor_mat = cor_mat)
     obj <- res$obj
-    isam <- res$isam
+#     isam <- res$isam
     dif <- res$dif
 #     iobj <- res$iobj
 
@@ -126,7 +126,7 @@ clhs <- function(
     metrop <- exp(-1*de/temp) + runif(1)*temp
 
     if (obj == 0) {
-      obj_values[[il]] <- obj
+      obj_values[i] <- obj
       break
     }
 
@@ -134,29 +134,29 @@ clhs <- function(
     }
     else {
       # revert, no changes
-      ipick <- isave
-      iunsam <- iusave
-      xsam <- x[ipick, ]
+      i_sampled <- isave
+      i_unsampled <- iusave
+      data_continuous_sampled <- x[i_sampled, ]
       if (n_factor > 0) {
-        xobs <- data_factor[ipick, ]
+        data_factor_sampled <- data_factor[i_sampled, ]
       }
       obj <- objsave
       dif <- dsave
     }
 
-    obj_values[[il]] <- obj
-    if ((il %% 10) ==0) {
+    obj_values[i] <- obj
+    if ((i %% 10) ==0) {
       temp <- temp*tdecrease
     }
 
     # calc the final obj function
-    res <- lhs_obj(size = size, n_cont_variables = n_cont_variables, xsam = xsam, xobs = xobs, xedge = xedge, cor_mat = cor_mat)
+    res <- lhs_obj(size = size, n_cont_variables = n_cont_variables, data_continuous_sampled = data_continuous_sampled, data_factor_sampled = data_factor_sampled, xedge = xedge, cor_mat = cor_mat)
     obj <- res$obj
-    isam <- res$isam
+#     isam <- res$isam
     dif <- res$dif
 #     iobj <- res$iobj
   }
-  list(ipick, xsam, obj_values, isam)
+  list(i_sampled, data_continuous_sampled, obj_values)
 }
 
 ## Random permutations
@@ -169,8 +169,8 @@ randperm <- function(x, ...) {
 lhs_obj <- function(
   size,
   n_cont_variables,
-  xsam,
-  xobs,
+  data_continuous_sampled,
+  data_factor_sampled,
   xedge,
   w1 = 1,
   w2 = 1,
@@ -180,22 +180,22 @@ lhs_obj <- function(
 #   cobj
   ) {
 
-  # data in quantiles
+  # data in quanties
   hsam <- isam <- matrix(NA, ncol = n_cont_variables, nrow = size)
   for (j in 1:n_cont_variables) {
-    hsam[, j] <- hist(xsam[, j], breaks = xedge[, j], plot = FALSE)$counts
+    hsam[, j] <- hist(data_continuous_sampled[, j], breaks = xedge[, j], plot = FALSE)$counts
     isam[, j] <- hsam[1:size, j]
   }
   dif <- sum(abs(isam - 1))
 
-  # correlation
-  csam <- cor(xsam)
+  # correlation of continuous data
+  csam <- cor(data_continuous_sampled)
   dc <- sum(sum(abs(cor_mat - csam)))
 
 #   # object data
 #   nobj <- length(factor_levels)
 #   for (j in 1:nobj) {
-#     iobj[j] <- sum(xobs == factor_levels[j])
+#     iobj[j] <- sum(data_factor_sampled == factor_levels[j])
 #   }
 #   do <- sum(abs(iobj - cobj))
 
