@@ -34,7 +34,6 @@ clhs <- function(
   metropolis <- 1
 
   n_data <- nrow(data_continuous) # Number of individuals in the data set
-  n_cont_variables <- ncol(data_continuous) # Number of continuous variables
 
   # the edge of the strata
   xedge <- apply(data_continuous, 2, function(x) quantile(x, probs = seq(0, 1, length.out = size + 1)))
@@ -66,7 +65,7 @@ clhs <- function(
     data_factor_sampled <- data_factor[i_sampled, ] # sampled factor data
 
   # objective function
-  res <- lhs_obj(size = size, n_cont_variables = n_cont_variables, data_continuous_sampled = data_continuous_sampled, data_factor_sampled = data_factor_sampled, xedge = xedge, cor_mat = cor_mat)
+  res <- .lhs_obj(size = size, data_continuous_sampled = data_continuous_sampled, data_factor_sampled = data_factor_sampled, xedge = xedge, cor_mat = cor_mat)
 
   obj <- res$obj # value of the objective function
 #   isam <- res$isam
@@ -126,7 +125,7 @@ clhs <- function(
     }
 
     # calc obj
-    res <- lhs_obj(size = size, n_cont_variables = n_cont_variables, data_continuous_sampled = data_continuous_sampled, data_factor_sampled = data_factor_sampled, xedge = xedge, cor_mat = cor_mat)
+    res <- .lhs_obj(size = size, data_continuous_sampled = data_continuous_sampled, data_factor_sampled = data_factor_sampled, xedge = xedge, cor_mat = cor_mat)
 
     obj <- res$obj
 #     isam <- res$isam
@@ -182,9 +181,8 @@ clhs <- function(
 
 ## objective function for LHS
 
-lhs_obj <- function(
+.lhs_obj <- function(
   size,
-  n_cont_variables,
   data_continuous_sampled,
   data_factor_sampled,
   xedge,
@@ -196,18 +194,20 @@ lhs_obj <- function(
 #   cobj
   ) {
 
-  # Vectorised version
+  # Continuous variables
+  n_cont_variables <- ncol(data_continuous_sampled)
+
   cdat <- lapply(1:n_cont_variables, function(i) list(data_continuous_sampled[, i], xedge[, i]) )
   isam <- lapply(cdat, function(x) hist(x[[1]], breaks = x[[2]], plot = FALSE)$counts)
   isam <- matrix(unlist(isam), ncol = n_cont_variables, byrow = FALSE)
 
   dif <- rowSums(abs(isam - 1))
 
-  # correlation of continuous data
-  csam <- cor(data_continuous_sampled)
-  dc <- sum(sum(abs(cor_mat - csam)))
+  # Correlation of continuous data
+  cor_sampled <- cor(data_continuous_sampled)
+  dc <- sum(sum(abs(cor_mat - cor_sampled)))
 
-#   # Factor data
+#   # Factor variables
 #   nobj <- length(factor_levels)
 #   for (j in 1:nobj) {
 #     iobj[j] <- sum(data_factor_sampled == factor_levels[j])
