@@ -196,12 +196,10 @@ lhs_obj <- function(
 #   cobj
   ) {
 
-  # data in quanties
-  hsam <- isam <- matrix(NA, ncol = n_cont_variables, nrow = size)
-  for (j in 1:n_cont_variables) {
-    hsam[, j] <- hist(data_continuous_sampled[, j], breaks = xedge[, j], plot = FALSE)$counts
-    isam[, j] <- hsam[1:size, j]
-  }
+  # Vectorised version
+  cdat <- lapply(1:n_cont_variables, function(i) list(data_continuous_sampled[, i], xedge[, i]) )
+  isam <- lapply(cdat, function(x) hist(x[[1]], breaks = x[[2]], plot = FALSE)$counts)
+  isam <- matrix(unlist(isam), ncol = n_cont_variables, byrow = FALSE)
 
   dif <- rowSums(abs(isam - 1))
 
@@ -209,7 +207,7 @@ lhs_obj <- function(
   csam <- cor(data_continuous_sampled)
   dc <- sum(sum(abs(cor_mat - csam)))
 
-#   # object data
+#   # Factor data
 #   nobj <- length(factor_levels)
 #   for (j in 1:nobj) {
 #     iobj[j] <- sum(data_factor_sampled == factor_levels[j])
@@ -217,6 +215,7 @@ lhs_obj <- function(
 #   do <- sum(abs(iobj - cobj))
 
   obj <- w1*sum(dif) + w2*dc #+ w3*do
+
   list(obj = obj, isam = isam, dif = dif)
 }
 
