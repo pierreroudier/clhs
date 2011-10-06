@@ -6,7 +6,7 @@
 clhs <- function(
   x, # Continuous data
   size, # Number of samples you want
-  iter = 10000, # Number of max iterations
+  iter = 5000, # Number of max iterations
   tdecrease = 0.95,
   weights = list(numeric = 1, factor = 1, corelation = 1), # weight for continuous data , weight for corelation among data, weight for object data
   progress = TRUE # progress bar
@@ -41,7 +41,7 @@ clhs <- function(
 
   # for object/class variable
   if (n_factor == 0) {
-    data_factor_sampled <- NULL
+    data_factor_sampled <- data.frame()
   }
   else {
     factor_obj <- apply(data_factor, 2, function(x) table(x)/n_data)
@@ -159,7 +159,12 @@ clhs <- function(
   if (progress)
     close(pb)
 
-  res <- list(index_samples = i_sampled, sampled_data = data.frame(data_continuous_sampled, data_factor_sampled), obj_function = obj_values)
+  if (n_factor > 0)
+    sampled_data <- data.frame(data_continuous_sampled, data_factor_sampled)
+  else
+    sampled_data <- data_continuous_sampled
+
+  res <- list(index_samples = i_sampled, sampled_data = sampled_data, obj_function = obj_values)
 
   class(res) <- "cLHS_result"
 
@@ -189,10 +194,14 @@ clhs <- function(
 
   # Factor variables
   n_factor_variables <- ncol(data_factor_sampled)
-  factor_obj_sampled <- lapply(1:n_factor_variables, function(x) table(data_factor_sampled[, x])/nrow(data_factor_sampled))
-  delta_obj_factor <- lapply(1:n_factor_variables, function(x) sum(abs(factor_obj_sampled[[x]] - factor_obj[[x]])))
+  if (n_factor_variables > 0) {
+    factor_obj_sampled <- lapply(1:n_factor_variables, function(x) table(data_factor_sampled[, x])/nrow(data_factor_sampled))
+    delta_obj_factor <- lapply(1:n_factor_variables, function(x) sum(abs(factor_obj_sampled[[x]] - factor_obj[[x]])))
 
-  delta_obj_factor <- unlist(delta_obj_factor)#/length(delta_obj_factor) # do we need to ponder w/ the number of factors?
+    delta_obj_factor <- unlist(delta_obj_factor)#/length(delta_obj_factor) # do we need to ponder w/ the number of factors?
+  }
+  else
+    delta_obj_factor <- 0
 
   # Correlation of continuous data
   cor_sampled <- cor(data_continuous_sampled)
