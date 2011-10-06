@@ -60,7 +60,9 @@ clhs <- function(
   res <- .lhs_obj(size = size, data_continuous_sampled = data_continuous_sampled, data_factor_sampled = data_factor_sampled, continuous_strata = continuous_strata, cor_mat = cor_mat, factor_obj = factor_obj, weights = weights)
 
   obj <- res$obj # value of the objective function
-  delta_obj_continuous <- res$delta_obj_continuous #
+  delta_obj_continuous <- res$delta_obj_continuous
+
+  print(c(res$delta_obj_continuous, res$delta_obj_factor, res$delta_obj_cor))
 
   # vector storing the values of the objective function
   obj_values <- vector(mode = 'numeric', length = n)
@@ -90,12 +92,13 @@ clhs <- function(
       i_unsampled[idx_unsampled] <- spl_sampled
 
       # creating new data sampled
-      data_continuous_sampled[idx_sampled, , drop = FALSE] <- data_continuous[idx_unsampled, , drop = FALSE]
+      data_continuous_sampled[idx_sampled, ] <- data_continuous[idx_unsampled, ]
       if (n_factor > 0) {
-        data_factor_sampled[idx_sampled, , drop = FALSE] <- data_factor[idx_unsampled, , drop = FALSE]
+        data_factor_sampled[idx_sampled, ] <- data_factor[idx_unsampled, ]
       }
     }
     else {
+      browser()
       # remove the worse sampled & resample
       worse <- max(delta_obj_continuous)
       i_worse <- which(delta_obj_continuous == worse)
@@ -108,9 +111,9 @@ clhs <- function(
       i_unsampled[1:n_worse] <- spl_removed # replacing the worst pick in the reservoir
 
       # creating new data sampled
-      data_continuous_sampled[i_worse, , drop = FALSE] <- data_continuous[idx_added, , drop = FALSE]
+      data_continuous_sampled[i_worse, ] <- data_continuous[idx_added, ]
       if (n_factor > 0) {
-        data_factor_sampled[i_worse, , drop = FALSE] <- data_factor[idx_added, , drop = FALSE]
+        data_factor_sampled[i_worse, ] <- data_factor[idx_added, ]
       }
     }
 
@@ -120,6 +123,7 @@ clhs <- function(
     obj <- res$obj
     delta_obj_continuous <- res$delta_obj_continuous
 
+print(c(res$delta_obj_continuous, res$delta_obj_factor, res$delta_obj_cor))
 
     # Compare with previous iterations
     delta_obj <- obj - current$obj
@@ -186,20 +190,22 @@ clhs <- function(
   cont_obj_sampled <- lapply(cont_data_strata, function(x) hist(x[[1]], breaks = x[[2]], plot = FALSE)$counts)
   cont_obj_sampled <- matrix(unlist(cont_obj_sampled), ncol = n_cont_variables, byrow = FALSE)
 
-  delta_obj_continuous <- sum(rowSums(abs(cont_obj_sampled - 1)))
+  delta_obj_continuous <- rowSums(abs(cont_obj_sampled - 1))
 
   # Factor variables
   n_factor_variables <- ncol(data_factor_sampled)
-  factor_obj_sampled <- lapply(1:n_factor_variables, function(x) table(data_factor_sampled[,x])/nrow(data_factor_sampled) - factor_obj[[x]])
+  factor_obj_sampled <- lapply(1:n_factor_variables, function(x) table(data_factor_sampled[, x])/nrow(data_factor_sampled))
   delta_obj_factor <- lapply(1:n_factor_variables, function(x) sum(abs(factor_obj_sampled[[x]] - factor_obj[[x]])))
-  delta_obj_factor <- sum(unlist(delta_obj_factor)/length(delta_obj_factor)) # do we need to ponder w/ the number of factors?
 
+  delta_obj_factor <- unlist(delta_obj_factor)#/length(delta_obj_factor) # do we need to ponder w/ the number of factors?
+browser()
   # Correlation of continuous data
   cor_sampled <- cor(data_continuous_sampled)
-  delta_obj_cor <- sum(sum(abs(cor_mat - cor_sampled)))
+
+  delta_obj_cor <- sum(abs(cor_mat - cor_sampled))
 
   # Objective function
-  obj <- weights[[1]]*delta_obj_continuous + weights[[2]]*delta_obj_factor + weights[[3]]*delta_obj_cor
+  obj <- weights[[1]]*sum(delta_obj_continuous) + weights[[2]]*sum(delta_obj_factor) + weights[[3]]*delta_obj_cor
 
   # Returning results
   list(obj = obj, delta_obj_continuous = delta_obj_continuous, delta_obj_factor = delta_obj_factor, delta_obj_cor = delta_obj_cor)
