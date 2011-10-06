@@ -8,9 +8,7 @@ clhs <- function(
   size, # Number of samples you want
   n = 10000, # Number of max iterations
   tdecrease = 0.95,
-  w1 = 1, # weight for continuous data
-  w2 = 1, # weight for corelation among data
-  w3 = 1, # weight for object data
+  weights = list(numeric = 1, factor = 1, corelation = 1), # weight for continuous data , weight for corelation among data, weight for object data
   progress = TRUE # progress bar
   ) {
 
@@ -36,7 +34,7 @@ clhs <- function(
   n_data <- nrow(data_continuous) # Number of individuals in the data set
 
   # the edge of the strata
-  xedge <- apply(data_continuous, 2, function(x) quantile(x, probs = seq(0, 1, length.out = size + 1)))
+  continuous_strata <- apply(data_continuous, 2, function(x) quantile(x, probs = seq(0, 1, length.out = size + 1)))
 
   # data correlation
   cor_mat <- cor(data_continuous)
@@ -46,25 +44,23 @@ clhs <- function(
     data_factor_sampled <- NULL
   }
   else {
-    cobj <- apply(data_factor, 2, function(x) table(x)/n_data)
+    factor_obj <- apply(data_factor, 2, function(x) table(x)/n_data)
   }
 
   # initialise, pick randomly
   n_remainings <- n_data - size # number of individuals remaining unsampled
   i_sampled <- sample(1:n_data, size = size, replace = FALSE) # individuals randomly chosen
   i_unsampled <- setdiff(1:n_data, i_sampled) # individuals remaining unsampled
-  data_continuous_sampled <- data_continuous[i_sampled, ] # sampled continuous data
+  data_continuous_sampled <- data_continuous[i_sampled, , drop = FALSE] # sampled continuous data
 
   if (n_factor > 0)
-    data_factor_sampled <- data_factor[i_sampled, ] # sampled factor data
+    data_factor_sampled <- data_factor[i_sampled, , drop = FALSE] # sampled factor data
 
   # objective function
-  res <- .lhs_obj(size = size, data_continuous_sampled = data_continuous_sampled, data_factor_sampled = data_factor_sampled, xedge = xedge, cor_mat = cor_mat, cobj = cobj)
+  res <- .lhs_obj(size = size, data_continuous_sampled = data_continuous_sampled, data_factor_sampled = data_factor_sampled, continuous_strata = continuous_strata, cor_mat = cor_mat, factor_obj = factor_obj, weights = weights)
 
   obj <- res$obj # value of the objective function
-#   isam <- res$isam
-  dif <- res$dif #
-#   iobj <- res$iobj
+  delta_obj_continuous <- res$delta_obj_continuous #
 
   # vector storing the values of the objective function
   obj_values <- vector(mode = 'numeric', length = n)
@@ -80,7 +76,7 @@ clhs <- function(
     current$obj <- obj
     current$i_sampled <- i_sampled
     current$i_unsampled <- i_unsampled
-    current$dif <- dif
+    current$delta_obj_continuous <- delta_obj_continuous
 
     if (runif(1) < 0.5) {
       # pick a random sample & swap with reservoir
@@ -94,15 +90,15 @@ clhs <- function(
       i_unsampled[idx_unsampled] <- spl_sampled
 
       # creating new data sampled
-      data_continuous_sampled[idx_sampled, ] <- data_continuous[idx_unsampled, ]
+      data_continuous_sampled[idx_sampled, , drop = FALSE] <- data_continuous[idx_unsampled, , drop = FALSE]
       if (n_factor > 0) {
-        data_factor_sampled[idx_sampled, ] <- data_factor[idx_unsampled, ]
+        data_factor_sampled[idx_sampled, , drop = FALSE] <- data_factor[idx_unsampled, , drop = FALSE]
       }
     }
     else {
       # remove the worse sampled & resample
-      worse <- max(dif)
-      i_worse <- which(dif == worse)
+      worse <- max(delta_obj_continuous)
+      i_worse <- which(delta_obj_continuous == worse)
       n_worse <- length(i_worse)
 
       # swap with reservoir
@@ -112,19 +108,18 @@ clhs <- function(
       i_unsampled[1:n_worse] <- spl_removed # replacing the worst pick in the reservoir
 
       # creating new data sampled
-      data_continuous_sampled[i_worse, ] <- data_continuous[idx_added, ]
+      data_continuous_sampled[i_worse, , drop = FALSE] <- data_continuous[idx_added, , drop = FALSE]
       if (n_factor > 0) {
-        data_factor_sampled[i_worse, ] <- data_factor[idx_added, ]
+        data_factor_sampled[i_worse, , drop = FALSE] <- data_factor[idx_added, , drop = FALSE]
       }
     }
 
     # calc obj
-    res <- .lhs_obj(size = size, data_continuous_sampled = data_continuous_sampled, data_factor_sampled = data_factor_sampled, xedge = xedge, cor_mat = cor_mat, cobj = cobj)
+    res <- .lhs_obj(size = size, data_continuous_sampled = data_continuous_sampled, data_factor_sampled = data_factor_sampled, continuous_strata = continuous_strata, cor_mat = cor_mat, factor_obj = factor_obj, weights = weights)
 
     obj <- res$obj
-#     isam <- res$isam
-    dif <- res$dif
-#     iobj <- res$iobj
+    delta_obj_continuous <- res$delta_obj_continuous
+
 
     # Compare with previous iterations
     delta_obj <- obj - current$obj
@@ -138,17 +133,14 @@ clhs <- function(
 
     # Revert change
     if (delta_obj > 0 & runif(1) >= metropolis) {
-#     if (delta_obj <=0 | runif(1) < metropolis) {# accept change
-#      }
-#     else {
       i_sampled <- current$i_sampled
       i_unsampled <- current$i_unsampled
-      data_continuous_sampled <- data_continuous[i_sampled, ]
+      data_continuous_sampled <- data_continuous[i_sampled, , drop = FALSE]
       if (n_factor > 0) {
-        data_factor_sampled <- data_factor[i_sampled, ]
+        data_factor_sampled <- data_factor[i_sampled, , drop = FALSE]
       }
       obj <- current$obj
-      dif <- current$dif
+      delta_obj_continuous <- current$delta_obj_continuous
     }
 
     # Storing the objective function value of the current iteration
@@ -169,7 +161,9 @@ clhs <- function(
     close(pb)
 
   res <- list(index_samples = i_sampled, sampled_data = data_continuous_sampled, obj_function = obj_values)
+
   class(res) <- "cLHS_result"
+
   res
 }
 
@@ -179,37 +173,36 @@ clhs <- function(
   size,
   data_continuous_sampled,
   data_factor_sampled,
-  xedge,
-  w1 = 1,
-  w2 = 1,
+  continuous_strata,
+  weights = list(numeric = 1, factor = 1, corelation = 1),
   cor_mat,
-  w3 = 1,#,
-#   factor_levels,
-  cobj
+  factor_obj
   ) {
 
   # Continuous variables
   n_cont_variables <- ncol(data_continuous_sampled)
 
-  cdat <- lapply(1:n_cont_variables, function(i) list(data_continuous_sampled[, i], xedge[, i]) )
-  isam <- lapply(cdat, function(x) hist(x[[1]], breaks = x[[2]], plot = FALSE)$counts)
-  isam <- matrix(unlist(isam), ncol = n_cont_variables, byrow = FALSE)
+  cont_data_strata <- lapply(1:n_cont_variables, function(i) list(data_continuous_sampled[, i], continuous_strata[, i]) )
+  cont_obj_sampled <- lapply(cont_data_strata, function(x) hist(x[[1]], breaks = x[[2]], plot = FALSE)$counts)
+  cont_obj_sampled <- matrix(unlist(cont_obj_sampled), ncol = n_cont_variables, byrow = FALSE)
 
-  dif <- rowSums(abs(isam - 1))
-
-  # Correlation of continuous data
-  cor_sampled <- cor(data_continuous_sampled)
-  dc <- sum(sum(abs(cor_mat - cor_sampled)))
+  delta_obj_continuous <- sum(rowSums(abs(cont_obj_sampled - 1)))
 
   # Factor variables
   n_factor_variables <- ncol(data_factor_sampled)
-  iobj <- lapply(1:n_factor_variables, function(x) table(data_factor_sampled[,x])/nrow(data_factor_sampled) - cobj[[x]])
-  do <- lapply(1:n_factor_variables, function(x) sum(abs(iobj[[x]] - cobj[[x]])))
-  do <- sum(unlist(do)/length(do))
+  factor_obj_sampled <- lapply(1:n_factor_variables, function(x) table(data_factor_sampled[,x])/nrow(data_factor_sampled) - factor_obj[[x]])
+  delta_obj_factor <- lapply(1:n_factor_variables, function(x) sum(abs(factor_obj_sampled[[x]] - factor_obj[[x]])))
+  delta_obj_factor <- sum(unlist(delta_obj_factor)/length(delta_obj_factor)) # do we need to ponder w/ the number of factors?
 
-  obj <- w1*sum(dif) + w2*dc + w3*do
+  # Correlation of continuous data
+  cor_sampled <- cor(data_continuous_sampled)
+  delta_obj_cor <- sum(sum(abs(cor_mat - cor_sampled)))
 
-  list(obj = obj, isam = isam, dif = dif)
+  # Objective function
+  obj <- weights[[1]]*delta_obj_continuous + weights[[2]]*delta_obj_factor + weights[[3]]*delta_obj_cor
+
+  # Returning results
+  list(obj = obj, delta_obj_continuous = delta_obj_continuous, delta_obj_factor = delta_obj_factor, delta_obj_cor = delta_obj_cor)
 }
 
 ## Basic plotting function
