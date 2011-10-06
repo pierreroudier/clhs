@@ -6,7 +6,7 @@
 clhs <- function(
   x, # Continuous data
   size, # Number of samples you want
-  n = 10000, # Number of max iterations
+  iter = 10000, # Number of max iterations
   tdecrease = 0.95,
   weights = list(numeric = 1, factor = 1, corelation = 1), # weight for continuous data , weight for corelation among data, weight for object data
   progress = TRUE # progress bar
@@ -62,16 +62,14 @@ clhs <- function(
   obj <- res$obj # value of the objective function
   delta_obj_continuous <- res$delta_obj_continuous
 
-  print(c(res$delta_obj_continuous, res$delta_obj_factor, res$delta_obj_cor))
-
   # vector storing the values of the objective function
-  obj_values <- vector(mode = 'numeric', length = n)
+  obj_values <- vector(mode = 'numeric', length = iter)
 
   # progress bar
   if (progress)
-    pb <- txtProgressBar(min = 1, max = n, style = 3)
+    pb <- txtProgressBar(min = 1, max = iter, style = 3)
 
-  for (i in 1:n) {
+  for (i in 1:iter) {
 
     # storing current values
     current <- list()
@@ -98,7 +96,6 @@ clhs <- function(
       }
     }
     else {
-      browser()
       # remove the worse sampled & resample
       worse <- max(delta_obj_continuous)
       i_worse <- which(delta_obj_continuous == worse)
@@ -122,8 +119,6 @@ clhs <- function(
 
     obj <- res$obj
     delta_obj_continuous <- res$delta_obj_continuous
-
-print(c(res$delta_obj_continuous, res$delta_obj_factor, res$delta_obj_cor))
 
     # Compare with previous iterations
     delta_obj <- obj - current$obj
@@ -164,7 +159,7 @@ print(c(res$delta_obj_continuous, res$delta_obj_factor, res$delta_obj_cor))
   if (progress)
     close(pb)
 
-  res <- list(index_samples = i_sampled, sampled_data = data_continuous_sampled, obj_function = obj_values)
+  res <- list(index_samples = i_sampled, sampled_data = data.frame(data_continuous_sampled, data_factor_sampled), obj_function = obj_values)
 
   class(res) <- "cLHS_result"
 
@@ -198,7 +193,7 @@ print(c(res$delta_obj_continuous, res$delta_obj_factor, res$delta_obj_cor))
   delta_obj_factor <- lapply(1:n_factor_variables, function(x) sum(abs(factor_obj_sampled[[x]] - factor_obj[[x]])))
 
   delta_obj_factor <- unlist(delta_obj_factor)#/length(delta_obj_factor) # do we need to ponder w/ the number of factors?
-browser()
+
   # Correlation of continuous data
   cor_sampled <- cor(data_continuous_sampled)
 
