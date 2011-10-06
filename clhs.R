@@ -46,13 +46,7 @@ clhs <- function(
     data_factor_sampled <- NULL
   }
   else {
-      nobj <- length(factor_levels)
-      # For each class value (?)
-#       for (j in 1:nobj) {
-#         cobj[j] <- sum(data_factor == factor_levels[j])
-#       }
-      cobj <- table(data_factor)
-      cobj <- (cobj/n_data)*size # target value
+    cobj <- apply(data_factor, 2, function(x) table(x)/n_data)
   }
 
   # initialise, pick randomly
@@ -65,7 +59,7 @@ clhs <- function(
     data_factor_sampled <- data_factor[i_sampled, ] # sampled factor data
 
   # objective function
-  res <- .lhs_obj(size = size, data_continuous_sampled = data_continuous_sampled, data_factor_sampled = data_factor_sampled, xedge = xedge, cor_mat = cor_mat)
+  res <- .lhs_obj(size = size, data_continuous_sampled = data_continuous_sampled, data_factor_sampled = data_factor_sampled, xedge = xedge, cor_mat = cor_mat, cobj = cobj)
 
   obj <- res$obj # value of the objective function
 #   isam <- res$isam
@@ -125,7 +119,7 @@ clhs <- function(
     }
 
     # calc obj
-    res <- .lhs_obj(size = size, data_continuous_sampled = data_continuous_sampled, data_factor_sampled = data_factor_sampled, xedge = xedge, cor_mat = cor_mat)
+    res <- .lhs_obj(size = size, data_continuous_sampled = data_continuous_sampled, data_factor_sampled = data_factor_sampled, xedge = xedge, cor_mat = cor_mat, cobj = cobj)
 
     obj <- res$obj
 #     isam <- res$isam
@@ -189,9 +183,9 @@ clhs <- function(
   w1 = 1,
   w2 = 1,
   cor_mat,
-  w3 = 1#,
+  w3 = 1,#,
 #   factor_levels,
-#   cobj
+  cobj
   ) {
 
   # Continuous variables
@@ -207,14 +201,13 @@ clhs <- function(
   cor_sampled <- cor(data_continuous_sampled)
   dc <- sum(sum(abs(cor_mat - cor_sampled)))
 
-#   # Factor variables
-#   nobj <- length(factor_levels)
-#   for (j in 1:nobj) {
-#     iobj[j] <- sum(data_factor_sampled == factor_levels[j])
-#   }
-#   do <- sum(abs(iobj - cobj))
+  # Factor variables
+  n_factor_variables <- ncol(data_factor_sampled)
+  iobj <- lapply(1:n_factor_variables, function(x) table(data_factor_sampled[,x])/nrow(data_factor_sampled) - cobj[[x]])
+  do <- lapply(1:n_factor_variables, function(x) sum(abs(iobj[[x]] - cobj[[x]])))
+  do <- sum(unlist(do)/length(do))
 
-  obj <- w1*sum(dif) + w2*dc #+ w3*do
+  obj <- w1*sum(dif) + w2*dc + w3*do
 
   list(obj = obj, isam = isam, dif = dif)
 }
