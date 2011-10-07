@@ -1,5 +1,4 @@
-.lhs_obj <-
-function(
+.lhs_obj <- function(
   size,
   data_continuous_sampled,
   data_factor_sampled,
