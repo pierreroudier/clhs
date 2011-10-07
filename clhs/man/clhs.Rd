@@ -1,52 +1,45 @@
 \name{clhs}
 \alias{clhs}
-%- Also NEED an '\alias' for EACH other topic documented here.
-\title{
-%%  ~~function to do ... ~~
-}
+
+\title{Conditioned Latin Hypercube Sampling}
+
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Implementation of the conditioned Latin hypercube sampling, as published by Minasny and McBratney (2006). This method proposes to stratify sampling in presence of ancillary data.
 }
+
 \usage{
 clhs(x, size, iter = 10000, tdecrease = 0.95, weights = list(numeric = 1, factor = 1, corelation = 1), progress = TRUE)
 }
-%- maybe also 'usage' for other objects documented here.
+
 \arguments{
-  \item{x}{
-%%     ~~Describe \code{x} here~~
+  \item{x}{a \code{data.frame} object.}
+  \item{size}{a non-negative integer giving the number of items to choose.}
+  \item{iter}{a positive number, giving the number of iterations for the Metropolis-Hastings annealing process. See `Details'.}
+  \item{tdecrease}{a number betwen 0 and 1, giving the rate at which temperature decreases in the simulated annealing process. See `Details'.}
+  \item{weights}{a list a length 3, giving the relative weights for continuous data, categorical data, and correlation between variables.}
+  \item{progress}{TRUE or FALSE, displays a progress bar.}
 }
-  \item{size}{
-%%     ~~Describe \code{size} here~~
-}
-  \item{iter}{
-%%     ~~Describe \code{iter} here~~
-}
-  \item{tdecrease}{
-%%     ~~Describe \code{tdecrease} here~~
-}
-  \item{weights}{
-%%     ~~Describe \code{weights} here~~
-}
-  \item{progress}{
-%%     ~~Describe \code{progress} here~~
-}
-}
+
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+Details about the algorithm to follow here.
 }
+
 \value{
 %%  ~Describe the value returned
 %%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
+An object of class \code{cLHS_result}, with the following elements:
+\item{index_samples }{a vector giving the indices of the chosen samples.}
+\item{sampled_data }{the sampled data.frame.}
+\item{obj_function }{a vector giving the evolution of the objective function throughout the Meropolis-Hastings iterations.}
 %% ...
 }
+
 \references{
-%% ~put references to the literature/web site here ~
+Minasny, B. and McBratney, A.B. 2006. A conditioned Latin hypercube method for sampling in the presence of ancillary information. Computers and Geosciences, 32:1378-1388.
 }
-\author{
-%%  ~~who you are~~
-}
+
+\author{Pierre Roudier}
+
 \note{
 %%  ~~further notes~~
 }
@@ -56,10 +49,15 @@ clhs(x, size, iter = 10000, tdecrease = 0.95, weights = list(numeric = 1, factor
 \seealso{
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
+
 \examples{
 ##---- Should be DIRECTLY executable !! ----
 ##-- ==>  Define data, use random,
 ##--	or do  help(data=index)  for the standard data sets.
+data(mtcars)
+res <- clhs(mtcars, size = 5, iter = 100)
+plot(res)
+str(res)
 
 ## The function is currently defined as
 function(
@@ -230,7 +228,7 @@ function(
   res
   }
 }
+
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+% \keyword{ ~kwd1 }

@@ -1,5 +1,9 @@
-clhs <-
-function(
+## Conditioned latin Hypercube Sampling, after Minasny and McBratney, 2006.
+##
+## (c) Pierre Roudier, Landcare Research, 2011.
+##
+
+clhs <- function(
   x, # Continuous data
   size, # Number of samples you want
   iter = 10000, # Number of max iterations
@@ -160,8 +164,8 @@ function(
   else
     sampled_data <- data_continuous_sampled
 
+  # Making up the object to be returned
   res <- list(index_samples = i_sampled, sampled_data = sampled_data, obj_function = obj_values)
-
   class(res) <- "cLHS_result"
 
   res

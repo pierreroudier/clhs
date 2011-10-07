@@ -1,15 +1,17 @@
 \name{clhs-package}
 \alias{clhs-package}
 \alias{clhs}
+
 \docType{package}
+
 \title{
-What the package does (short line)
-~~ package title ~~
+Conditioned Latin Hypercube Sampling
 }
+
 \description{
-More about what it does (maybe more than one line)
-~~ A concise (1-5 lines) description of the package ~~
+This package implements the conditioned Latin hypercube sampling, as published by Minasny and McBratney (2006). This method proposes to stratify sampling in presence of ancillary data.
 }
+
 \details{
 \tabular{ll}{
 Package: \tab clhs\cr
@@ -19,18 +21,21 @@ Date: \tab 2011-10-07\cr
 License: \tab What license is it under?\cr
 LazyLoad: \tab yes\cr
 }
+
 ~~ An overview of how to use the package, including the most important ~~
 ~~ functions ~~
 }
-\author{
-Who wrote it
 
-Maintainer: Who to complain to <yourfault@somewhere.net>
-~~ The author and/or maintainer of the package ~~
+\author{
+Pierre Roudier
+
+Maintainer: Pierre Roudier <roudierp@landcareresearch.co.nz>
 }
+
 \references{
-~~ Literature or other references for background information ~~
+Minasny, B. and McBratney, A.B. 2006. A conditioned Latin hypercube method for sampling in the presence of ancillary information. Computers and Geosciences, 32:1378-1388.
 }
+
 ~~ Optionally other standard keywords, one per line, from file KEYWORDS in ~~
 ~~ the R documentation directory ~~
 \keyword{ package }
@@ -39,5 +44,8 @@ Maintainer: Who to complain to <yourfault@somewhere.net>
 ~~ \code{\link[<pkg>:<pkg>-package]{<pkg>}} ~~
 }
 \examples{
-~~ simple examples of the most important functions ~~
+data(mtcars)
+res <- clhs(mtcars, size = 5, iter = 100)
+plot(res)
+str(res)
 }

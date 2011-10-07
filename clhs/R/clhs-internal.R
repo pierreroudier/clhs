@@ -1,3 +1,8 @@
+## Objective function for cLHS
+##
+## (c) Pierre Roudier, landcare Research, 2011.
+##
+
 .lhs_obj <- function(
   size,
   data_continuous_sampled,
