@@ -35,12 +35,14 @@
 
   # Correlation of continuous data
   cor_sampled <- cor(data_continuous_sampled)
+  # when there's only one observation, cor() throws NAs - we set these to 1
+  cor_sampled[is.na(cor_sampled)] <- 1
 
   delta_obj_cor <- sum(abs(cor_mat - cor_sampled))
 
   # Objective function
   obj <- weights[[1]]*sum(delta_obj_continuous) + weights[[2]]*sum(delta_obj_factor) + weights[[3]]*delta_obj_cor
-
+  if (is.na(obj)) browser()
   # Returning results
   list(obj = obj, delta_obj_continuous = delta_obj_continuous, delta_obj_factor = delta_obj_factor, delta_obj_cor = delta_obj_cor)
 }
