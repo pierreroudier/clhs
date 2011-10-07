@@ -1,0 +1,12 @@
+citHeader("To cite the clhs package in publications use:")
+
+citEntry(entry="Manual",
+         title = "clhs: a R package for conditioned Latin hypercube sampling.",
+         author = Pierre Roudier),
+         journal = "",
+         year         = 2011,
+         volume       = '',
+         pages        = '', 
+         url          = "http://code.scenzgrid.org/index.php/p/clhs/",
+
+        textVersion = "Roudier, P. clhs: a R package for conditioned Latin hypercube sampling. 2011." )
