@@ -6,5 +6,5 @@ Date: 2011-10-07
 Author: Pierre Roudier
 Maintainer: Pierre Roudier <roudierp@landcareresearch.co.nz>
 Description: This package implements the conditioned Latin hypercube sampling, as published by Minasny and McBratney (2006). This method proposes to stratify sampling in presence of ancillary data.
-License: GPL-v3
+License: GPL (>= 2)
 LazyLoad: yes
