@@ -14,6 +14,7 @@
   ) {
 
   # Continuous variables
+  #
   n_cont_variables <- ncol(data_continuous_sampled)
 
   cont_data_strata <- lapply(1:n_cont_variables, function(i) list(data_continuous_sampled[, i], continuous_strata[, i]) )
@@ -23,6 +24,7 @@
   delta_obj_continuous <- rowSums(abs(cont_obj_sampled - 1))
 
   # Factor variables
+  #
   n_factor_variables <- ncol(data_factor_sampled)
   if (n_factor_variables > 0) {
     factor_obj_sampled <- lapply(1:n_factor_variables, function(x) table(data_factor_sampled[, x])/nrow(data_factor_sampled))
@@ -34,16 +36,18 @@
     delta_obj_factor <- 0
 
   # Correlation of continuous data
+  #
   cor_sampled <- cor(data_continuous_sampled)
-  # when there's only one observation, cor() throws NAs - we set these to 1
-  cor_sampled[is.na(cor_sampled)] <- 1
+  cor_sampled[is.na(cor_sampled)] <- 1 # when there's only one observation, cor() throws NAs - we set these to 1
 
   delta_obj_cor <- sum(abs(cor_mat - cor_sampled))
 
   # Objective function
+  #
   obj <- weights[[1]]*sum(delta_obj_continuous) + weights[[2]]*sum(delta_obj_factor) + weights[[3]]*delta_obj_cor
-  if (is.na(obj)) browser()
+
   # Returning results
+  #
   list(obj = obj, delta_obj_continuous = delta_obj_continuous, delta_obj_factor = delta_obj_factor, delta_obj_cor = delta_obj_cor)
 }
 
