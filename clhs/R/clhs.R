@@ -90,10 +90,8 @@ clhs <- function(
 
       # creating new data sampled
       data_continuous_sampled <- data_continuous[i_sampled, , drop = FALSE]
-#       data_continuous_sampled[idx_sampled, ] <- data_continuous[idx_unsampled, ]
       if (n_factor > 0) {
         data_factor_sampled <- data_factor[i_sampled, , drop = FALSE]
-#         data_factor_sampled[idx_sampled, ] <- data_factor[idx_unsampled, ]
       }
     }
     else {
@@ -109,9 +107,9 @@ clhs <- function(
       i_unsampled[1:n_worse] <- spl_removed # replacing the worst pick in the reservoir
 
       # creating new data sampled
-      data_continuous_sampled[i_worse, ] <- data_continuous[idx_added, ]
+      data_continuous_sampled <- data_continuous[i_sampled, , drop = FALSE]
       if (n_factor > 0) {
-        data_factor_sampled[i_worse, ] <- data_factor[idx_added, ]
+        data_factor_sampled <- data_factor[i_sampled, , drop = FALSE]
       }
     }
 
