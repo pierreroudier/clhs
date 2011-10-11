@@ -71,28 +71,29 @@ clhs <- function(
 
   for (i in 1:iter) {
 
-    # storing current values
-    current <- list()
-    current$obj <- obj
-    current$i_sampled <- i_sampled
-    current$i_unsampled <- i_unsampled
-    current$delta_obj_continuous <- delta_obj_continuous
+
+
+    # storing previous values
+    previous <- list()
+    previous$obj <- obj
+    previous$i_sampled <- i_sampled
+    previous$i_unsampled <- i_unsampled
+    previous$delta_obj_continuous <- delta_obj_continuous
 
     if (runif(1) < 0.5) {
-      # pick a random sample & swap with reservoir
+      # pick a random sampled point and random unsampled point
       idx_unsampled <- sample(1:n_remainings, size = 1)
       idx_sampled <- sample(1:size, size = 1)
-      # Retrieving indices values
-      spl_unsampled <- i_unsampled[idx_unsampled]
-      spl_sampled <- i_sampled[idx_sampled]
       # Swap these:
-      i_sampled[idx_sampled] <- spl_unsampled
-      i_unsampled[idx_unsampled] <- spl_sampled
+      i_sampled[idx_sampled] <- i_unsampled[idx_unsampled]
+      i_unsampled[idx_unsampled] <- i_sampled[idx_sampled]
 
       # creating new data sampled
-      data_continuous_sampled[idx_sampled, ] <- data_continuous[idx_unsampled, ]
+      data_continuous_sampled <- data_continuous[i_sampled, , drop = FALSE]
+#       data_continuous_sampled[idx_sampled, ] <- data_continuous[idx_unsampled, ]
       if (n_factor > 0) {
-        data_factor_sampled[idx_sampled, ] <- data_factor[idx_unsampled, ]
+        data_factor_sampled <- data_factor[i_sampled, , drop = FALSE]
+#         data_factor_sampled[idx_sampled, ] <- data_factor[idx_unsampled, ]
       }
     }
     else {
@@ -121,7 +122,7 @@ clhs <- function(
     delta_obj_continuous <- res$delta_obj_continuous
 
     # Compare with previous iterations
-    delta_obj <- obj - current$obj
+    delta_obj <- obj - previous$obj
     metropolis <- exp(-1*delta_obj/temp) + runif(1)*temp
 
     # If the optimum has been reached
@@ -132,14 +133,14 @@ clhs <- function(
 
     # Revert change
     if (delta_obj > 0 & runif(1) >= metropolis) {
-      i_sampled <- current$i_sampled
-      i_unsampled <- current$i_unsampled
+      i_sampled <- previous$i_sampled
+      i_unsampled <- previous$i_unsampled
       data_continuous_sampled <- data_continuous[i_sampled, , drop = FALSE]
       if (n_factor > 0) {
         data_factor_sampled <- data_factor[i_sampled, , drop = FALSE]
       }
-      obj <- current$obj
-      delta_obj_continuous <- current$delta_obj_continuous
+      obj <- previous$obj
+      delta_obj_continuous <- previous$delta_obj_continuous
     }
 
     # Storing the objective function value of the current iteration
