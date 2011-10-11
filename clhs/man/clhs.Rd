@@ -42,7 +42,7 @@ Minasny, B. and McBratney, A.B. 2006. A conditioned Latin hypercube method for s
 \seealso{}
 
 \examples{
-data(mtcars)
-res <- clhs(mtcars, size = 5, iter = 1000, progress = FALSE)
+df <- data.frame(a = runif(1000), b = rnorm(1000), c = sample(LETTERS[1:5], size = 1000, replace = TRUE))
+res <- clhs(df, size = 50, iter = 2000, progress = FALSE)
 str(res)
 }

@@ -1,6 +1,6 @@
 ## Objective function for cLHS
 ##
-## (c) Pierre Roudier, landcare Research, 2011.
+## (c) Pierre Roudier, Landcare Research, 2011.
 ##
 
 .lhs_obj <- function(
