@@ -8,7 +8,7 @@ clhs <- function(
   size, # Number of samples you want
   iter = 10000, # Number of max iterations
   tdecrease = 0.95,
-  weights = list(numeric = 1, factor = 1, corelation = 1), # weight for continuous data , weight for corelation among data, weight for object data
+  weights = list(numeric = 1, factor = 1, correlation = 1), # weight for continuous data , weight for correlation among data, weight for object data
   progress = TRUE # progress bar
   ) {
 

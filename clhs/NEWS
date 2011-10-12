@@ -1,5 +1,8 @@
-============ clhs_0.2.1 - 2011-10-12 ============
+============ clhs_0.2-1 - 2011-10-12 ============
 * changed examples
 
-============ clhs_0.2 - 2011-10-12 ============
+============ clhs_0.2-0 - 2011-10-12 ============
 * Fixed important bugs in the annealing process.
+
+============ clhs_0.1-0 - 2011-10-07 ============
+* Initial release of the package.

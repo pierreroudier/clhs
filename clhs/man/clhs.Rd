@@ -8,7 +8,7 @@ Implementation of the conditioned Latin hypercube sampling, as published by Mina
 }
 
 \usage{
-clhs(x, size, iter = 10000, tdecrease = 0.95, weights = list(numeric = 1, factor = 1, corelation = 1), progress = TRUE)
+clhs(x, size, iter = 10000, tdecrease = 0.95, weights = list(numeric = 1, factor = 1, correlation = 1), progress = TRUE)
 }
 
 \arguments{

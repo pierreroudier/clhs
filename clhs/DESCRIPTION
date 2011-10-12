@@ -1,7 +1,7 @@
 Package: clhs
 Type: Package
 Title: Conditioned Latin Hypercube Sampling
-Version: 0.2.1
+Version: 0.2-1
 Date: 2011-10-12
 Author: Pierre Roudier
 Maintainer: Pierre Roudier <roudierp@landcareresearch.co.nz>
