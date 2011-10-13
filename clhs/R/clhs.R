@@ -3,8 +3,8 @@
 ## (c) Pierre Roudier, Landcare Research, 2011.
 ##
 
-clhs <- function(
-  x, # Continuous data
+clhs.data.frame <- function(
+  x, # data.frame
   size, # Number of samples you want
   iter = 10000, # Number of max iterations
   tdecrease = 0.95,
@@ -170,3 +170,4 @@ clhs <- function(
   res
 }
 
+setMethod("clhs", "data.frame", clhs.data.frame)
