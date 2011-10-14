@@ -1,5 +1,14 @@
 \name{clhs}
+
+\docType{methods}
+
 \alias{clhs}
+\alias{clhs.data.frame}
+\alias{clhs.SpatialPointsDataFrame}
+\alias{clhs.Raster}
+\alias{clhs,data.frame-method}
+\alias{clhs,Raster-method}
+\alias{clhs,SpatialPointsDataFrame-method}
 
 \title{Conditioned Latin Hypercube Sampling}
 
@@ -8,20 +17,27 @@ Implementation of the conditioned Latin hypercube sampling, as published by Mina
 }
 
 \usage{
-clhs(x, size, iter = 10000, tdecrease = 0.95, weights = list(numeric = 1, factor = 1, correlation = 1), progress = TRUE)
+clhs(x, ...)
 }
 
 \arguments{
-  \item{x}{a \code{data.frame} object.}
-  \item{size}{a non-negative integer giving the number of items to choose.}
-  \item{iter}{a positive number, giving the number of iterations for the Metropolis-Hastings annealing process. See `Details'.}
-  \item{tdecrease}{a number betwen 0 and 1, giving the rate at which temperature decreases in the simulated annealing process. See `Details'.}
-  \item{weights}{a list a length 3, giving the relative weights for continuous data, categorical data, and correlation between variables.}
-  \item{progress}{TRUE or FALSE, displays a progress bar.}
+  \item{x}{A \code{data.frame} object.}
+  \item{...}{Additional arguments, see under Details.}
 }
 
 \details{
-Details about the algorithm to follow here.
+Below are the additional arguments that can be used:
+
+- \code{size}: A non-negative integer giving the number of items to choose.
+
+- \code{iter}: A positive number, giving the number of iterations for the Metropolis-Hastings annealing process.
+
+- \code{tdecrease}: A number betwen 0 and 1, giving the rate at which temperature decreases in the simulated annealing process.
+
+- \code{weights}: A list a length 3, giving the relative weights for continuous data, categorical data, and correlation between variables.
+
+- \code{progress}: TRUE or FALSE, displays a progress bar.
+
 }
 
 \value{

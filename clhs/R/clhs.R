@@ -71,8 +71,6 @@ clhs.data.frame <- function(
 
   for (i in 1:iter) {
 
-
-
     # storing previous values
     previous <- list()
     previous$obj <- obj
