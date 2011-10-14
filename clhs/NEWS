@@ -1,3 +1,7 @@
+============ clhs_0.3-0 - 2011-10-14 ============
+* Switch to S4 methods
+* Introduced methods for Raster* and SpatialP*DataDrame classes
+
 ============ clhs_0.2-1 - 2011-10-12 ============
 * changed examples
 
