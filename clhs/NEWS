@@ -1,3 +1,6 @@
+============ clhs_0.3-2 - 2011-10-18 ============
+* slight improvement on the Raster method using rasterToPoints(...)
+
 ============ clhs_0.3-1 - 2011-10-18 ============
 * Corrected bug on Raster* methods. Now returns a SpatialPointsDataFrame object.
 

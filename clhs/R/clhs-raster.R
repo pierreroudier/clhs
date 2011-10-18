@@ -2,10 +2,11 @@ clhs.Raster <- function(
   x, # data
   ...
   ){
-  spdf <- as(x, "SpatialPixelsDataFrame")
+  spdf <- rasterToPoints(x, spatial = TRUE)
   spl <- clhs(x = spdf, ...)
 
   spl
+
 }
 
 setMethod("clhs", "Raster", clhs.Raster)
