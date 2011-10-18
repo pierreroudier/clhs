@@ -1,3 +1,6 @@
+============ clhs_0.3-1 - 2011-10-18 ============
+* Corrected bug on Raster* methods. Now returns a SpatialPointsDataFrame object.
+
 ============ clhs_0.3-0 - 2011-10-14 ============
 * Switch to S4 methods
 * Introduced methods for Raster* and SpatialP*DataDrame classes

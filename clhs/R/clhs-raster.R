@@ -5,12 +5,7 @@ clhs.Raster <- function(
   spdf <- as(x, "SpatialPixelsDataFrame")
   spl <- clhs(x = spdf, ...)
 
-  if(ncol(spl) > 1)
-    res <- stack(spl)
-  else
-    res <- raster(spl)
-
-  res
+  spl
 }
 
 setMethod("clhs", "Raster", clhs.Raster)
