@@ -9,6 +9,7 @@ clhs.data.frame <- function(
   iter = 10000, # Number of max iterations
   tdecrease = 0.95,
   weights = list(numeric = 1, factor = 1, correlation = 1), # weight for continuous data , weight for correlation among data, weight for object data
+  plot = FALSE, # Plotting the objcetive function
   progress = TRUE # progress bar
   ) {
 
@@ -164,6 +165,10 @@ clhs.data.frame <- function(
   # Making up the object to be returned
   res <- list(index_samples = i_sampled, sampled_data = sampled_data, obj_function = obj_values)
   class(res) <- "cLHS_result"
+
+  # Plotting the objective function
+  if (plot)
+    plot(1:length(obj_values), obj_values, type = 'l', xlab = "Iteration", ylab = "Energy function")
 
   res
 }
