@@ -1,0 +1,9 @@
+A conditioned Latin hypercube sampling algorithm incorporating operational constraints
+
+P. Roudier, D.E. Beaudette and A.E. Hewitt
+
+The conditioned Latin hypercube sampling (cLHS) method proposed by Minasny and McBratney (2006) is providing soil scientists with a tool to optimise a sampling scheme using a stack of continuous and/or categorical covariates. It is based on the optimisation of an energy function that describes how well the covariates are covered by a candidate stratification, using a Metropolis-Hastings algorithm. That method yields results superior to other sampling alternatives and allows to make use of existing data, and has been picked up by digital soil mappers.
+
+While this method offers an optimal coverage of the variability expressed by the covariates, practical results are are often difficult to implement in the field as it would in most case result in a set of locations sparsly distributed across the region of interest. In this paper, we discuss the integration of field constraints into the cLHS method to take practical constraints such as ease of access and clustering of the sampling points into a limited number of sites.
+
+An illustration of these improvements, implemented in a publicly-available software package, is proposed on real-world cases in New Zealand and in the United States.
