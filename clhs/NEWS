@@ -1,3 +1,8 @@
+============ clhs_0.4-0 - 2012-01-12 ============
+* Introduced cLHS_result S3 class with associated plot method
+* Introduced simple = ... option to the clhs() method. If set to true, returns only the indices of the selected samples, if set to FALSE, retuurns a cLHS_result object (eg if you want to plot the objective function behaviour).
+* added a plot() method. For the moment, it just plots the objective function.
+
 ============ clhs_0.3-2 - 2011-10-18 ============
 * slight improvement on the Raster method using rasterToPoints(...)
 * added plotting option for the objective function
@@ -7,7 +12,7 @@
 
 ============ clhs_0.3-0 - 2011-10-14 ============
 * Switch to S4 methods
-* Introduced methods for Raster* and SpatialP*DataDrame classes
+* Introduced methods for Raster* and SpatialP*DataFrame classes
 
 ============ clhs_0.2-1 - 2011-10-12 ============
 * changed examples
