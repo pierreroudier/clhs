@@ -12,12 +12,11 @@
 
 \description{Produces a plot illustrating the result of a cLHS sampling procedure. }
 
-\value{A ggplot object}
-
 \details{
 The subplots to be included in the final illustration are controlled by the \code{mdoe} option:
 - \code{"obj"} adds the evolution of the objective function over the iterations
-- \code{"hist"} adds the comparison of the distributions of each variables in both the original object and the sampled result.
+- \code{"hist"} adds the comparison of the distributions of each variables in both the original object and the sampled result using histogram plots (for continuous variables).
+- \code{"dens"} adds the comparison of the distributions of each variables in both the original object and the sampled result using density plots (for continuous variables).
 }
 
 \seealso{\code{\link{clhs}}}

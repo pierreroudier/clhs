@@ -1,3 +1,7 @@
+============ clhs_0.4-2 - 2012-01-11 ============
+* Added the choice between histogram and density plots in
+the plot method
+
 ============ clhs_0.4-1 - 2012-01-11 ============
 * Improved doc
 * Complete plot.cLHS_result method using ggplot2

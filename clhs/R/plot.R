@@ -24,8 +24,11 @@ plot.cLHS_result <- function(
   pl[[length(pl) + 1]] <- objective_plot
   }
 
-  if ("hist" %in% modes) {
+  if (any(c("hist", "dens" )%in% modes)) {
     
+    if (all(c("hist", "dens") %in% modes))
+      stop('"hist" and "dens" modes are mutually exclusive.')
+
     init <- x$initial_object
     spl <- x$sampled_data
     
@@ -78,8 +81,11 @@ plot.cLHS_result <- function(
       # merge df
       df_hist_continuous <- melt(rbind(init_continuous, spl_continuous), idcolname)
       
-      # Plot for continuous (density plot)
-      distrib_continuous <- ggplot(df_hist_continuous) + geom_density(aes_string(x = 'value', fill = idcolname), alpha = 0.5) + facet_wrap(~ variable, scales = "free") + theme_bw()  + opts(title = "Continuous variables")
+      # Plot for continuous
+      if ('dens' %in% modes)
+        distrib_continuous <- ggplot(df_hist_continuous) + geom_density(aes_string(x = 'value', fill = idcolname), alpha = 0.5) + facet_wrap(~ variable, scales = "free") + theme_bw()  + opts(title = "Continuous variables")
+      if ('hist' %in% modes)
+        distrib_continuous <- ggplot(df_hist_continuous) + geom_histogram(aes_string(x = 'value', fill = idcolname), position = 'dodge') + facet_wrap(~ variable, scales = "free") + theme_bw()  + opts(title = "Continuous variables")
 
       pl[[length(pl) + 1]] <- distrib_continuous
     }
