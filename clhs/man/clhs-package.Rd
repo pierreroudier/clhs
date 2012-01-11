@@ -22,7 +22,7 @@ Minasny, B. and McBratney, A.B. 2006. A conditioned Latin hypercube method for s
 }
 
 \keyword{package}
-\seealso{}
+\seealso{\code{sample}}
 
 \examples{
 df <- data.frame(a = runif(1000), b = rnorm(1000), c = sample(LETTERS[1:5], size = 1000, replace = TRUE))

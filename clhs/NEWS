@@ -1,4 +1,10 @@
-============ clhs_0.4-0 - 2012-01-12 ============
+============ clhs_0.4-1 - 2012-01-11 ============
+* Improved doc
+* Complete plot.cLHS_result method using ggplot2
+* new reshape2 dependency
+* various buxfixes, esp. for spatial classes
+
+============ clhs_0.4-0 - 2012-01-10 ============
 * Introduced cLHS_result S3 class with associated plot method
 * Introduced simple = ... option to the clhs() method. If set to true, returns only the indices of the selected samples, if set to FALSE, retuurns a cLHS_result object (eg if you want to plot the objective function behaviour).
 * added a plot() method. For the moment, it just plots the objective function.

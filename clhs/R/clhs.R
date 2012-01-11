@@ -36,10 +36,16 @@ clhs.data.frame <- function(
   n_data <- nrow(data_continuous) # Number of individuals in the data set
 
   # the edge of the strata
-  continuous_strata <- apply(data_continuous, 2, function(x) quantile(x, probs = seq(0, 1, length.out = size + 1)))
+  continuous_strata <- apply(
+    data_continuous, 
+    2, 
+    function(x) {
+      quantile(x, probs = seq(0, 1, length.out = size + 1), na.rm = TRUE)
+    }
+  )
 
   # data correlation
-  cor_mat <- cor(data_continuous)
+  cor_mat <- cor(data_continuous, use = "complete.obs")
 
   # for object/class variable
   if (n_factor == 0) {
@@ -158,8 +164,11 @@ clhs.data.frame <- function(
   if (progress)
     close(pb)
 
-  if (n_factor > 0)
+  if (n_factor > 0) {
     sampled_data <- data.frame(data_continuous_sampled, data_factor_sampled)
+    # reordering cols
+    sampled_data <- sampled_data[, names(x)]
+  }
   else
     sampled_data <- data_continuous_sampled
 

@@ -4,11 +4,11 @@
 
 \alias{clhs}
 \alias{clhs.data.frame}
-\alias{clhs.SpatialPointsDataFrame}
-\alias{clhs.Raster}
 \alias{clhs,data.frame-method}
-\alias{clhs,Raster-method}
+\alias{clhs.SpatialPointsDataFrame}
 \alias{clhs,SpatialPointsDataFrame-method}
+\alias{clhs.Raster}
+\alias{clhs,Raster-method}
 
 \title{Conditioned Latin Hypercube Sampling}
 
@@ -21,7 +21,7 @@ clhs(x, ...)
 }
 
 \arguments{
-  \item{x}{A \code{data.frame} object.}
+  \item{x}{A \code{data.frame}, \code{SpatialPointsDataFrame} or \code{Raster} object.}
   \item{...}{Additional arguments, see under Details.}
 }
 
@@ -38,13 +38,16 @@ Below are the additional arguments that can be used:
 
 - \code{progress}: TRUE or FALSE, displays a progress bar.
 
+- \code{simple}: TRUE or FALSE. If set to TRUE, only the indices of the selected samples are returned, as a numeric vector. If set to FALSE, a cLHS_result object is returned (takes more memory but allows to make use of cLHS_results methods such as \code{plot.cLHS_result}).
 }
 
 \value{
-An object of class \code{cLHS_result}, with the following elements:
-\item{index_samples }{a vector giving the indices of the chosen samples.}
-\item{sampled_data }{the sampled data.frame.}
-\item{obj_function }{a vector giving the evolution of the objective function throughout the Meropolis-Hastings iterations.}
+* If the \code{simple} option is set to TRUE (default behaviour): A numeric vector containing the indices of the selected samples is returned
+
+* If the \code{simple} option is set to FALSE: An object of class \code{cLHS_result}, with the following elements:
+  \item{index_samples}{a vector giving the indices of the chosen samples.}
+  \item{sampled_data}{the sampled data.frame.}
+  \item{obj_function}{a vector giving the evolution of the objective function throughout the Meropolis-Hastings iterations.}
 }
 
 \references{
@@ -53,12 +56,17 @@ Minasny, B. and McBratney, A.B. 2006. A conditioned Latin hypercube method for s
 
 \author{Pierre Roudier}
 
-\note{}
-
-\seealso{}
+\seealso{\code{\link{plot.cLHS_result}}}
 
 \examples{
 df <- data.frame(a = runif(1000), b = rnorm(1000), c = sample(LETTERS[1:5], size = 1000, replace = TRUE))
-res <- clhs(df, size = 50, iter = 2000, progress = FALSE)
+
+# Returning the indices of the sampled points
+res <- clhs(df, size = 50, iter = 2000, progress = FALSE, simple = TRUE)
 str(res)
+
+# Returning a cLHS_result object for plotting
+res <- clhs(df, size = 50, iter = 2000, progress = FALSE, simple = FALSE)
+str(res)
+plot(res)
 }
