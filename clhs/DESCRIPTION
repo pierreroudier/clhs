@@ -6,6 +6,6 @@ Date: 2012-01-10
 Author: Pierre Roudier
 Maintainer: Pierre Roudier <roudierp@landcareresearch.co.nz>
 Description: This package implements the conditioned Latin hypercube sampling, as published by Minasny and McBratney (2006). This method proposes to stratify sampling in presence of ancillary data.
-Depends: R (>= 2.9.0), methods, ggplot2, sp, raster
+Depends: R (>= 2.9.0), utils, methods, grid, ggplot2, sp, raster, reshape2
 License: GPL (>= 2)
 LazyLoad: yes

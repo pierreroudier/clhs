@@ -1,4 +1,4 @@
-import(ggplot2)
+import(utils, ggplot2, grid)
 importFrom(reshape2, melt)
 import(sp, raster)
 
