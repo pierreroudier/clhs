@@ -1,3 +1,6 @@
+============ clhs_0.4-3 - 2012-01-12 ============
+* Dummy version increment to solve CRAN upload problems
+
 ============ clhs_0.4-2 - 2012-01-11 ============
 * Added the choice between histogram and density plots in
 the plot method
