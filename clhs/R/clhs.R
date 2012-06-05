@@ -14,6 +14,10 @@ clhs.data.frame <- function(
   progress = TRUE # progress bar
   ) {
 
+  # tdecrease should be < 1
+  if (tdecrease >= 1)
+    stop("tdecrease should be < 1")
+  
   # Detection of any factor data
   i_factor <- which(!sapply(x, is.numeric))
   n_factor <- length(i_factor)
