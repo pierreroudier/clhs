@@ -8,26 +8,39 @@ plot.cLHS_result <- function(
   ...
   ){
 
-  require(ggplot2)
+  # Hack to avoid compilation error on ggplot args
+  variable <- level <- value <- percent <- NULL
 
   # Number of canvas to init
   n_views <- length(modes)
-  iter <- 1:length(x$obj_function)
-  obj <- x$obj_function
-  df_obj <- data.frame(iter, obj)
+  iter <- 1:length(x$obj)
+  obj <- x$obj
+  cost <- x$cost
+  if (is.null(cost)) df_obj <- data.frame(iter, obj)
+  else df_obj <- data.frame(iter, obj, cost)
 
   pl <- list()
 
+  # Objective function plot
   if ("obj" %in% modes) {
-  objective_plot <- ggplot(df_obj) + geom_line(aes(x = iter, y = obj)) + labs(x = "Iteration", y = "Objective function") + theme_bw()  + opts(title = "Evolution of the objective function")
+    objective_plot <- ggplot(df_obj) + geom_line(aes(x = iter, y = obj)) + labs(x = "Iteration", y = "Objective function") + theme_bw()  + opts(title = "Evolution of the objective function")
 
-  pl[[length(pl) + 1]] <- objective_plot
+    pl[[length(pl) + 1]] <- objective_plot
+    names(pl)[length(pl)] <- 'obj'
   }
 
-  if (any(c("hist", "dens" )%in% modes)) {
+  # Cost function plot
+  if ("cost" %in% modes) {
+    cost_plot <- ggplot(df_obj) + geom_line(aes(x = iter, y = cost)) + labs(x = "Iteration", y = "Cost function") + theme_bw()  + opts(title = "Evolution of the cost function")
+
+    pl[[length(pl) + 1]] <- cost_plot
+    names(pl)[length(pl)] <- 'cost'
+  }
+
+  # Histogram/density plot
+  if (any(c("hist", "dens", "box") %in% modes)) {
     
-    if (all(c("hist", "dens") %in% modes))
-      stop('"hist" and "dens" modes are mutually exclusive.')
+    if (length(which(c('den', 'box', 'hist') %in% modes)) > 1) stop('"hist", "dens", and "box" modes are mutually exclusive.')
 
     init <- x$initial_object
     spl <- x$sampled_data
@@ -49,10 +62,6 @@ plot.cLHS_result <- function(
     n_factor <- length(i_factor)
     n_continuous <- length(i_continuous)
 
-    if (n_factor > 0) {
-
-    }
-
     init_continuous <- init[, i_continuous, drop = FALSE]
     spl_continuous <- spl[, i_continuous, drop = FALSE]
     init_factor <- init[, i_factor, drop = FALSE]
@@ -68,10 +77,36 @@ plot.cLHS_result <- function(
       # merge df
       df_hist_factor <- melt(rbind(init_factor, spl_factor), idcolname)
       
+      vars <- unique(df_hist_factor$variable)
+      nvars <- length(vars)
+      lvs <- dlply(df_hist_factor, "variable", function(x) unique(x$value))
+      lst_prop_table <- alply(1:nvars, 1, function(x) {
+        cur_var <- vars[x]
+        cur_df <- df_hist_factor[which(df_hist_factor$variable == cur_var), , drop = FALSE]
+        res <- ddply(cur_df, "id", function(y) {
+          vect_vals <- factor(y$value, levels = lvs[[x]])
+          prop.table(table(vect_vals))
+        })
+        res
+      })
+      names(lst_prop_table) <- vars
+      df_prop_table <- do.call(
+        "rbind",
+        alply(1:length(lst_prop_table), 1, function(x) data.frame(
+          variable = names(lst_prop_table)[x], 
+          melt(lst_prop_table[[x]]))
+        )
+      )
+      names(df_prop_table)[3] <- 'level'
+ 
       # Plot for factors (bar counts)
-      distrib_factor <- ggplot(df_hist_factor) + geom_bar(aes_string(x = 'value', fill = idcolname), position = 'dodge') + facet_wrap(~variable, scales = "free") + theme_bw() + opts(title = "Discrete variables")
+      distrib_factor <- ggplot(df_prop_table) + geom_point(aes(x = level, y = value, colour = id), position = 'dodge') + facet_wrap(~ variable, scales = "free") + theme_bw() + opts(title = "Discrete variables") 
+      
+      pl[[length(pl) + 1]] <- distrib_factor + 
+        scale_y_continuous(name = "Relative  Frequency", labels = percent) + scale_x_discrete(name = "Level") +
+        scale_colour_discrete(name = "")
 
-      pl[[length(pl) + 1]] <- distrib_factor
+      names(pl)[length(pl)] <- 'dens_factor'
     }
     
     if (n_continuous > 0) {
@@ -83,31 +118,49 @@ plot.cLHS_result <- function(
       
       # Plot for continuous
       if ('dens' %in% modes)
-        distrib_continuous <- ggplot(df_hist_continuous) + geom_density(aes_string(x = 'value', fill = idcolname), alpha = 0.5) + facet_wrap(~ variable, scales = "free") + theme_bw()  + opts(title = "Continuous variables")
+        distrib_continuous <- ggplot(df_hist_continuous) + geom_density(aes_string(x = 'value', fill = idcolname), alpha = 0.5) + facet_wrap( ~ variable, scales = "free") + theme_bw()  + opts(title = "Continuous variables") + scale_fill_discrete(name = "") + scale_x_continuous(name = "Value") + scale_y_continuous(name = "Density")
       if ('hist' %in% modes)
-        distrib_continuous <- ggplot(df_hist_continuous) + geom_histogram(aes_string(x = 'value', fill = idcolname), position = 'dodge') + facet_wrap(~ variable, scales = "free") + theme_bw()  + opts(title = "Continuous variables")
+        distrib_continuous <- ggplot(df_hist_continuous) + geom_histogram(aes_string(x = 'value', fill = idcolname), position = 'dodge') + facet_wrap(~ variable, scales = "free") + theme_bw()  + opts(title = "Continuous variables") + scale_fill_discrete(name = "") + scale_x_continuous(name = "Value") + scale_y_continuous(name = "Count")
+      if ('box' %in% modes)
+        distrib_continuous <- ggplot(df_hist_continuous) + geom_boxplot(aes_string(x = idcolname, y = 'value')) + facet_wrap( ~ variable, scales = "free") + theme_bw()  + opts(title = "Continuous variables") + scale_x_discrete(name = "") + scale_y_continuous(name = "Value")
 
-      pl[[length(pl) + 1]] <- distrib_continuous
+      pl[[length(pl) + 1]] <- distrib_continuous 
+
+      names(pl)[length(pl)] <- 'dens_continuous'
     }
   }
 
   if (length(pl) > 1) {
     grid.newpage()
+    vplayout <- function(x, y) viewport(layout.pos.row = x, layout.pos.col = y)
 
-    if (length(pl) == 2) {
-      pushViewport(viewport(layout = grid.layout(1, 2)))
-      vplayout <- function(x, y) viewport(layout.pos.row = x, layout.pos.col = y)
+    # If there's density plots
+    if ("dens_continuous" %in% names(pl) & "dens_factor" %in% names(pl)) {
+      pushViewport(viewport(layout = grid.layout(2, length(pl) - 1)))
+      
+      k_row <- 1
+      k_col <- 1
 
-      print(pl[[1]], vp = vplayout(1, 1))
-      print(pl[[2]], vp = vplayout(1, 2)) 
-    }
-    else {
-      pushViewport(viewport(layout = grid.layout(2, 2)))
-      vplayout <- function(x, y) viewport(layout.pos.row = x, layout.pos.col = y)
+      for (i_pl in 1:length(pl)) {
+        
+        if (names(pl)[i_pl] == "dens_continuous" | names(pl)[i_pl] == "dens_factor") {
 
-      print(pl[[1]], vp = vplayout(1:2, 1))
-      print(pl[[2]], vp = vplayout(1, 2)) 
-      print(pl[[3]], vp = vplayout(2, 2)) 
+          print(pl[[i_pl]], vp = vplayout(k_row, k_col))
+          k_row <- k_row + 1
+
+        } else {
+          print(pl[[i_pl]], vp = vplayout(1:2, k_col))
+          k_col <- k_col + 1
+        }
+      }
+    } else {
+      pushViewport(viewport(layout = grid.layout(1, length(pl))))
+      k_col <- 1
+
+      for (i_pl in 1:length(pl)) {
+        print(pl[[i_pl]], vp = vplayout(1, k_col))
+        k_col <- k_col + 1
+      }
     }
   }
   else {

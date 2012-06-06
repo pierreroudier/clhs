@@ -15,8 +15,10 @@
 \details{
 The subplots to be included in the final illustration are controlled by the \code{mdoe} option:
 - \code{"obj"} adds the evolution of the objective function over the iterations
+- \code{"cost"} adds the evolution of the cost function over the iterations (if available in \code{x})
 - \code{"hist"} adds the comparison of the distributions of each variables in both the original object and the sampled result using histogram plots (for continuous variables).
 - \code{"dens"} adds the comparison of the distributions of each variables in both the original object and the sampled result using density plots (for continuous variables).
+- \code{"box"} adds the comparison of the distributions of each variables in both the original object and the sampled result using boxplots (for continuous variables).
 }
 
 \seealso{\code{\link{clhs}}}
@@ -30,5 +32,5 @@ res <- clhs(df, size = 50, iter = 2000, progress = FALSE, simple = FALSE)
 plot(res, mode = "obj")
 # Or you can compare the distribution in the original object 
 # and in the sampled result
-plot(res, mode = c("obj", "hist"))
+plot(res, mode = c("obj", "box"))
 }

@@ -1,3 +1,13 @@
+============ clhs_0.5-0 - 2012-06-06 ============
+* introduced cost and cost tracking modes
+* general code cleaning
+* improved plot function:
+  - general buxfixes
+  - now using dotplot for factors
+  - support cost function
+  - new boxplot mode
+* cleaner NAMESPACE
+
 ============ clhs_0.4-3 - 2012-01-12 ============
 * Dummy version increment to solve CRAN upload problems
 
