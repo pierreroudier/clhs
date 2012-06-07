@@ -69,7 +69,7 @@ res_cost <- clhs(diamonds, size = 100, progress = FALSE, iter = 1000, cost = 'co
 If you want to report on the cLHS results, e.g. plot the evolution of the objective function, or compare the distribution of attributes in the initial object and in the sampled subset, you need to switch the \texttt{simple} option to \texttt{FALSE}. Instead f simply returning a numeric vector giving the index of the sampled individuals in the original object, a specific, more complex will be returned. This object can be handled by a specific \texttt{plot} method:
 
 <<plot_clhs_1, echo=TRUE, fig=TRUE, height=10, width=10>>=
-res <- clhs(diamonds, size = 100, simple = FALSE, progress = FALSE, iter = 2000)
+res <- clhs(diamonds, size = 100, simple = FALSE, progress = FALSE, iter = 1000)
 plot(res)
 @
 
