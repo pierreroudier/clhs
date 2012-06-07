@@ -9,7 +9,7 @@ plot.cLHS_result <- function(
   ){
 
   # Hack to avoid compilation error on ggplot args
-  variable <- level <- value <- percent <- NULL
+  variable <- level <- value <- percent <- id <- NULL
 
   # Number of canvas to init
   n_views <- length(modes)

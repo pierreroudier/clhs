@@ -1,16 +1,15 @@
-import(utils, ggplot2, grid)
-
 importClassesFrom("sp",
   "SpatialPointsDataFrame"
 )
+
+import(utils, ggplot2, grid)
 
 importClassesFrom("raster",
   "Raster"
 )
 
-importFrom(
-  reshape2, 
-    melt
+importFrom(scales,
+  percent
 )
 
 importFrom(
@@ -19,15 +18,16 @@ importFrom(
     dlply
 )
 
-importFrom(scales,
-  percent
-)
-
 importFrom(
   raster, 
     raster,
     rasterToPoints,
     stack
+)
+
+importFrom(
+  reshape2, 
+    melt
 )
 
 exportMethods(clhs)
