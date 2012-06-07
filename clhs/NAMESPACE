@@ -16,8 +16,7 @@ importFrom(
 importFrom(
   plyr,
     ddply,
-    dlply,
-    alply
+    dlply
 )
 
 importFrom(scales,
