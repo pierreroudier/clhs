@@ -80,7 +80,7 @@ plot.cLHS_result <- function(
       vars <- unique(df_hist_factor$variable)
       nvars <- length(vars)
       lvs <- dlply(df_hist_factor, "variable", function(x) unique(x$value))
-      lst_prop_table <- alply(1:nvars, 1, function(x) {
+      lst_prop_table <- lapply(1:nvars, function(x) {
         cur_var <- vars[x]
         cur_df <- df_hist_factor[which(df_hist_factor$variable == cur_var), , drop = FALSE]
         res <- ddply(cur_df, "id", function(y) {
@@ -90,17 +90,21 @@ plot.cLHS_result <- function(
         res
       })
       names(lst_prop_table) <- vars
-      df_prop_table <- do.call(
-        "rbind",
-        alply(1:length(lst_prop_table), 1, function(x) data.frame(
-          variable = names(lst_prop_table)[x], 
-          melt(lst_prop_table[[x]]))
+      
+      lst_prop_table_melt <- lapply(1:length(lst_prop_table), function(x) data.frame(
+            variable = names(lst_prop_table)[x], 
+            melt(lst_prop_table[[x]], id = "id")
+          )
         )
-      )
+
+      df_prop_table <- do.call("rbind", lst_prop_table_melt)
       names(df_prop_table)[3] <- 'level'
  
       # Plot for factors (bar counts)
-      distrib_factor <- ggplot(df_prop_table) + geom_point(aes(x = level, y = value, colour = id), position = 'dodge') + facet_wrap(~ variable, scales = "free") + theme_bw() + opts(title = "Discrete variables") 
+      distrib_factor <- ggplot(df_prop_table) + 
+        geom_point(aes(x = level, y = value, colour = id)) + 
+        facet_wrap(~ variable, scales = "free") + 
+        theme_bw() + opts(title = "Discrete variables") 
       
       pl[[length(pl) + 1]] <- distrib_factor + 
         scale_y_continuous(name = "Relative  Frequency", labels = percent) + scale_x_discrete(name = "Level") +
