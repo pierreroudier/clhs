@@ -21,6 +21,9 @@ plot.cLHS_result <- function(
 
   pl <- list()
 
+  ## Temporary fix for 0.9.2
+  require(ggplot2)
+
   ## Back-compatibility snippet code for ggplot2
   ver <- as.numeric_version(packageVersion('ggplot2'))
 

@@ -2,7 +2,10 @@ importClassesFrom("sp",
   "SpatialPointsDataFrame"
 )
 
-import(utils, ggplot2, grid)
+import(utils, 
+  ggplot2, 
+  grid
+)
 
 importClassesFrom("raster",
   "Raster"
