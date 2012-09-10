@@ -1,13 +1,12 @@
 Package: clhs
 Type: Package
 Title: Conditioned Latin Hypercube Sampling
-Version: 0.5-1
+Version: 0.5-2
 Date: 2012-09-10
 Author: Pierre Roudier
 Maintainer: Pierre Roudier <roudierp@landcareresearch.co.nz>
 Description: This package implements the conditioned Latin hypercube sampling, as published by Minasny and McBratney (2006). This method proposes to stratify sampling in presence of ancillary data. An extension of this method, which propose to associate a cost to each individual and take it into account during the optimisation process, is also proposed (Roudier et al., 2012).
 Depends: R (>= 2.9.0)
 Imports: utils, methods, grid, ggplot2, sp, raster, reshape2, plyr, scales
-Suggests: ggplot2
 License: GPL (>= 2)
 LazyLoad: yes

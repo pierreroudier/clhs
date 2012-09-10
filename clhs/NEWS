@@ -1,3 +1,6 @@
+============ clhs_0.5-2 - 2012-09-10 ============
+* version ready for release when ggplot2_0.9.2.1 is rolled out
+
 ============ clhs_0.5-1 - 2012-09-10 ============
 * minor bugfix version fixing compatibility issues with ggplot2 >= 0.9.2
 * added ggplot2 in Suggests temporarly to fix bug in ggplot2_0.9.2
