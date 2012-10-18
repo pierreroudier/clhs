@@ -1,3 +1,6 @@
+============ clhs_0.5-3 - 2012-10-19 ============
+* corrected dependencies - now depend on R >= 2.14 (due to ggplot2)
+
 ============ clhs_0.5-2 - 2012-09-10 ============
 * version ready for release when ggplot2_0.9.2.1 is rolled out
 
