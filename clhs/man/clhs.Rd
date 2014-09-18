@@ -76,7 +76,11 @@ Roudier, P., Beaudette, D.E. and Hewitt, A.E. 2012. A conditioned Latin hypercub
 \seealso{\code{\link{plot.cLHS_result}}}
 
 \examples{
-df <- data.frame(a = runif(1000), b = rnorm(1000), c = sample(LETTERS[1:5], size = 1000, replace = TRUE))
+df <- data.frame(
+  a = runif(1000), 
+  b = rnorm(1000), 
+  c = sample(LETTERS[1:5], size = 1000, replace = TRUE)
+)
 
 # Returning the indices of the sampled points
 res <- clhs(df, size = 50, iter = 2000, progress = FALSE, simple = TRUE)
