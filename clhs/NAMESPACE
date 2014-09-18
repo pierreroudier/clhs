@@ -3,6 +3,7 @@ importClassesFrom("sp",
 )
 
 import(utils, 
+  methods,
   ggplot2, 
   grid
 )
