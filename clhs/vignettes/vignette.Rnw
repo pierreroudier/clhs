@@ -1,0 +1,95 @@
+\documentclass{article}
+% \VignetteIndexEntry{Introduction to conditioned Latin hypercube sampling with the clhs package}
+
+\usepackage{graphicx}
+\usepackage[colorlinks=true,urlcolor=blue]{hyperref}
+\usepackage{color}
+\usepackage{subfig}
+\usepackage{multirow}
+\usepackage{Sweave}
+
+\newcommand{\strong}[1]{{\normalfont\fontseries{b}\selectfont #1}}
+\let\pkg=\strong
+
+% \SweaveOpts{prefix.string=<directory>/<filename-prefix>}
+
+% \VignetteDepends{ggplot2,clhs}
+
+\setkeys{Gin}{width=0.9\textwidth}
+
+\title{Introduction to conditioned Latin hypercube sampling with the \tt{clhs} package}
+
+\author{
+Pierre Roudier\footnote{Landcare Research -- Manaaki Whenua, Private Bag 11052, Manawatu Mail Centre, Palmerston North 4442, New Zealand.
+{\tt roudierp@landcareresearch.co.nz}}
+}
+
+\date{\today}
+
+\begin{document}
+
+<<make_things_reproducible, echo=FALSE, eval=TRUE>>=
+set.seed(42)
+@
+
+\maketitle
+% \tableofcontents
+
+\section{A simple example}
+
+<<load_diamonds>>=
+data(diamonds, package = 'ggplot2')
+head(diamonds)
+nrow(diamonds)
+@
+
+In this example we sample the \texttt{diamonds} data set and pick a subset of 100 individuals using the cLHS method. To reduce the length of the optimisation step to 1000 iterations to save computing time. This is controlled through the \texttt{iter} option. The progress bar is disabled because it doesn't renders well in the vignette. By default, the index of the selected individuals in the original object are returned.
+
+<<simple_clhs, echo=TRUE, eval=TRUE>>=
+library(clhs)
+res <- clhs(diamonds, size = 100, progress = FALSE, iter = 1000)
+str(res)
+@
+
+\section{Tweaking the parameters}
+
+(work in progress)
+
+\section{Cost-constrained implementation}
+
+(work in progress)
+
+<<cost_clhs, echo=TRUE, eval=TRUE>>=
+diamonds$cost <- runif(nrow(diamonds))
+res_cost <- clhs(diamonds, size = 100, progress = FALSE, iter = 1000, cost = 'cost')
+@
+
+\section{Plotting the results}
+
+If you want to report on the cLHS results, e.g. plot the evolution of the objective function, or compare the distribution of attributes in the initial object and in the sampled subset, you need to switch the \texttt{simple} option to \texttt{FALSE}. Instead f simply returning a numeric vector giving the index of the sampled individuals in the original object, a specific, more complex will be returned. This object can be handled by a specific \texttt{plot} method:
+
+<<plot_clhs_1, echo=TRUE, fig=TRUE, height=10, width=10>>=
+res <- clhs(diamonds, size = 100, simple = FALSE, progress = FALSE, iter = 1000)
+plot(res)
+@
+
+The default plotting method plots the evolution of the objective function with the number of iterations. However, you can get more details using the \texttt{modes} option, which controls which indicators are plotted. Three \emph{modes} can be simultaneously plotted:
+\begin{itemize}
+ \item \texttt{obj}: evolution of the objective function (default)
+ \item \texttt{cost}: evolution of the cost function (if available)
+ \item \texttt{dens} OR \texttt{box} OR \texttt{hist}: comparison of the distributions of each attribute in the original object and in the proposed sample, respectively using probability density functions, boxplots or histograms. Note that categorical attributes are always reported using dotplots.
+\end{itemize}
+These modes should be given as a vector of characters.
+
+<<plot_clhs_2, echo=TRUE, fig=TRUE, height=10, width=15>>=
+plot(res, c('obj', 'box'))
+@
+<<plot_clhs_3, echo=TRUE, fig=TRUE, height=10, width=20>>=
+res_cost <- clhs(diamonds, size = 100, progress = FALSE, iter = 1000, cost = 'cost', simple = FALSE)
+plot(res_cost, c('obj', 'cost'))
+@
+<<plot_clhs_4, echo=TRUE, fig=TRUE, height=10, width=20>>=
+plot(res_cost, c('obj', 'cost', 'box'))
+@
+
+\end{document}
