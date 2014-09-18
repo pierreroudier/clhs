@@ -98,7 +98,7 @@ clhs.data.frame <- function(
 
   # For object/class variable
   if (n_factor == 0) data_factor_sampled <- data.frame()
-  else factor_obj <- apply(data_factor, 2, function(x) table(x)/n_data)
+  else factor_obj <- alply(data_factor, 2, function(x) table(x)/n_data)
 
   # initialise, pick randomly
   n_remainings <- n_data - size # number of individuals remaining unsampled
