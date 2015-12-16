@@ -83,11 +83,11 @@ df <- data.frame(
 )
 
 # Returning the indices of the sampled points
-res <- clhs(df, size = 50, iter = 2000, progress = FALSE, simple = TRUE)
+res <- clhs(df, size = 50, iter = 100, progress = FALSE, simple = TRUE)
 str(res)
 
 # Returning a cLHS_result object for plotting
-res <- clhs(df, size = 50, iter = 2000, progress = FALSE, simple = FALSE)
+res <- clhs(df, size = 50, iter = 100, progress = FALSE, simple = FALSE)
 str(res)
 plot(res)
 }
