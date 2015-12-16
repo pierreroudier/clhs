@@ -31,7 +31,7 @@ plot.cLHS_result <- function(
     if (ver >= as.numeric_version("0.9.2")) {
       objective_plot <- ggplot(df_obj) + geom_line(aes(x = iter, y = obj)) + labs(title = "Evolution of the objective function", x = "Iteration", y = "Objective function") + theme_bw()
     } else {
-      objective_plot <- ggplot(df_obj) + geom_line(aes(x = iter, y = obj)) + labs(x = "Iteration", y = "Objective function") + theme_bw() + opts(title = "Evolution of the objective function")
+      objective_plot <- ggplot(df_obj) + geom_line(aes(x = iter, y = obj)) + labs(x = "Iteration", y = "Objective function") + theme_bw() + ggtitle("Evolution of the objective function")
     }
 
     pl[[length(pl) + 1]] <- objective_plot
@@ -45,7 +45,7 @@ plot.cLHS_result <- function(
     if (ver >= as.numeric_version("0.9.2")) {
       cost_plot <- ggplot(df_obj) + geom_line(aes(x = iter, y = cost)) + labs(title = "Evolution of the cost function", x = "Iteration", y = "Cost function") + theme_bw()
     } else {
-      cost_plot <- ggplot(df_obj) + geom_line(aes(x = iter, y = cost)) + labs(x = "Iteration", y = "Cost function") + theme_bw()  + opts(title = "Evolution of the cost function")
+      cost_plot <- ggplot(df_obj) + geom_line(aes(x = iter, y = cost)) + labs(x = "Iteration", y = "Cost function") + theme_bw()  + ggtitle("Evolution of the cost function")
     }
     
     pl[[length(pl) + 1]] <- cost_plot
@@ -126,7 +126,7 @@ plot.cLHS_result <- function(
         distrib_factor <- ggplot(df_prop_table) + 
           geom_point(aes(x = level, y = value, colour = id)) + 
           facet_wrap(~ variable, scales = "free") + 
-          theme_bw() + opts(title = "Discrete variables") 
+          theme_bw() + ggtitle("Discrete variables") 
       }
             
       pl[[length(pl) + 1]] <- distrib_factor + 
@@ -160,7 +160,7 @@ plot.cLHS_result <- function(
             geom_density(aes_string(x = 'value', fill = idcolname), alpha = 0.5) + 
             facet_wrap( ~ variable, scales = "free") + 
             theme_bw()  + 
-            opts(title = "Continuous variables") + 
+            ggtitle("Continuous variables") + 
             scale_fill_discrete(name = "") + 
             scale_x_continuous(name = "Value") + 
             scale_y_continuous(name = "Density")
@@ -182,7 +182,7 @@ plot.cLHS_result <- function(
             geom_histogram(aes_string(x = 'value', fill = idcolname), position = 'dodge') + 
             facet_wrap(~ variable, scales = "free") + 
             theme_bw() + 
-            opts(title = "Continuous variables") + 
+            ggtitle("Continuous variables") + 
             scale_fill_discrete(name = "") + 
             scale_x_continuous(name = "Value") + 
             scale_y_continuous(name = "Count")
@@ -203,7 +203,7 @@ plot.cLHS_result <- function(
             geom_boxplot(aes_string(x = idcolname, y = 'value')) + 
             facet_wrap( ~ variable, scales = "free") + 
             theme_bw() + 
-            opts(title = "Continuous variables") + 
+            ggtitle("Continuous variables") + 
             scale_x_discrete(name = "") + 
             scale_y_continuous(name = "Value")
         }
