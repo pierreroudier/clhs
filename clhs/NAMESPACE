@@ -4,8 +4,24 @@ importClassesFrom("sp",
 
 import(utils, 
   methods,
-  ggplot2, 
-  grid
+  ggplot2
+)
+
+importFrom(graphics,
+  hist
+)
+
+importFrom(stats, 
+  cor, 
+  quantile, 
+  runif
+) 
+  
+importFrom(grid,
+           grid.layout,
+           grid.newpage,
+           viewport,
+           pushViewport
 )
 
 importClassesFrom("raster",
