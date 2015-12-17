@@ -6,6 +6,5 @@ citEntry(entry="Manual",
          journal = "",
          year         = 2011,
          volume       = '',
-         pages        = '',
-         url          = "http://code.scenzgrid.org/index.php/p/clhs/",
+         pages        = ''
         textVersion = "Roudier, P. clhs: a R package for conditioned Latin hypercube sampling. 2011." )
