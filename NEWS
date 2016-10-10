@@ -1,3 +1,7 @@
+============ clhs_0.5-6 - 2016-10-10 ============
+* fixed bug when passing a single raster layer (Github issue #1, thanks Github user GreatEmerald)
+* Raster* clhs method now returns SpatialPointsDataFrame
+
 ============ clhs_0.5-3 - 2012-10-19 ============
 * corrected dependencies - now depend on R >= 2.14 (due to ggplot2)
 

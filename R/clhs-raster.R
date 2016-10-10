@@ -5,15 +5,13 @@ clhs.Raster <- function(
   spdf <- rasterToPoints(x, spatial = TRUE)
   spl <- clhs(x = spdf, ...)
   
-  if (is(spl, "cLHS_result"))
+  dots <- list(...)
+  simple <- dots$simple
+  
+  if (!simple) {
     spl$initial_object <- x
-  else {
-    if (ncol(spl) < 2)
-      spl <- raster(spl)
-    else
-      spl <- stack(spl)
   }
-
+  
   spl
 }
 
