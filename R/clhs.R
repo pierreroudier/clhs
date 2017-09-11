@@ -127,6 +127,9 @@ clhs.data.frame <- function(
   # progress bar
   if (progress) pb <- txtProgressBar(min = 1, max = iter, style = 3)
 
+  if (any(duplicated(i_sampled))) browser() 
+  if (any(i_sampled %in% i_unsampled)) browser()
+  
   for (i in 1:iter) {
 
     # storing previous values
@@ -139,13 +142,18 @@ clhs.data.frame <- function(
     if (cost_mode) previous$op_cost <- op_cost
 
     if (runif(1) < 0.5) {
-      # pick a random sampled point and random unsampled point
-      idx_unsampled <- sample(1:n_remainings, size = 1)
-      idx_sampled <- sample(1:size, size = 1)
-      # Swap these:
-      i_sampled[idx_sampled] <- i_unsampled[idx_unsampled]
-      i_unsampled[idx_unsampled] <- i_sampled[idx_sampled]
-
+      # pick a random sampled point and random unsampled point and swap them
+      idx_removed <- sample(1:length(i_sampled), size = 1, replace = FALSE)
+      spl_removed <- i_sampled[idx_removed]
+      idx_added <- sample(1:length(i_unsampled), size = 1, replace = FALSE)
+      i_sampled <- i_sampled[-idx_removed]
+      i_sampled <- c(i_sampled, i_unsampled[idx_added])
+      i_unsampled <- i_unsampled[-idx_added]
+      i_unsampled <- c(i_unsampled, spl_removed)
+      
+      if (any(duplicated(i_sampled))) browser() 
+      if (any(i_sampled %in% i_unsampled)) browser()
+        
       # creating new data sampled
       data_continuous_sampled <- data_continuous[i_sampled, , drop = FALSE]
 
@@ -155,14 +163,20 @@ clhs.data.frame <- function(
       # remove the worse sampled & resample
       worse <- max(delta_obj_continuous)
       i_worse <- which(delta_obj_continuous == worse)
-      n_worse <- length(i_worse)
+      # If there's more than one worse candidate, we pick one at random
+      if (length(i_worse) > 1) i_worse <- sample(i_worse, size = 1)
 
       # swap with reservoir
-      spl_removed <- i_sampled[i_worse] # will be removed from the sampled set
-      idx_added <- sample(1:n_remainings, size = n_worse) # will take their place
-      i_sampled[i_worse] <- i_unsampled[idx_added] # replacing worst sampled by new pick
-      i_unsampled[1:n_worse] <- spl_removed # replacing the worst pick in the reservoir
-
+      spl_removed <- i_sampled[i_worse] # will be removed from the sampled set. 
+      idx_added <- sample(1:n_remainings, size = 1, replace = FALSE) # new candidate that will take their place
+      i_sampled <- i_sampled[-i_worse]
+      i_sampled <- c(i_sampled, i_unsampled[idx_added])
+      i_unsampled <- i_unsampled[-idx_added]
+      i_unsampled <- c(i_unsampled, spl_removed)
+      
+      if (any(duplicated(i_sampled))) browser()
+      if (any(i_sampled %in% i_unsampled)) browser()
+          
       # creating new data sampled
       data_continuous_sampled <- data_continuous[i_sampled, , drop = FALSE]
 

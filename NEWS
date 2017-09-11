@@ -1,3 +1,6 @@
+============ clhs_0.5-7 - 2017-09-11 ============
+* fixed sneaky bug that produced duplicated sampling points (thanks Ankur Gupta for the pointers)
+
 ============ clhs_0.5-6 - 2016-10-10 ============
 * fixed bug when passing a single raster layer (Github issue #1, thanks Github user GreatEmerald)
 * Raster* clhs method now returns SpatialPointsDataFrame

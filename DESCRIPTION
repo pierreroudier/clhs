@@ -1,8 +1,8 @@
 Package: clhs
 Type: Package
 Title: Conditioned Latin Hypercube Sampling
-Version: 0.5-6
-Date: 2016-10-10
+Version: 0.5-7
+Date: 2017-09-11
 Author: Pierre Roudier
 Maintainer: Pierre Roudier <roudierp@landcareresearch.co.nz>
 Description: Conditioned Latin hypercube sampling, as published by Minasny and McBratney (2006) <DOI:10.1016/j.cageo.2005.12.009>. This method proposes to stratify sampling in presence of ancillary data. An extension of this method, which propose to associate a cost to each individual and take it into account during the optimisation process, is also proposed (Roudier et al., 2012, <DOI:10.1201/b12728-46>).
