@@ -4,7 +4,7 @@ author: "Pierre Roudier"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  # %\VignetteIndexEntry{intro-clhs}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -47,7 +47,7 @@ res_cost <- clhs(diamonds, size = 100, progress = FALSE, iter = 1000, cost = 'co
 
 If you want to report on the cLHS results, e.g. plot the evolution of the objective function, or compare the distribution of attributes in the initial object and in the sampled subset, you need to switch the `simple` option to `FALSE`. Instead f simply returning a numeric vector giving the index of the sampled individuals in the original object, a specific, more complex will be returned. This object can be handled by a specific `plot` method:
 
-```{rplot_clhs_1, echo=TRUE, fig=TRUE, height=10, width=10}
+```{r plot_clhs_1, echo=TRUE, fig=TRUE, height=10, width=10}
 res <- clhs(diamonds, size = 100, simple = FALSE, progress = FALSE, iter = 1000)
 plot(res)
 ```
