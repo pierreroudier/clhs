@@ -1,0 +1,70 @@
+---
+title: "Introduction to conditioned Latin hypercube sampling with the clhs package"
+author: "Pierre Roudier"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r make_things_reproducible, echo=FALSE, eval=TRUE}
+set.seed(42)
+```
+
+# A simple example
+
+```{r load_diamonds}
+data(diamonds, package = 'ggplot2')
+diamonds <- data.frame(diamonds)
+head(diamonds)
+nrow(diamonds)
+```
+
+In this example we sample the `diamonds` data set and pick a subset of 100 individuals using the cLHS method. To reduce the length of the optimisation step to 1000 iterations to save computing time. This is controlled through the `iter` option. The progress bar is disabled because it doesn't renders well in the vignette. By default, the index of the selected individuals in the original object are returned.
+
+```{r simple_clhs, echo=TRUE, eval=TRUE}
+library(clhs)
+res <- clhs(diamonds, size = 100, progress = FALSE, iter = 1000)
+str(res)
+```
+
+# Tweaking the parameters
+
+(work in progress)
+
+# Cost-constrained implementation
+
+(work in progress)
+
+```{r cost_clhs, echo=TRUE, eval=TRUE}
+diamonds$cost <- runif(nrow(diamonds))
+res_cost <- clhs(diamonds, size = 100, progress = FALSE, iter = 1000, cost = 'cost')
+```
+
+# Plotting the results
+
+If you want to report on the cLHS results, e.g. plot the evolution of the objective function, or compare the distribution of attributes in the initial object and in the sampled subset, you need to switch the `simple` option to `FALSE`. Instead f simply returning a numeric vector giving the index of the sampled individuals in the original object, a specific, more complex will be returned. This object can be handled by a specific `plot` method:
+
+```{rplot_clhs_1, echo=TRUE, fig=TRUE, height=10, width=10}
+res <- clhs(diamonds, size = 100, simple = FALSE, progress = FALSE, iter = 1000)
+plot(res)
+```
+
+The default plotting method plots the evolution of the objective function with the number of iterations. However, you can get more details using the `modes` option, which controls which indicators are plotted. Three `modes` can be simultaneously plotted:
+
+- `obj`: evolution of the objective function (default)
+- `cost`: evolution of the cost function (if present)
+- `dens` OR `box` OR `hist`: comparison of the distributions of each attribute in the original object and in the proposed sample, respectively using probability density functions, boxplots or histograms. Note that categorical attributes are always reported using dotplots.
+
+These modes should be given as a vector of characters.
+
+```{r plot_clhs_3, echo=TRUE, fig=TRUE, height=10, width=20}
+res_cost <- clhs(diamonds, size = 100, progress = FALSE, iter = 1000, cost = 'cost', simple = FALSE)
+plot(res_cost, c('obj', 'cost'))
+```
+
+```{r plot_clhs_4, echo=TRUE, fig=TRUE, height=10, width=20, warning=FALSE}
+plot(res_cost, c('obj', 'cost', 'box'))
+```

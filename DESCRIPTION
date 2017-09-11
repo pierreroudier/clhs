@@ -10,3 +10,6 @@ Depends: R (>= 2.14.0)
 Imports: utils, methods, grid, ggplot2, sp, raster, reshape2, plyr, scales
 License: GPL (>= 2)
 LazyLoad: yes
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr
