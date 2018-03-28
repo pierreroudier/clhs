@@ -116,6 +116,7 @@ clhs.data.frame <- function(
 
   if (cost_mode) {
     # (initial) operational cost
+    # the presence of NA in the cost surface automatially result in an infinite cost
     if(any(is.na(cost[i_sampled, ]))) {
       op_cost <- Inf
     } else {
@@ -199,6 +200,7 @@ clhs.data.frame <- function(
 
     if (cost_mode) {
       # op costs
+      # the presence of NA in the cost surface automatially result in an infinite cost
       if(any(is.na(cost[i_sampled, ]))) {
         metropolis_cost <- Inf
       } else {
