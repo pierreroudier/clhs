@@ -116,7 +116,12 @@ clhs.data.frame <- function(
 
   if (cost_mode) {
     # (initial) operational cost
-    op_cost <- sum(cost[i_sampled, ])
+    if(any(is.na(cost[i_sampled, ]))) {
+      op_cost <- Inf
+    } else {
+      op_cost <- sum(cost[i_sampled, ])
+    }
+    
     # vector storing operational costs
     op_cost_values <- vector(mode = 'numeric', length = iter)
   } else op_cost_values <- NULL
@@ -194,10 +199,14 @@ clhs.data.frame <- function(
 
     if (cost_mode) {
       # op costs
-      op_cost <- sum(cost[i_sampled, ])
-      delta_cost <- op_cost - previous$op_cost
-      if (track_mode) metropolis_cost <- Inf # runif(1) >= Inf is always FALSE
-      else metropolis_cost <- exp(-1*delta_cost/temp)
+      if(any(is.na(cost[i_sampled, ]))) {
+        metropolis_cost <- Inf
+      } else {
+        op_cost <- sum(cost[i_sampled, ])
+        delta_cost <- op_cost - previous$op_cost
+        if (track_mode) metropolis_cost <- Inf # runif(1) >= Inf is always FALSE
+        else metropolis_cost <- exp(-1*delta_cost/temp)
+      }
     }
     else metropolis_cost <- Inf # runif(1) >= Inf is always FALSE
 
