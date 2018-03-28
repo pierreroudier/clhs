@@ -9,6 +9,8 @@
 
 ## TODO: convert to gower package: https://cran.r-project.org/web/packages/gower/
 
+## TODO: ouput vector of file names for later use
+
 
 # Function to calculate Gower's similarity index for every pixel within an X m radius buffer of each sampling point.
 GS <- function(rstack,samps,buffer,fac) {
@@ -19,8 +21,9 @@ GS <- function(rstack,samps,buffer,fac) {
   # If buffer = 250 the final buffer will be 500 m in diameter.
   # fac: numeric, can be > 1, (e.g., fac = c(2,3)). Raster layer(s) which are categorical variables. Set to NA if no factor is present. 
   
-  # Iterate over evey point. This keeps memory usage small
-  for(i in 1:length(samps)){
+  # Iterate over every point. This keeps memory usage small
+  f.list <- vector(mode = 'character', length = nrow(samps))
+  for(i in 1:nrow(samps)){
     
     #2. Extract all cells within x m of the sampling points. 
     buff <- extract(x = rstack, y = samps[i,], buffer = buffer, cellnumbers = TRUE, method = 'simple')
@@ -57,8 +60,8 @@ GS <- function(rstack,samps,buffer,fac) {
     similarL <- list()
     similarL[[1]] <- cbind(tL$cell, finalgL[-1]) 
     
-    # Print out the iteration number that it is currently working on. 
-    cat("Iteration: ", i, "  | ",date(), "\n")
+    # Print out the sample number that it is currently working on. 
+    cat("Sample: ", i, "  | ", date(), "\n")
     flush.console()
     
     # Note this may return several warning messages from the daisy package. See https://stat.ethz.ch/R-manual/R-devel/library/cluster/html/daisy.html for more information on these warnings.
@@ -80,9 +83,13 @@ GS <- function(rstack,samps,buffer,fac) {
     x <- which(names(samps) == 'ID')
     
     # Write raster with the sample name 
-    fname = paste0('SimilarityIndex', '_', samps@data[i,x], '.tif')
+    fname <- sprintf('SimilarityIndex_%s.tif', samps@data[i, x])
+    f.list[i] <- fname
     writeRaster(r, filename = fname, overwrite = TRUE)
   }
+  
+  invisible(f.list)
+  
 } # end function
 
 
