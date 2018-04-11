@@ -1,21 +1,16 @@
-# This code written by Colby Brungard to produce Gowers similarity indecies around sampling points. 
-# 11/13/2017
-
-# Colby Brungard, PhD
-# Assistant Professor of Pedology | Plant and Environmental Sciences Dept.  
-# New Mexico State University | Las Cruces, NM 88003
-# +1-575-646-1907
-# cbrung@nmsu.edu
-
 ## TODO: convert to gower package: https://cran.r-project.org/web/packages/gower/
 
-## TODO: ouput vector of file names for later use
-
-
-# Function to calculate Gower's similarity index for every pixel within an X m radius buffer of each sampling point
+# 
 # 
 
 #' @name Gower similarity
+#' @description Calculates Gower's similarity index for every pixel within an given radius buffer of each sampling point
+#' @param rstack raster stack of environmental covariates
+#' @param samps sampling points, object of class SpatialPointsDataframe
+#' @param buffer Radius of the disk around each point that similarity will be calculated
+#' @param fac numeric, can be > 1, (e.g., fac = c(2,3)). Raster layer(s) which are categorical variables. Set to NA if no factor is present
+#' @return a RasterStack
+#' @author Colby Brungard (cbrung@nmsu.edu)
 #' @example 
 #' library(raster)
 #' library(sp)
@@ -28,25 +23,19 @@
 #' plot(gw)
 #' 
 GS <- function(rstack, samps, buffer, fac = NA) {
-  # rstack: raster stack of environmental covariates
-  # samps: SpatialPointsDataframe of your sampling points. 
-  # This MUST have one column named 'ID' of sample point names to name the output rasters
-  # Buffer: numeric. Buffer distance around each point that similarity will be calculated. 
-  # If buffer = 250 the final buffer will be 500 m in diameter.
-  # fac: numeric, can be > 1, (e.g., fac = c(2,3)). Raster layer(s) which are categorical variables. Set to NA if no factor is present. 
-  
-  # Iterate over every point. This keeps memory usage small
-  f.list <- list() #vector(mode = 'character', length = nrow(samps))
+
+    # Iterate over every point. This keeps memory usage small
+  f.list <- list()
   
   for(i in 1:nrow(samps)){
     
     #2. Extract all cells within x m of the sampling points. 
-    buff <- extract(x = rstack, y = samps[i,], buffer = buffer, cellnumbers = TRUE, method = 'simple')
+    buff <- extract(x = rstack, y = samps[i, ], buffer = buffer, cellnumbers = TRUE, method = 'simple', df  =TRUE)
     
     # 3.Apply gowers similarity index to each element of list of extracted raster values.
     # Get the cell numbers from each sample point to identity the right column in the similarity matrix. 
     cellNum <- extract(x = rstack, y = samps[i,], method = 'simple', cellnumbers = TRUE, small = TRUE)
-    cellnum <- cellNum[,1] #just need the cell numbers. 
+    cellnum <- cellNum[, 1] #just need the cell numbers. 
     
     # 3.b Function to calculate Gower's similarity index around each point. I used Gower's because it can handle categorical covariates, but there are other options. 
     
