@@ -14,7 +14,8 @@ importFrom(graphics,
 importFrom(stats, 
   cor, 
   quantile, 
-  runif
+  runif,
+  complete.cases
 ) 
   
 importFrom(grid,
@@ -43,12 +44,19 @@ importFrom(
   raster, 
     raster,
     rasterToPoints,
-    stack
+    stack,
+    extract,
+    writeRaster
 )
 
 importFrom(
   reshape2, 
     melt
+)
+
+importFrom(
+  cluster,
+    daisy
 )
 
 exportMethods(clhs)
