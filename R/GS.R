@@ -12,8 +12,22 @@
 ## TODO: ouput vector of file names for later use
 
 
-# Function to calculate Gower's similarity index for every pixel within an X m radius buffer of each sampling point.
-GS <- function(rstack,samps,buffer,fac) {
+# Function to calculate Gower's similarity index for every pixel within an X m radius buffer of each sampling point
+# 
+
+#' @name Gower similarity
+#' @example 
+#' library(raster)
+#' library(sp)
+#' 
+#' slogo <- stack(system.file("external/rlogo.grd", package="raster")) 
+#' coords <- data.frame(x = sample(1:101, size = 25), y = sample(1:77, size = 25))
+#' spdf <- SpatialPointsDataFrame(coords, data = data.frame(ID = 1:25))
+#' 
+#' gw <- GS(rstack = slogo, samps = spdf, buffer = 25, fac = NA)
+#' plot(gw)
+#' 
+GS <- function(rstack, samps, buffer, fac = NA) {
   # rstack: raster stack of environmental covariates
   # samps: SpatialPointsDataframe of your sampling points. 
   # This MUST have one column named 'ID' of sample point names to name the output rasters
@@ -22,7 +36,8 @@ GS <- function(rstack,samps,buffer,fac) {
   # fac: numeric, can be > 1, (e.g., fac = c(2,3)). Raster layer(s) which are categorical variables. Set to NA if no factor is present. 
   
   # Iterate over every point. This keeps memory usage small
-  f.list <- vector(mode = 'character', length = nrow(samps))
+  f.list <- list() #vector(mode = 'character', length = nrow(samps))
+  
   for(i in 1:nrow(samps)){
     
     #2. Extract all cells within x m of the sampling points. 
@@ -46,23 +61,20 @@ GS <- function(rstack,samps,buffer,fac) {
       if (is.na(fac)) {
         tL <- tL
       } else {
-        tL[,fac+1] <- lapply(tL[fac+1], factor)
+        tL[,fac+1] <- lapply(tL[fac + 1], factor)
       })
     
     # Calculate gowers similarity index and make dissimilarity object a matrix
-    GL <- daisy(x = tL[,-1], metric = 'gower')
+    GL <- daisy(x = tL[, -1], metric = 'gower')
+    
     gmatL <- cbind(tL$cell, as.matrix(GL)) 
     
     # Select the row of similarity indices with cell number equal to the cell number of the sample point and convert dissimilarity to similarity by subtracting from 1.  
-    finalgL <- 1-gmatL[gmatL[,1] == cellnum,] 
+    finalgL <- 1 - gmatL[gmatL[, 1] == cellnum,] 
     
     # Combine the cellnumbers of the raster to the similarity index. 
     similarL <- list()
     similarL[[1]] <- cbind(tL$cell, finalgL[-1]) 
-    
-    # Print out the sample number that it is currently working on. 
-    cat("Sample: ", i, "  | ", date(), "\n")
-    flush.console()
     
     # Note this may return several warning messages from the daisy package. See https://stat.ethz.ch/R-manual/R-devel/library/cluster/html/daisy.html for more information on these warnings.
     
@@ -71,29 +83,15 @@ GS <- function(rstack,samps,buffer,fac) {
     names(s.df) <- c('CellNum', 'Similar') #Give better names
     
     # Define a raster to hold the similarity values by selecting the first layer of the raster stack, and make all cells NA
-    r = rstack[[1]] 
-    r[] <- NA
-    names(r) <- 'Similarity' # Change the name.
+    r <- raster(rstack, layer = 0) 
     
     # Index the original raster by the cell numbers and replace the NA values with the similarity values. 
     # This results in a raster with similarity values in the buffers around each point and NA everywhere else. 
     r[s.df$CellNum] <- s.df$Similar
+    names(r) <- paste0('SimilarityIndex_', i)
     
-    # Which column name is the ID. Needed for naming the rasters 
-    x <- which(names(samps) == 'ID')
-    
-    # Write raster with the sample name 
-    fname <- sprintf('SimilarityIndex_%s.tif', samps@data[i, x])
-    f.list[i] <- fname
-    writeRaster(r, filename = fname, overwrite = TRUE)
+    f.list[[i]] <- r
   }
   
-  invisible(f.list)
-  
-} # end function
-
-
-
-
-
-
+  stack(f.list)
+} 
