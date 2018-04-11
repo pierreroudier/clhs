@@ -1,3 +1,6 @@
+============ clhs_0.6-0 - 2018-03-29 ============
+* Added Gower similarity tool (thanks to Colby Brugnard)
+
 ============ clhs_0.5-7 - 2017-09-11 ============
 * fixed sneaky bug that produced duplicated sampling points (thanks Ankur Gupta for the pointers)
 
