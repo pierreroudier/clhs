@@ -1,8 +1,5 @@
 ## TODO: convert to gower package: https://cran.r-project.org/web/packages/gower/
 
-# 
-# 
-
 #' @name Gower similarity
 #' @description Calculates Gower's similarity index for every pixel within an given radius buffer of each sampling point
 #' @param rstack raster stack of environmental covariates
@@ -19,10 +16,10 @@
 #' coords <- data.frame(x = sample(1:101, size = 25), y = sample(1:77, size = 25))
 #' spdf <- SpatialPointsDataFrame(coords, data = data.frame(ID = 1:25))
 #' 
-#' gw <- GS(rstack = slogo, samps = spdf, buffer = 25, fac = NA)
+#' gw <- similarity_buffer(rstack = slogo, samps = spdf, buffer = 25, fac = NA)
 #' plot(gw)
 #' 
-GS <- function(rstack, samps, buffer, fac = NA) {
+similarity_buffer <- function(rstack, samps, buffer, fac = NA) {
 
   # Iterate over every point
   # res <- plyr::alply(coordinates(samps), function(coords) {
@@ -38,7 +35,7 @@ GS <- function(rstack, samps, buffer, fac = NA) {
   # })
   
   # Iterate over every point. This keeps memory usage small
-  f.list <- list()
+  res_l <- list()
   
   for(i in 1:nrow(samps)){
     
@@ -76,19 +73,19 @@ GS <- function(rstack, samps, buffer, fac = NA) {
     gower_sim <- 1 - gower_dissim[gower_dissim[, 1] == cellnum, ] 
     
     # Combine the cellnumbers of the raster to the similarity index. 
-    s.df <- data.frame(cellnum = buff_data$cell, similarity = gower_sim[-1])
+    res_df <- data.frame(cellnum = buff_data$cell, similarity = gower_sim[-1])
     
     # Define the raster layer storing the results
-    r <- raster(rstack, layer = 0) 
+    res_r <- raster(rstack, layer = 0) 
     
     # Index the original raster by the cell numbers and replace the NA values with the similarity values. 
     # This results in a raster with similarity values in the buffers around each point and NA everywhere else. 
-    r[s.df$cellnum] <- s.df$similarity
+    res_r[res_df$cellnum] <- res_df$similarity
     
-    names(r) <- paste0('SimilarityIndex_', i)
+    names(res_r) <- paste0('SimilarityIndex_', i)
     
-    f.list[[i]] <- r
+    res_l[[i]] <- res_r
   }
   
-  stack(f.list)
+  stack(res_l)
 } 
