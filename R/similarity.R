@@ -47,12 +47,14 @@ similarity_buffer <- function(covs, pts, buffer, fac = NA, ...) {
     # Only retain cases without NA values
     buff_data <- data.frame(buff_data[complete.cases(buff_data), ])
     
+    # If there are some factor data
     if (!any(is.na(fac))) {
       buff_data[, fac + 1] <- lapply(buff_data[fac + 1], factor)
     }
 
-    # Calculate gowers similarity index and make dissimilarity object a matrix
+    # Calculate gowers similarity index 
     gower_dissim <- daisy(x = buff_data[, names(covs)], metric = 'gower')
+    # turn dissimilarity object to matrix
     gower_dissim <- cbind(buff_data$cell, as.matrix(gower_dissim)) 
     
     # Select the row of similarity indices with cell number equal to the cell number of the 
@@ -63,7 +65,7 @@ similarity_buffer <- function(covs, pts, buffer, fac = NA, ...) {
     res_df <- data.frame(cellnum = buff_data$cell, similarity = gower_sim[-1])
     
     # Define the raster layer storing the results
-    res_r <- raster(rstack, layer = 0) 
+    res_r <- raster(covs, layer = 0) 
     
     # Index the original raster by the cell numbers and replace the NA values with the similarity values. 
     # This results in a raster with similarity values in the buffers around each point and NA everywhere else. 
