@@ -14,6 +14,7 @@ Imports: utils, methods, grid, ggplot2, sp, raster, reshape2, plyr, scales, clus
 License: GPL (>= 2)
 LazyLoad: yes
 Suggests: knitr,
-    rmarkdown
+    rmarkdown,
+    testthat
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
