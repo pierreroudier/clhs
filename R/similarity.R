@@ -83,7 +83,7 @@ similarity_buffer <- function(covs, pts, buffer, fac = NA, ...) {
   }, ...)
   
   res_s <- stack(res_l)
-  names(res_s) <- paste0('SimilarityIndex_', 1:nlayers(res_s))
+  names(res_s) <- paste0('similarity_point_', 1:nlayers(res_s))
   
   res_s
 } 
