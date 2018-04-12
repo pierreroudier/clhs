@@ -6,6 +6,7 @@
 #' @param samps sampling points, object of class SpatialPointsDataframe
 #' @param buffer Radius of the disk around each point that similarity will be calculated
 #' @param fac numeric, can be > 1, (e.g., fac = c(2,3)). Raster layer(s) which are categorical variables. Set to NA if no factor is present
+#' @param ... passed to plyr::alply
 #' @return a RasterStack
 #' @author Colby Brungard (cbrung@nmsu.edu)
 #' @example 
@@ -19,33 +20,25 @@
 #' gw <- similarity_buffer(rstack = slogo, samps = spdf, buffer = 25, fac = NA)
 #' plot(gw)
 #' 
-similarity_buffer <- function(rstack, samps, buffer, fac = NA) {
+similarity_buffer <- function(rstack, samps, buffer, fac = NA, ...) {
 
   # Iterate over every point
-  # res <- plyr::alply(coordinates(samps), function(coords) {
-  #   
-  #   # Extract all cells within x m of the sampling points. 
-  #   buff <- extract(x = rstack, y = coords, buffer = buffer, cellnumbers = TRUE, method = 'simple', df  =TRUE)
-  #   
-  #   # Apply Gower's similarity to each element of the list of extracted raster values.
-  #   # Get the cell numbers from each sample point to identity the right column in the similarity matrix. 
-  #   cellNum <- extract(x = rstack, y = coords, method = 'simple', cellnumbers = TRUE, small = TRUE)
-  #   cellnum <- cellNum[, 1] #just need the cell numbers. 
-  #   
-  # })
-  
-  # Iterate over every point. This keeps memory usage small
-  res_l <- list()
-  
-  for(i in 1:nrow(samps)){
+  res_l <- plyr::alply(samps, 1, function(coords) {
     
     # 2. Extract all cells within x m of the sampling points. 
-    buff_data <- extract(x = rstack, y = samps[i, ], buffer = buffer, cellnumbers = TRUE, method = 'simple', df = TRUE)
+    buff_data <- extract(
+      x = rstack, 
+      y = coords, 
+      buffer = buffer, 
+      cellnumbers = TRUE, 
+      method = 'simple', 
+      df = TRUE
+    )
     
     # 3. Apply gowers similarity index to each element of list of extracted raster values
     
     # Get the cell numbers from each sample point to identity the right column in the similarity matrix. 
-    cellnum <- cellFromXY(rstack, samps[i,])
+    cellnum <- cellFromXY(rstack, coords)
     
     # 3.b Calculate Gower's similarity index around each point. 
     #   I used Gower's because it can handle categorical covariates, 
@@ -82,10 +75,11 @@ similarity_buffer <- function(rstack, samps, buffer, fac = NA) {
     # This results in a raster with similarity values in the buffers around each point and NA everywhere else. 
     res_r[res_df$cellnum] <- res_df$similarity
     
-    names(res_r) <- paste0('SimilarityIndex_', i)
-    
-    res_l[[i]] <- res_r
-  }
+    res_r
+  }, ...)
   
-  stack(res_l)
+  res_s <- stack(res_l)
+  names(res_s) <- paste0('SimilarityIndex_', 1:nlayers(res_s))
+  
+  res_s
 } 
