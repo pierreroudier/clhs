@@ -40,8 +40,10 @@
 
   # Correlation of continuous data
   #
-  cor_sampled <- cor(data_continuous_sampled)
-  cor_sampled[is.na(cor_sampled)] <- 1 # when there's only one observation, cor() throws NAs - we set these to 1
+  cor_sampled <- suppressWarnings(cor(data_continuous_sampled))
+  
+  # when there's only one observation, cor() throws NAs - we set these to 1
+  cor_sampled[is.na(cor_sampled)] <- 1 
 
   delta_obj_cor <- sum(abs(cor_mat - cor_sampled))
 
