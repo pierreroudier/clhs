@@ -46,7 +46,9 @@ importFrom(
     rasterToPoints,
     stack,
     extract,
-    writeRaster
+    writeRaster,
+    cellFromXY,
+    nlayers
 )
 
 importFrom(

@@ -3,6 +3,9 @@
 ## (c) Pierre Roudier, Landcare Research, 2011.
 ##
 
+#' @importFrom stats cor
+#' @importFrom graphics hist
+#' 
 .lhs_obj <- function(
   size,
   data_continuous_sampled,

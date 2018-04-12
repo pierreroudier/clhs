@@ -1,3 +1,4 @@
+#' @importFrom methods setMethod
 clhs.SpatialPointsDataFrame <- function(
   x, # data
   ...

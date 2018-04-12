@@ -2,6 +2,11 @@
 # - a plot of the objective function
 # - histograms or density plots of the sampled attributes
 #
+
+#' @import ggplot2 
+#' @importFrom reshape2 melt
+#' @importFrom plyr dlply ddply
+#' @importFrom grid pushViewport viewport
 plot.cLHS_result <- function(
   x,
   modes = "obj",
