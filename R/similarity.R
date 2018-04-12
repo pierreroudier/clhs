@@ -2,8 +2,8 @@
 
 #' @name Gower similarity
 #' @description Calculates Gower's similarity index for every pixel within an given radius buffer of each sampling point
-#' @param rstack raster stack of environmental covariates
-#' @param samps sampling points, object of class SpatialPointsDataframe
+#' @param covs raster stack of environmental covariates
+#' @param pts sampling points, object of class SpatialPointsDataframe
 #' @param buffer Radius of the disk around each point that similarity will be calculated
 #' @param fac numeric, can be > 1, (e.g., fac = c(2,3)). Raster layer(s) which are categorical variables. Set to NA if no factor is present
 #' @param ... passed to plyr::alply
@@ -17,17 +17,17 @@
 #' coords <- data.frame(x = sample(1:101, size = 25), y = sample(1:77, size = 25))
 #' spdf <- SpatialPointsDataFrame(coords, data = data.frame(ID = 1:25))
 #' 
-#' gw <- similarity_buffer(rstack = slogo, samps = spdf, buffer = 25, fac = NA)
+#' gw <- similarity_buffer(covs = slogo, pts = spdf, buffer = 25, fac = NA)
 #' plot(gw)
 #' 
-similarity_buffer <- function(rstack, samps, buffer, fac = NA, ...) {
+similarity_buffer <- function(covs, pts, buffer, fac = NA, ...) {
 
   # Iterate over every point
-  res_l <- plyr::alply(samps, 1, function(coords) {
+  res_l <- plyr::alply(pts, 1, function(coords) {
     
     # 2. Extract all cells within x m of the sampling points. 
     buff_data <- extract(
-      x = rstack, 
+      x = covs, 
       y = coords, 
       buffer = buffer, 
       cellnumbers = TRUE, 
@@ -38,7 +38,7 @@ similarity_buffer <- function(rstack, samps, buffer, fac = NA, ...) {
     # 3. Apply gowers similarity index to each element of list of extracted raster values
     
     # Get the cell numbers from each sample point to identity the right column in the similarity matrix. 
-    cellnum <- cellFromXY(rstack, coords)
+    cellnum <- cellFromXY(covs, coords)
     
     # 3.b Calculate Gower's similarity index around each point. 
     #   I used Gower's because it can handle categorical covariates, 
@@ -58,7 +58,7 @@ similarity_buffer <- function(rstack, samps, buffer, fac = NA, ...) {
     )
     
     # Calculate gowers similarity index and make dissimilarity object a matrix
-    gower_dissim <- daisy(x = buff_data[, names(rstack)], metric = 'gower')
+    gower_dissim <- daisy(x = buff_data[, names(covs)], metric = 'gower')
     gower_dissim <- cbind(buff_data$cell, as.matrix(gower_dissim)) 
     
     # Select the row of similarity indices with cell number equal to the cell number of the 
