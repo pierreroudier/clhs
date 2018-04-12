@@ -9,6 +9,14 @@
 #' @param ... passed to plyr::alply
 #' @return a RasterStack
 #' @author Colby Brungard (cbrung@nmsu.edu)
+#' 
+#' @importFrom stats complete.cases
+#' @importFrom raster extract cellFromXY raster stack nlayers
+#' @importFrom cluster daisy
+#' @importFrom plyr alply
+#' 
+#' @export
+#' 
 #' @example 
 #' library(raster)
 #' library(sp)
