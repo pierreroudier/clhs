@@ -47,16 +47,10 @@ similarity_buffer <- function(covs, pts, buffer, fac = NA, ...) {
     # Only retain cases without NA values
     buff_data <- data.frame(buff_data[complete.cases(buff_data), ])
     
-    # Warnings are suppressed because if fac is > 1 the is.na function 
-    # warns that only the first value will be used.
-    # This does not affect the output whatsoever.   
-    # All other elements of the result list are as expected.
-    suppressWarnings(
-      if (!is.na(fac)) {
-        buff_data[, fac + 1] <- lapply(buff_data[fac + 1], factor)
-      }
-    )
-    
+    if (!any(is.na(fac))) {
+      buff_data[, fac + 1] <- lapply(buff_data[fac + 1], factor)
+    }
+
     # Calculate gowers similarity index and make dissimilarity object a matrix
     gower_dissim <- daisy(x = buff_data[, names(covs)], metric = 'gower')
     gower_dissim <- cbind(buff_data$cell, as.matrix(gower_dissim)) 
