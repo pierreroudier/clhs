@@ -61,7 +61,7 @@ similarity_buffer <- function(covs, pts, buffer, fac = NA, ...) {
     }
 
     # Calculate gowers similarity index 
-    gower_dissim <- daisy(x = buff_data[, names(covs)], metric = 'gower')
+    gower_dissim <- daisy(x = buff_data[, names(covs)], metric = 'gower', warnBin = FALSE)
     # turn dissimilarity object to matrix
     gower_dissim <- cbind(buff_data$cell, as.matrix(gower_dissim)) 
     
