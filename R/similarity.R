@@ -21,11 +21,14 @@
 #' library(raster)
 #' library(sp)
 #' 
-#' slogo <- stack(system.file("external/rlogo.grd", package="raster")) 
-#' coords <- data.frame(x = sample(1:101, size = 25), y = sample(1:77, size = 25))
-#' spdf <- SpatialPointsDataFrame(coords, data = data.frame(ID = 1:25))
-#' 
-#' gw <- similarity_buffer(covs = slogo, pts = spdf, buffer = 25, fac = NA)
+#' data(meuse.grid)
+#' coordinates(meuse.grid) = ~x+y
+#' proj4string(meuse.grid) <- CRS("+init=epsg:28992")
+#' gridded(meuse.grid) = TRUE
+#' ms <- stack(meuse.grid)
+#' set.seed(1)
+#' pts <- clhs(ms, size = 3, iter = 100, progress = FALSE, simple = TRUE)
+#' gw <- similarity_buffer(ms, pts, buffer = 500)
 #' plot(gw)
 #' 
 similarity_buffer <- function(covs, pts, buffer, fac = NA, ...) {
