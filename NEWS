@@ -1,5 +1,7 @@
-============ clhs_0.6-0 - 2018-03-29 ============
+============ clhs_0.6-0 - 2018-04-13 ============
 * Added Gower similarity tool (thanks to Colby Brugnard)
+* Switched documentation to Roxygen
+* Implemented the first few tests
 
 ============ clhs_0.5-7 - 2017-09-11 ============
 * fixed sneaky bug that produced duplicated sampling points (thanks Ankur Gupta for the pointers)
