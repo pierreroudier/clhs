@@ -1,3 +1,8 @@
+#' @include clhs-data.frame.R
+#' @rdname clhs
+#' @importFrom raster rasterToPoints
+#' @method clhs Raster
+#' @export
 clhs.Raster <- function(
   x, # data
   ...
@@ -14,5 +19,3 @@ clhs.Raster <- function(
   
   spl
 }
-
-setMethod("clhs", "Raster", clhs.Raster)

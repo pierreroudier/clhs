@@ -1,14 +1,23 @@
 ## TODO: convert to gower package: https://cran.r-project.org/web/packages/gower/
 
-#' @name Gower similarity
+#' Gower similarity analysis
+#' @rdname similarity_buffer
+#' @aliases similarity_buffer
 #' @description Calculates Gower's similarity index for every pixel within an given radius buffer of each sampling point
 #' @param covs raster stack of environmental covariates
 #' @param pts sampling points, object of class SpatialPointsDataframe
 #' @param buffer Radius of the disk around each point that similarity will be calculated
 #' @param fac numeric, can be > 1, (e.g., fac = c(2,3)). Raster layer(s) which are categorical variables. Set to NA if no factor is present
+#' @param metric character string specifying the similarity metric to be used. The currently available options are "euclidean", "manhattan" and "gower" (the default).  See \code{daisy} from the \code{cluster} package for more details
+#' @param stand logical flag: if TRUE, then the measurements in x are standardized before calculating the dissimilarities. 
 #' @param ... passed to plyr::alply
 #' @return a RasterStack
-#' @author Colby Brungard (cbrung@nmsu.edu)
+#' 
+#' @author Colby Brungard
+#' 
+#' @references 
+#' Brungard, C. and Johanson, J. 2015. The gate's locked! I can't get to the exact 
+#' sampling spot... can I sample nearby? Pedometron, 37:8--10. 
 #' 
 #' @importFrom stats complete.cases
 #' @importFrom raster extract cellFromXY raster stack nlayers
@@ -17,7 +26,7 @@
 #' 
 #' @export
 #' 
-#' @example 
+#' @examples 
 #' library(raster)
 #' library(sp)
 #' 
@@ -31,7 +40,7 @@
 #' gw <- similarity_buffer(ms, pts, buffer = 500)
 #' plot(gw)
 #' 
-similarity_buffer <- function(covs, pts, buffer, fac = NA, ...) {
+similarity_buffer <- function(covs, pts, buffer, fac = NA, metric = "gower", stand = FALSE, ...) {
 
   # Iterate over every point
   res_l <- plyr::alply(pts, 1, function(coords) {
@@ -46,7 +55,7 @@ similarity_buffer <- function(covs, pts, buffer, fac = NA, ...) {
       df = TRUE
     )
     
-    # 3. Apply gowers similarity index to each element of list of extracted raster values
+    # 3. Apply Gower's similarity index to each element of list of extracted raster values
     
     # Get the cell numbers from each sample point to identity the right column in the similarity matrix. 
     cellnum <- cellFromXY(covs, coords)
@@ -64,7 +73,7 @@ similarity_buffer <- function(covs, pts, buffer, fac = NA, ...) {
     }
 
     # Calculate gowers similarity index 
-    gower_dissim <- daisy(x = buff_data[, names(covs)], metric = 'gower', warnBin = FALSE)
+    gower_dissim <- daisy(x = buff_data[, names(covs)], metric = metric, stand = stand, warnBin = FALSE)
     # turn dissimilarity object to matrix
     gower_dissim <- cbind(buff_data$cell, as.matrix(gower_dissim)) 
     

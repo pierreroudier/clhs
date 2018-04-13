@@ -1,12 +1,51 @@
-# Produces a plot illustrating teh results of the cLHS sampling.
-# - a plot of the objective function
-# - histograms or density plots of the sampled attributes
-#
-
+#' Plot cLHS results
+#' 
+#' Produces a plot illustrating the result of a cLHS sampling procedure.
+#' 
+#' The subplots to be included in the final illustration are controlled by the
+#' \code{mode} option: - \code{"obj"} adds the evolution of the objective
+#' function over the iterations - \code{"cost"} adds the evolution of the cost
+#' function over the iterations (if available in \code{x}) - \code{"hist"} adds
+#' the comparison of the distributions of each variables in both the original
+#' object and the sampled result using histogram plots (for continuous
+#' variables). - \code{"dens"} adds the comparison of the distributions of each
+#' variables in both the original object and the sampled result using density
+#' plots (for continuous variables). - \code{"box"} adds the comparison of the
+#' distributions of each variables in both the original object and the sampled
+#' result using boxplots (for continuous variables).
+#' 
+#' @param x Object of class \dQuote{cLHS_result}.
+#' @param modes A character vector describing the plot to produce (see Details)
+#' @param ... Other ggplot2 plotting parameters.
+#' @author Pierre Roudier
+#' @seealso \code{\link{clhs}}
+#' @examples
+#' 
+#' df <- data.frame(
+#'   a = runif(1000), 
+#'   b = rnorm(1000), 
+#'   c = sample(LETTERS[1:5], size = 1000, replace = TRUE)
+#' )
+#' 
+#' res <- clhs(df, size = 50, iter = 2000, progress = FALSE, simple = FALSE)
+#' 
+#' # You can plot only the objective function
+#' plot(res, mode = "obj")
+#' 
+#' # Or you can compare the distribution in the original object 
+#' # and in the sampled result
+#' plot(res, mode = c("obj", "box"))
+#' 
+#' 	
 #' @import ggplot2 
 #' @importFrom reshape2 melt
 #' @importFrom plyr dlply ddply
-#' @importFrom grid pushViewport viewport
+#' @importFrom grid pushViewport viewport grid.newpage grid.layout
+#' @importFrom utils packageVersion
+#' 
+#' @method plot cLHS_result
+#' @export 
+#' 
 plot.cLHS_result <- function(
   x,
   modes = "obj",

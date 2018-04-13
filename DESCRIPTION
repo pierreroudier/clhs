@@ -18,3 +18,13 @@ Suggests: knitr,
     testthat
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
+Collate: 
+    'clhs-internal.R'
+    'clhs-data.frame.R'
+    'clhs-package.R'
+    'clhs-raster.R'
+    'utils.R'
+    'clhs.R'
+    'clhs-sp.R'
+    'plot.R'
+    'similarity.R'

@@ -1,11 +1,11 @@
-## Objective function for cLHS
-##
-## (c) Pierre Roudier, Landcare Research, 2011.
-##
-
+#' Objective function for cLHS
+#'
+#' @author Pierre Roudier
+#' 
+#' @keywords internal
+#' 
 #' @importFrom stats cor
 #' @importFrom graphics hist
-#' 
 .lhs_obj <- function(
   size,
   data_continuous_sampled,

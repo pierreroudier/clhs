@@ -1,4 +1,8 @@
-#' @importFrom methods setMethod
+#' @include clhs.R utils.R
+#' @rdname clhs
+#' @method clhs SpatialPointsDataFrame
+#' @importFrom methods is
+#' @export
 clhs.SpatialPointsDataFrame <- function(
   x, # data
   ...
@@ -14,5 +18,3 @@ clhs.SpatialPointsDataFrame <- function(
     spl <- x[spl, ]
   spl
 }
-
-setMethod("clhs", "SpatialPointsDataFrame", clhs.SpatialPointsDataFrame)
