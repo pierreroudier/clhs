@@ -4,7 +4,7 @@ Title: Conditioned Latin Hypercube Sampling
 Version: 0.6-0
 Date: 2018-03-29
 Authors@R: c(
-    person("Pierre", "Roudier", email = "pierre.roudier@gmail.com", role = c("aut", "cre")),
+    person("Pierre", "Roudier", email = "roudierp@landcareresearch.co.nz", role = c("aut", "cre")),
     person("Colby", "Brugnard", email = "cbrung@ad.nmsu.edu", role = "ctb"),
     person("Dylan", "Beaudette", email = "dylan.beaudette@ca.usda.gov", role = "ctb"))
 Maintainer: Pierre Roudier <roudierp@landcareresearch.co.nz>
