@@ -1,5 +1,3 @@
-## TODO: convert to gower package: https://cran.r-project.org/web/packages/gower/
-
 #' Gower similarity analysis
 #' @rdname similarity_buffer
 #' @aliases similarity_buffer
