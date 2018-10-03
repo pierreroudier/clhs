@@ -1,10 +1,22 @@
 #' Conditioned Latin Hypercube Sampling
 #' 
 #' Implementation of the conditioned Latin hypercube sampling, as published by
-#' Minasny and McBratney (2006). This method proposes to stratify sampling in
+#' Minasny and McBratney (2006) and the DLHS variant method (Minasny and 
+#' McBratney, 2010). These methods propose to stratify sampling in
 #' presence of ancillary data. An extension of this method, which propose to
 #' associate a cost to each individual and take it into account during the
 #' optimisation process, is also proposed (Roudier et al., 2012).
+#' 
+#' For the DLHS method, the original paper defines parameter \code{b} as the importance 
+#' of the edge of the distributions. A matrix \code{eta} (size N x K, where N is the size of 
+#' the final sample and K the number of continuous variables) is defined, to 
+#' compute the objective function of the algorithm, where each column equal the 
+#' vector (b, 1, ..., 1, b) in order to give the edge of the distribution a 
+#' probability b times higher to be sampled. In our function, instead of define 
+#' the \code{b} parameter, users can defined their own \code{eta} matrix so that they 
+#' can give more complex probabilty design of sampling each strata of the 
+#' distribution instead of just be able to give more importance to both edges of 
+#' the distribution.
 #' 
 #' @name clhs
 #' @aliases clhs clhs.data.frame clhs.SpatialPointsDataFrame clhs.Raster
@@ -33,6 +45,9 @@
 #' @param weights A list a length 3, giving the relative weights for
 #' continuous data, categorical data, and correlation between variables.
 #' Defaults to \code{list(numeric = 1, factor = 1, correlation = 1)}.
+#' @param eta Either a number equal 1 to perform a classic cLHS or a constrained 
+#' cLHS or a matrix to perform a cLHS that samples more on the edge of the
+#' distibutions (DLHS, see details)
 #' @param obj.limit The minimal value at which the optimisation is stopped.
 #' Defaults to \code{-Inf}.
 #' @param length.cycle The duration (number of iterations) of the
@@ -62,12 +77,19 @@
 #' for sampling in the presence of ancillary information. Computers and
 #' Geosciences, 32:1378-1388.
 #' 
+#' *For the DLHS method:
+#' 
+#' Minasny, B. and A. B. McBratney, A.B.. 2010. Conditioned Latin Hypercube 
+#' Sampling for Calibrating Soil Sensor Data to Soil Properties. In: Proximal 
+#' Soil Sensing, Progress in Soil Science, pages 111-119.
+#' 
 #' *For the cost-constrained implementation:
 #' 
 #' Roudier, P., Beaudette, D.E. and Hewitt, A.E. 2012. A conditioned Latin
 #' hypercube sampling algorithm incorportaing operational constraints. In:
 #' Digital Soil Assessments and Beyond. Proceedings of the 5th Golobal Workshop
 #' on Digital Soil Mapping, Sydney, Australia.
+#' 
 #' 
 #' @examples
 #' 
@@ -88,4 +110,4 @@
 #' 
 #' @include clhs-data.frame.R
 #' @export
-clhs <- function(x, size,  cost,  iter,  temp,  tdecrease,  weights, obj.limit, length.cycle, simple, progress, track) UseMethod("clhs")
+clhs <- function(x, size,  cost,  iter,  temp,  tdecrease,  weights, eta, obj.limit, length.cycle, simple, progress, track) UseMethod("clhs")
