@@ -12,14 +12,14 @@
 \alias{clhs.SpatialPointsDataFrame}
 \title{Conditioned Latin Hypercube Sampling}
 \usage{
-\method{clhs}{data.frame}(x, size, cost = NULL, iter = 10000, temp = 1,
-  tdecrease = 0.95, weights = list(numeric = 1, factor = 1, correlation =
-  1), eta = 1, obj.limit = -Inf, length.cycle = 10, simple = TRUE,
-  progress = TRUE, track = NULL)
+\method{clhs}{data.frame}(x, size, include = NULL, cost = NULL,
+  iter = 10000, temp = 1, tdecrease = 0.95, weights = list(numeric = 1,
+  factor = 1, correlation = 1), eta = 1, obj.limit = -Inf,
+  length.cycle = 10, simple = TRUE, progress = TRUE, track = NULL)
 
 \method{clhs}{Raster}(x, ...)
 
-clhs(x, size, cost, iter, temp, tdecrease, weights, eta, obj.limit,
+clhs(x, size, include, cost, iter, temp, tdecrease, weights, eta, obj.limit,
   length.cycle, simple, progress, track)
 
 \method{clhs}{SpatialPointsDataFrame}(x, ...)
@@ -29,6 +29,10 @@ clhs(x, size, cost, iter, temp, tdecrease, weights, eta, obj.limit,
 object.}
 
 \item{size}{A non-negative integer giving the number of samples to pick.}
+
+\item{include}{Vector of row indexes of data from \code{x} that must be 
+included in the final sample. If NULL (default), all data are randomly choosen 
+according to cLHS method.}
 
 \item{cost}{A character giving the name or an integer giving the index of
 the attribute in \code{x} that gives a cost that can be use to constrain the
