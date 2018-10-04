@@ -6,7 +6,8 @@ Date: 2018-04-13
 Authors@R: c(
     person("Pierre", "Roudier", email = "roudierp@landcareresearch.co.nz", role = c("aut", "cre")),
     person("Colby", "Brugnard", email = "cbrung@ad.nmsu.edu", role = "ctb"),
-    person("Dylan", "Beaudette", email = "dylan.beaudette@ca.usda.gov", role = "ctb"))
+    person("Dylan", "Beaudette", email = "dylan.beaudette@ca.usda.gov", role = "ctb"),
+    person("Benjamin", "Louis", email = "contact@benjaminlouis-stat.fr", role = "ctb"))
 Maintainer: Pierre Roudier <roudierp@landcareresearch.co.nz>
 Description: Conditioned Latin hypercube sampling, as published by Minasny and McBratney (2006) <DOI:10.1016/j.cageo.2005.12.009>. This method proposes to stratify sampling in presence of ancillary data. An extension of this method, which propose to associate a cost to each individual and take it into account during the optimisation process, is also proposed (Roudier et al., 2012, <DOI:10.1201/b12728-46>).
 Depends: R (>= 2.14.0)
