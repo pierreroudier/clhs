@@ -12,6 +12,7 @@ clhs.data.frame <- function(
   temp = 1, # initial temperature
   tdecrease = 0.95, # temperature decrease rate
   weights = list(numeric = 1, factor = 1, correlation = 1), # weight for continuous data , weight for correlation among data, weight for object data
+  eta = 1,
   obj.limit = -Inf, # Stopping criterion
   length.cycle = 10, # Number of cycles done at each constant temperature value
   simple = TRUE, # only return selected indices (if false, return a more complex S3 object)
@@ -110,7 +111,7 @@ clhs.data.frame <- function(
   if (n_factor > 0) data_factor_sampled <- data_factor[i_sampled, , drop = FALSE] # sampled factor data
   
   # objective function
-  res <- .lhs_obj(size = size, data_continuous_sampled = data_continuous_sampled, data_factor_sampled = data_factor_sampled, continuous_strata = continuous_strata, cor_mat = cor_mat, factor_obj = factor_obj, weights = weights)
+  res <- .lhs_obj(size = size, data_continuous_sampled = data_continuous_sampled, data_factor_sampled = data_factor_sampled, continuous_strata = continuous_strata, cor_mat = cor_mat, factor_obj = factor_obj, weights = weights, eta = eta)
   
   obj <- res$obj # value of the objective function
   delta_obj_continuous <- res$delta_obj_continuous
@@ -185,7 +186,7 @@ clhs.data.frame <- function(
     }
     
     # calc obj
-    res <- .lhs_obj(size = size, data_continuous_sampled = data_continuous_sampled, data_factor_sampled = data_factor_sampled, continuous_strata = continuous_strata, cor_mat = cor_mat, factor_obj = factor_obj, weights = weights)
+    res <- .lhs_obj(size = size, data_continuous_sampled = data_continuous_sampled, data_factor_sampled = data_factor_sampled, continuous_strata = continuous_strata, cor_mat = cor_mat, factor_obj = factor_obj, weights = weights, eta = eta)
     
     obj <- res$obj
     delta_obj_continuous <- res$delta_obj_continuous
