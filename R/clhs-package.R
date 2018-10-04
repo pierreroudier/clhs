@@ -1,8 +1,9 @@
 #' Conditioned Latin Hypercube Sampling
 #' 
 #' This package implements the conditioned Latin hypercube sampling, as
-#' published by Minasny and McBratney (2006). This method proposes to stratify
-#' sampling in presence of ancillary data.
+#' published by Minasny and McBratney (2006) and the DLHS variant method 
+#' (Minasny and McBratney, 2010).. This method proposes to stratify sampling in 
+#' presence of ancillary data.
 #' 
 #' An extension of this method, which propose to associate a cost to each
 #' individual and take it into account during the optimisation process, is also
@@ -21,6 +22,12 @@
 #' Minasny, B. and McBratney, A.B. 2006. A conditioned Latin hypercube method
 #' for sampling in the presence of ancillary information. Computers and
 #' Geosciences, 32:1378-1388.
+#' 
+#' *For the DLHS variant method:
+#' 
+#' Minasny, B. and A. B. McBratney, A.B.. 2010. Conditioned Latin Hypercube 
+#' Sampling for Calibrating Soil Sensor Data to Soil Properties. In: Proximal 
+#' Soil Sensing, Progress in Soil Science, pages 111-119. 
 #' 
 #' * For the cost-constrained implementation:
 #' 

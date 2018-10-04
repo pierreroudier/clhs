@@ -13,7 +13,8 @@
   continuous_strata,
   weights = list(numeric = 1, factor = 1, corelation = 1),
   cor_mat,
-  factor_obj
+  factor_obj,
+  eta = 1
   ) {
 
   # Continuous variables
@@ -24,7 +25,7 @@
   cont_obj_sampled <- lapply(cont_data_strata, function(x) hist(x[[1]], breaks = x[[2]], plot = FALSE)$counts)
   cont_obj_sampled <- matrix(unlist(cont_obj_sampled), ncol = n_cont_variables, byrow = FALSE)
 
-  delta_obj_continuous <- rowSums(abs(cont_obj_sampled - 1))
+  delta_obj_continuous <- rowSums(abs(cont_obj_sampled - eta))
 
   # Factor variables
   #
