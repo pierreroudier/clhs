@@ -5,7 +5,7 @@ test_that("Gower similarity works", {
   library(raster)
   library(sp)
 
-  slogo <- stack(system.file("external/rlogo.grd", package="raster"))
+  slogo <- stack(system.file("external/rlogo.grd", package = "raster"))
   spdf <- SpatialPointsDataFrame(data.frame(x = 50, y = 50), data = data.frame(ID = 1))
 
   gw <- similarity_buffer(covs = slogo, pts = spdf, buffer = 1, fac = NA)
