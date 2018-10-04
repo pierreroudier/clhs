@@ -28,8 +28,9 @@
 #' object.
 #' @param size A non-negative integer giving the number of samples to pick.
 #' @param include Vector of row indexes of data from \code{x} that must be 
-#' included in the final sample. If NULL (default), all data are randomly choosen 
-#' according to cLHS method.
+#' included in the final sample. For the cost-constrained cLHS method, cost of 
+#' these mandatory samples is set to 0. If NULL (default), all data are randomly 
+#' choosen according to the classic cLHS method.
 #' @param cost A character giving the name or an integer giving the index of
 #' the attribute in \code{x} that gives a cost that can be use to constrain the
 #' cLHS sampling. If NULL (default), the cost-constrained implementation is not
