@@ -7,11 +7,13 @@
 clhs.data.frame <- function(
   x, # data.frame
   size, # Number of samples you want
+  include = NULL, # row index of data that must be in the final sample
   cost = NULL, # Number or name of the attribute used as a cost
   iter = 10000, # Number of max iterations
   temp = 1, # initial temperature
   tdecrease = 0.95, # temperature decrease rate
   weights = list(numeric = 1, factor = 1, correlation = 1), # weight for continuous data , weight for correlation among data, weight for object data
+  eta = 1,
   obj.limit = -Inf, # Stopping criterion
   length.cycle = 10, # Number of cycles done at each constant temperature value
   simple = TRUE, # only return selected indices (if false, return a more complex S3 object)
@@ -61,6 +63,11 @@ clhs.data.frame <- function(
     # Remove cost attribute from attribute table
     x <- x[, -1*i_cost, drop = FALSE]
     
+    # Si include, cost is 0
+    if (!is.null(include)) {
+      cost[include, ] <- 0
+    }
+    
     # Flags
     cost_mode <- TRUE
     track_mode <- FALSE # cost is taken into account, therefore computed
@@ -75,7 +82,7 @@ clhs.data.frame <- function(
     data_factor <- x[, i_factor, drop = FALSE]
     # Creating a list storing the levels of each factor
     factor_levels <- apply(data_factor, 2, function(x) {
-      ifelse(is.factor(x), res <- levels(x), res <-levels(factor(x)))
+      ifelse(is.factor(x), res <- levels(x), res <- levels(factor(x)))
       res}
     )
   } else {
@@ -101,16 +108,20 @@ clhs.data.frame <- function(
   if (n_factor == 0) data_factor_sampled <- data.frame()
   else factor_obj <- alply(data_factor, 2, function(x) table(x)/n_data)
   
+  # Mandatory data in the sample
+  sampled_size <- size - length(include)
+  not_included <- setdiff(1:n_data, include)
+  
   # initialise, pick randomly
   n_remainings <- n_data - size # number of individuals remaining unsampled
-  i_sampled <- sample(1:n_data, size = size, replace = FALSE) # individuals randomly chosen
+  i_sampled <- c(sample(not_included, size = sampled_size, replace = FALSE), include) # individuals randomly chosen
   i_unsampled <- setdiff(1:n_data, i_sampled) # individuals remaining unsampled
   data_continuous_sampled <- data_continuous[i_sampled, , drop = FALSE] # sampled continuous data
   
   if (n_factor > 0) data_factor_sampled <- data_factor[i_sampled, , drop = FALSE] # sampled factor data
   
   # objective function
-  res <- .lhs_obj(size = size, data_continuous_sampled = data_continuous_sampled, data_factor_sampled = data_factor_sampled, continuous_strata = continuous_strata, cor_mat = cor_mat, factor_obj = factor_obj, weights = weights)
+  res <- .lhs_obj(size = size, data_continuous_sampled = data_continuous_sampled, data_factor_sampled = data_factor_sampled, continuous_strata = continuous_strata, cor_mat = cor_mat, factor_obj = factor_obj, weights = weights, eta = eta)
   
   obj <- res$obj # value of the objective function
   delta_obj_continuous <- res$delta_obj_continuous
@@ -144,11 +155,11 @@ clhs.data.frame <- function(
     
     if (runif(1) < 0.5) {
       # pick a random sampled point and random unsampled point and swap them
-      idx_removed <- sample(1:length(i_sampled), size = 1, replace = FALSE)
-      spl_removed <- i_sampled[idx_removed]
+      idx_removed <- sample(1:length(setdiff(i_sampled, include)), size = 1, replace = FALSE)
+      spl_removed <- setdiff(i_sampled, include)[idx_removed]
       idx_added <- sample(1:length(i_unsampled), size = 1, replace = FALSE)
-      i_sampled <- i_sampled[-idx_removed]
-      i_sampled <- c(i_sampled, i_unsampled[idx_added])
+      i_sampled <- setdiff(i_sampled, include)[-idx_removed]
+      i_sampled <- c(i_sampled, i_unsampled[idx_added], include)
       i_unsampled <- i_unsampled[-idx_added]
       i_unsampled <- c(i_unsampled, spl_removed)
       
@@ -162,16 +173,16 @@ clhs.data.frame <- function(
     }
     else {
       # remove the worse sampled & resample
-      worse <- max(delta_obj_continuous)
-      i_worse <- which(delta_obj_continuous == worse)
+      worse <- max(delta_obj_continuous[!i_sampled %in% include])
+      i_worse <- which(delta_obj_continuous[!i_sampled %in% include] == worse)
       # If there's more than one worse candidate, we pick one at random
       if (length(i_worse) > 1) i_worse <- sample(i_worse, size = 1)
       
       # swap with reservoir
-      spl_removed <- i_sampled[i_worse] # will be removed from the sampled set. 
+      spl_removed <- setdiff(i_sampled, include)[i_worse] # will be removed from the sampled set. 
       idx_added <- sample(1:n_remainings, size = 1, replace = FALSE) # new candidate that will take their place
-      i_sampled <- i_sampled[-i_worse]
-      i_sampled <- c(i_sampled, i_unsampled[idx_added])
+      i_sampled <- setdiff(i_sampled, include)[-i_worse]
+      i_sampled <- c(i_sampled, i_unsampled[idx_added], include)
       i_unsampled <- i_unsampled[-idx_added]
       i_unsampled <- c(i_unsampled, spl_removed)
       
@@ -185,7 +196,7 @@ clhs.data.frame <- function(
     }
     
     # calc obj
-    res <- .lhs_obj(size = size, data_continuous_sampled = data_continuous_sampled, data_factor_sampled = data_factor_sampled, continuous_strata = continuous_strata, cor_mat = cor_mat, factor_obj = factor_obj, weights = weights)
+    res <- .lhs_obj(size = size, data_continuous_sampled = data_continuous_sampled, data_factor_sampled = data_factor_sampled, continuous_strata = continuous_strata, cor_mat = cor_mat, factor_obj = factor_obj, weights = weights, eta = eta)
     
     obj <- res$obj
     delta_obj_continuous <- res$delta_obj_continuous
