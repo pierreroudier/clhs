@@ -1,3 +1,8 @@
+============ clhs_0.7-0 - 2018-10-11 ============
+* New DLHS method contributed by Benjamin Louis
+* Included possibility to include compulsory/existing samples in the set (thanks to Benjamin Louis)
+* Added more tests
+
 ============ clhs_0.6-0 - 2018-04-13 ============
 * Added Gower similarity tool (thanks to Colby Brugnard)
 * Switched documentation to Roxygen
