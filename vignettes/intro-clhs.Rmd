@@ -34,6 +34,10 @@ str(res)
 
 (work in progress)
 
+# Including existing samples in the sampling routine
+
+(work in progress)
+
 # Cost-constrained implementation
 
 (work in progress)
@@ -43,11 +47,14 @@ diamonds$cost <- runif(nrow(diamonds))
 res_cost <- clhs(diamonds, size = 100, progress = FALSE, iter = 1000, cost = 'cost')
 ```
 
+# DLHS 
+
+(work in progress)
 # Plotting the results
 
 If you want to report on the cLHS results, e.g. plot the evolution of the objective function, or compare the distribution of attributes in the initial object and in the sampled subset, you need to switch the `simple` option to `FALSE`. Instead f simply returning a numeric vector giving the index of the sampled individuals in the original object, a specific, more complex will be returned. This object can be handled by a specific `plot` method:
 
-```{r plot_clhs_1, echo=TRUE, fig=TRUE, height=10, width=10}
+```{r plot_clhs_1, echo=TRUE, fig=TRUE, fig.height=8, fig.width=8}
 res <- clhs(diamonds, size = 100, simple = FALSE, progress = FALSE, iter = 1000)
 plot(res)
 ```
@@ -60,11 +67,11 @@ The default plotting method plots the evolution of the objective function with t
 
 These modes should be given as a vector of characters.
 
-```{r plot_clhs_3, echo=TRUE, fig=TRUE, height=10, width=20}
+```{r plot_clhs_3, echo=TRUE, fig=TRUE, fig.height=8, fig.width=12}
 res_cost <- clhs(diamonds, size = 100, progress = FALSE, iter = 1000, cost = 'cost', simple = FALSE)
 plot(res_cost, c('obj', 'cost'))
 ```
 
-```{r plot_clhs_4, echo=TRUE, fig=TRUE, height=10, width=20, warning=FALSE}
+```{r plot_clhs_4, echo=TRUE, fig=TRUE, fig.height=8, fig.width=12, warning=FALSE}
 plot(res_cost, c('obj', 'cost', 'box'))
 ```
