@@ -127,6 +127,14 @@ res <- clhs(df, size = 50, iter = 100, progress = FALSE, simple = FALSE)
 str(res)
 plot(res)
 
+# Method DLHS with a linear increase of the strata weight (i.e. probability to be sampled)
+# from 1 for the middle starta to 3 for the edge of the distribution
+linear_increase <- 1+(2/24)*0:24
+eta <- matrix(c(rev(linear_increase), linear_increase), ncol = 2, nrow = 50)
+res <- clhs(df, size = 50, iter = 100, eta = eta, progress = FALSE, simple = FALSE)
+str(res)
+plot(res)  
+
 }
 \references{
 *For the initial cLHS method:
