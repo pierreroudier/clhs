@@ -21,7 +21,7 @@
   #
   n_cont_variables <- ncol(data_continuous_sampled)
 
-  cont_data_strata <- lapply(1:n_cont_variables, function(i) list(data_continuous_sampled[, i], continuous_strata[, i]) )
+  cont_data_strata <- lapply(1:n_cont_variables, function(i) list(data_continuous_sampled[, i, drop = TRUE], continuous_strata[, i, drop = TRUE]) )
   cont_obj_sampled <- lapply(cont_data_strata, function(x) hist(x[[1]], breaks = x[[2]], plot = FALSE)$counts)
   cont_obj_sampled <- matrix(unlist(cont_obj_sampled), ncol = n_cont_variables, byrow = FALSE)
 
