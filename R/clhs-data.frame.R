@@ -74,6 +74,12 @@ clhs.data.frame <- function(
     
   }
   
+  if (!is.null(include)) {
+    if (size <= length(include)) {
+      stop(paste0("size (", size, ") should be larger than length of include (", length(include), ")"))
+    }
+  }
+  
   # Detection of any factor data
   i_factor <- which(!sapply(x, is.numeric))
   n_factor <- length(i_factor)

@@ -28,12 +28,15 @@ clhs(x, size, include, cost, iter, temp, tdecrease, weights, eta, obj.limit,
 \item{x}{A \code{data.frame}, \code{SpatialPointsDataFrame} or \code{Raster}
 object.}
 
-\item{size}{A non-negative integer giving the number of samples to pick.}
+\item{size}{A non-negative integer giving the total number of items to select}
 
-\item{include}{Vector of row indexes of data from \code{x} that must be 
-included in the final sample. For the cost-constrained cLHS method, cost of 
+\item{include}{A numeric vector giving the indices of the rows from \code{x} that must be 
+included in the selected items. For the cost-constrained cLHS method, cost of 
 these mandatory samples is set to 0. If NULL (default), all data are randomly 
-choosen according to the classic cLHS method.}
+choosen according to the classic cLHS method. If \code{include} is not NULL,
+argument \code{size} must inlcude the total size of the final sample i.e. the
+size of mandatory samples given by \code{include} plus the size of the randomly
+chosen samples to pick.}
 
 \item{cost}{A character giving the name or an integer giving the index of
 the attribute in \code{x} that gives a cost that can be use to constrain the
