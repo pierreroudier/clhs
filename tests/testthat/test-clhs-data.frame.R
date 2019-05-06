@@ -2,6 +2,7 @@ context("clhs-data.frame")
 
 test_that("basic clhs on a data.frame works", {
   
+  suppressWarnings(RNGversion("3.5.0"))
   set.seed(1)
   
   df <- data.frame(
