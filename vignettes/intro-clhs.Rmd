@@ -6,7 +6,6 @@ output: rmarkdown::html_vignette
 vignette: >
   # %\VignetteIndexEntry{intro-clhs}
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r make_things_reproducible, echo=FALSE, eval=TRUE}
