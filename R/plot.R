@@ -60,8 +60,8 @@ plot.cLHS_result <- function(
   iter <- 1:length(x$obj)
   obj <- x$obj
   cost <- x$cost
-  if (is.null(cost)) df_obj <- data.frame(iter, obj)
-  else df_obj <- data.frame(iter, obj, cost)
+  if (is.null(cost)) df_obj <- data.frame(iter, obj, stringsAsFactors = TRUE)
+  else df_obj <- data.frame(iter, obj, cost, stringsAsFactors = TRUE)
 
   pl <- list()
 
@@ -110,8 +110,8 @@ plot.cLHS_result <- function(
         spl <- spl@data
       }
       if (inherits(init, "Raster")) {
-        init <- as.data.frame(init)
-        spl <- as.data.frame(spl)
+        init <- as.data.frame(init, stringsAsFactors = TRUE)
+        spl <- as.data.frame(spl, stringsAsFactors = TRUE)
       }
     }
 
@@ -152,7 +152,8 @@ plot.cLHS_result <- function(
       
       lst_prop_table_melt <- lapply(1:length(lst_prop_table), function(x) data.frame(
             variable = names(lst_prop_table)[x], 
-            melt(lst_prop_table[[x]], id = "id")
+            melt(lst_prop_table[[x]], id = "id"),
+            stringsAsFactors = TRUE
           )
         )
 

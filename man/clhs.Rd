@@ -6,21 +6,18 @@
 \alias{clhs.data.frame}
 \alias{clhs.Raster}
 \alias{clhs}
-\alias{clhs.data.frame}
-\alias{clhs.SpatialPointsDataFrame}
-\alias{clhs.Raster}
 \alias{clhs.SpatialPointsDataFrame}
 \title{Conditioned Latin Hypercube Sampling}
 \usage{
 \method{clhs}{data.frame}(x, size, include = NULL, cost = NULL,
-  iter = 10000, temp = 1, tdecrease = 0.95, weights = list(numeric = 1,
-  factor = 1, correlation = 1), eta = 1, obj.limit = -Inf,
+  iter = 10000, temp = 1, tdecrease = 0.95, weights = list(numeric
+  = 1, factor = 1, correlation = 1), eta = 1, obj.limit = -Inf,
   length.cycle = 10, simple = TRUE, progress = TRUE, track = NULL)
 
 \method{clhs}{Raster}(x, ...)
 
-clhs(x, size, include, cost, iter, temp, tdecrease, weights, eta, obj.limit,
-  length.cycle, simple, progress, track)
+clhs(x, size, include, cost, iter, temp, tdecrease, weights, eta,
+  obj.limit, length.cycle, simple, progress, track)
 
 \method{clhs}{SpatialPointsDataFrame}(x, ...)
 }

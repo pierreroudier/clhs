@@ -65,7 +65,7 @@ similarity_buffer <- function(covs, pts, buffer, fac = NA, metric = "gower", sta
     #   but there could be other options. 
     
     # Only retain cases without NA values
-    buff_data <- data.frame(buff_data[complete.cases(buff_data), ])
+    buff_data <- data.frame(buff_data[complete.cases(buff_data), ], stringsAsFactors = TRUE)
     
     # If there are some factor data
     if (!any(is.na(fac))) {
@@ -82,7 +82,7 @@ similarity_buffer <- function(covs, pts, buffer, fac = NA, metric = "gower", sta
     gower_sim <- 1 - gower_dissim[gower_dissim[, 1] == cellnum, ] 
     
     # Combine the cellnumbers of the raster to the similarity index. 
-    res_df <- data.frame(cellnum = buff_data$cell, similarity = gower_sim[-1])
+    res_df <- data.frame(cellnum = buff_data$cell, similarity = gower_sim[-1], stringsAsFactors = TRUE)
     
     # Define the raster layer storing the results
     res_r <- raster(covs, layer = 0) 

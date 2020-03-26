@@ -111,7 +111,7 @@ clhs.data.frame <- function(
   cor_mat <- cor(data_continuous, use = "complete.obs")
   
   # For object/class variable
-  if (n_factor == 0) data_factor_sampled <- data.frame()
+  if (n_factor == 0) data_factor_sampled <- data.frame(stringsAsFactors = TRUE)
   else factor_obj <- alply(data_factor, 2, function(x) table(x)/n_data)
   
   # Mandatory data in the sample
@@ -265,7 +265,7 @@ clhs.data.frame <- function(
   if (progress) close(pb)
   
   if (n_factor > 0) {
-    sampled_data <- data.frame(data_continuous_sampled, data_factor_sampled)
+    sampled_data <- data.frame(data_continuous_sampled, data_factor_sampled, stringsAsFactors = TRUE)
     # reordering cols
     sampled_data <- sampled_data[, names(x)]
   } else sampled_data <- data_continuous_sampled
