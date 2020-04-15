@@ -5,7 +5,8 @@ test_that("Mandatory samples are actually selected", {
   df <- data.frame(
     a = runif(1000), 
     b = rnorm(1000), 
-    c = sample(LETTERS[1:5], size = 1000, replace = TRUE)
+    c = sample(LETTERS[1:5], size = 1000, replace = TRUE),
+    stringsAsFactors = TRUE
   )
   
   mandatory_idx <- sample(1:nrow(df), size = 3)

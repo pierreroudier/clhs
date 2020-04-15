@@ -8,7 +8,8 @@ test_that("DLHS method on a data.frame works", {
   df <- data.frame(
     a = runif(1000), 
     b = rnorm(1000), 
-    c = sample(LETTERS[1:5], size = 1000, replace = TRUE)
+    c = sample(LETTERS[1:5], size = 1000, replace = TRUE),
+    stringsAsFactors = TRUE
   )
   
   # Weigth of sampling from 1 for the middle strata to 3 for the edges
