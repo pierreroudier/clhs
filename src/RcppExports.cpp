@@ -6,29 +6,6 @@
 
 using namespace Rcpp;
 
-// c_cor
-NumericMatrix c_cor(NumericMatrix mat);
-RcppExport SEXP _clhs_c_cor(SEXP matSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type mat(matSEXP);
-    rcpp_result_gen = Rcpp::wrap(c_cor(mat));
-    return rcpp_result_gen;
-END_RCPP
-}
-// table_cpp
-NumericVector table_cpp(const Rcpp::NumericVector& v, const NumericVector full);
-RcppExport SEXP _clhs_table_cpp(SEXP vSEXP, SEXP fullSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type v(vSEXP);
-    Rcpp::traits::input_parameter< const NumericVector >::type full(fullSEXP);
-    rcpp_result_gen = Rcpp::wrap(table_cpp(v, full));
-    return rcpp_result_gen;
-END_RCPP
-}
 // CppLHS
 List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata, arma::mat include, bool factors, arma::uvec i_fact, int nsample, bool cost_mode, int iter, double wCont, double wFact, double wCorr, double temperature, double tdecrease, int length_cycle);
 RcppExport SEXP _clhs_CppLHS(SEXP xASEXP, SEXP costSEXP, SEXP strataSEXP, SEXP includeSEXP, SEXP factorsSEXP, SEXP i_factSEXP, SEXP nsampleSEXP, SEXP cost_modeSEXP, SEXP iterSEXP, SEXP wContSEXP, SEXP wFactSEXP, SEXP wCorrSEXP, SEXP temperatureSEXP, SEXP tdecreaseSEXP, SEXP length_cycleSEXP) {
@@ -54,58 +31,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// rcpparma_hello_world
-arma::mat rcpparma_hello_world();
-RcppExport SEXP _clhs_rcpparma_hello_world() {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(rcpparma_hello_world());
-    return rcpp_result_gen;
-END_RCPP
-}
-// rcpparma_outerproduct
-arma::mat rcpparma_outerproduct(const arma::colvec& x);
-RcppExport SEXP _clhs_rcpparma_outerproduct(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::colvec& >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpparma_outerproduct(x));
-    return rcpp_result_gen;
-END_RCPP
-}
-// rcpparma_innerproduct
-double rcpparma_innerproduct(const arma::colvec& x);
-RcppExport SEXP _clhs_rcpparma_innerproduct(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::colvec& >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpparma_innerproduct(x));
-    return rcpp_result_gen;
-END_RCPP
-}
-// rcpparma_bothproducts
-Rcpp::List rcpparma_bothproducts(const arma::colvec& x);
-RcppExport SEXP _clhs_rcpparma_bothproducts(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::colvec& >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpparma_bothproducts(x));
-    return rcpp_result_gen;
-END_RCPP
-}
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_clhs_c_cor", (DL_FUNC) &_clhs_c_cor, 1},
-    {"_clhs_table_cpp", (DL_FUNC) &_clhs_table_cpp, 2},
     {"_clhs_CppLHS", (DL_FUNC) &_clhs_CppLHS, 15},
-    {"_clhs_rcpparma_hello_world", (DL_FUNC) &_clhs_rcpparma_hello_world, 0},
-    {"_clhs_rcpparma_outerproduct", (DL_FUNC) &_clhs_rcpparma_outerproduct, 1},
-    {"_clhs_rcpparma_innerproduct", (DL_FUNC) &_clhs_rcpparma_innerproduct, 1},
-    {"_clhs_rcpparma_bothproducts", (DL_FUNC) &_clhs_rcpparma_bothproducts, 1},
     {NULL, NULL, 0}
 };
 

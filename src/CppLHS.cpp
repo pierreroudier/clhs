@@ -78,7 +78,6 @@ inline NumericMatrix c_cor_helper(const NumericMatrix& mat, const int rstart, co
   return rmat;
 }
 
-// [[Rcpp::export]]
 NumericMatrix c_cor(NumericMatrix mat) {
   return c_cor_helper(mat, 0, mat.nrow());
 }
@@ -86,7 +85,6 @@ NumericMatrix c_cor(NumericMatrix mat) {
 //pair list
 typedef std::pair<double, int>  ptype;
 
-// [[Rcpp::export]]
 NumericVector table_cpp(const Rcpp::NumericVector & v, const NumericVector full){
   std::vector<double> data = as<std::vector<double>>(v);
   unsigned int nTot = v.size();
@@ -296,6 +294,7 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
   delta_cont = res.obj_cont_res;
   //Rcout << "Finished function; obj = "<< obj << "\n";
   
+  NumericVector cost_values(iter, NA_REAL);
   if(cost_mode){
     idx2 = wrap(i_sampled);
     temp = cost[idx2];
@@ -372,6 +371,9 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
       }
     }
     obj_values[i] = obj;
+    if(cost_mode){
+      cost_values[i] = opCost;
+    }
     if(i % length_cycle == 0){
       temperature = temperature*tdecrease;
     }
@@ -382,5 +384,6 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
   return List::create(_["sampled_data"] = x_curr,
                       _["index_sampled"] = i_sampled,
                       _["obj"] = obj_values,
+                      _["cost"] = cost_values,
                       _["final_obj_continuous"] = delta_cont);
 }
