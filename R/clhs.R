@@ -45,6 +45,9 @@
 #' option is not used.
 #' @param iter A positive number, giving the number of iterations for the
 #' Metropolis-Hastings annealing process. Defaults to 10000.
+#' @param use.cpp TRUE or FALSE. If set to TRUE, annealing process uses C++ code.
+#' This is ~ 150 times faster than the R version, but is less stable and currently 
+#' doesn't accept track, eta, or obj.limit parameters.
 #' @param temp The initial temperature at which the simulated annealing
 #' begins. Defaults to 1.
 #' @param tdecrease A number betwen 0 and 1, giving the rate at which
@@ -110,8 +113,8 @@
 #' res <- clhs(df, size = 50, iter = 100, progress = FALSE, simple = TRUE)
 #' str(res)
 #' 
-#' # Returning a cLHS_result object for plotting
-#' res <- clhs(df, size = 50, iter = 100, progress = FALSE, simple = FALSE)
+#' # Returning a cLHS_result object for plotting using C++
+#' res <- clhs(df, size = 50, use.cpp = TRUE, iter = 5000, progress = FALSE, simple = FALSE)
 #' str(res)
 #' plot(res)
 #' 
