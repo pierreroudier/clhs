@@ -58,7 +58,7 @@ clhs.data.frame <- function(
     }
     
     continuous_strata <- apply(
-      data_continuous, 
+      data, 
       2, 
       function(x) {
         quantile(x, probs = seq(0, 1, length.out = size + 1), na.rm = TRUE)
