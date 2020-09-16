@@ -55,6 +55,7 @@ clhs.data.frame <- function(
       factIdx <- 1:n_factor
     } else {
       data <- as.matrix(x)
+      factIdx <- 1:5
     }
     
     continuous_strata <- apply(
