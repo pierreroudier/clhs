@@ -4,3 +4,4 @@
 .Ruserdata
 clhs.Rproj
 *.o
+*.so
