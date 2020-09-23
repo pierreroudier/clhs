@@ -1,19 +1,13 @@
-[![Travis-CI Build Status](https://travis-ci.org/pierreroudier/clhs.svg?branch=master)](https://travis-ci.org/pierreroudier/clhs)
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/clhs)](https://cran.r-project.org/package=clhs)
-[![Total_Downloads](http://cranlogs.r-pkg.org/badges/grand-total/clhs)](https://cran.r-project.org/package=clhs)
-
 # clhs
 
-A R implementation of the conditioned Latin Hypercube Sampling method
+A faster (C++) implementation of the conditioned Latin Hypercube Sampling method
 
 ## Scope
 
 ## Installation
 
-It's easiest to install `clhs` from CRAN:
+The C++ method is not yet on CRAN. 
 
-`install.packages("clhs")`
-
-You can also install it use the `devtools` package to install `clhs`:
+You can install it using the `devtools` package to install `clhs`:
 
 `devtools::install_github("pierreroudier/clhs")`
