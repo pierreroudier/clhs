@@ -53,9 +53,22 @@ clhs.data.frame <- function(
       }
       data <- as.matrix(cbind(data_factor,data_continuous))
       factIdx <- 1:n_factor
+      ncont <- ncol(data_continuous)
     } else {
       data <- as.matrix(x)
       factIdx <- 1:5
+      ncont <- ncol(data)
+    }
+    
+    if(length(eta) == 1){
+      eMat <- matrix(data = eta, nrow = size, ncol = ncont)
+    }else{
+      etaDim <- dim(eta)
+      if(!all(c(size,ncont) == etaDim)){
+        stop("eta matrix is incorrect dimension")
+      }else{
+        eMat <- eta
+      }
     }
     
     continuous_strata <- apply(
@@ -75,8 +88,8 @@ clhs.data.frame <- function(
     }
     res <- CppLHS(xA = dat, cost = costVec, strata = continuous_strata, include = inc,
                   factors = areFactors, i_fact = factIdx-1, nsample = size, cost_mode = costFlag, iter = iter,
-                  wCont = weights$numeric, wFact = weights$factor, wCorr = weights$correlation, temperature = temp,
-                  tdecrease = tdecrease, length_cycle = length.cycle)
+                  wCont = weights$numeric, wFact = weights$factor, wCorr = weights$correlation, etaMat = eMat,
+                  temperature = temp, tdecrease = tdecrease, length_cycle = length.cycle)
     res$index_sampled <- res$index_sampled + 1 ##fix indexing difference
     res$sampled_data <- x[res$index_sampled,]
     

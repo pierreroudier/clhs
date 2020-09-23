@@ -167,7 +167,7 @@ struct objResult {
 //objective function
 objResult obj_fn(arma::mat x, NumericMatrix strata, arma::mat include, bool factors, 
                  arma::uvec i_fact, NumericMatrix cor_full, Rcpp::List fact_full, 
-                 double wCont, double wFact, double wCorr, int eta = 1){
+                 double wCont, double wFact, double wCorr, arma::mat etaMat){
   arma::mat x_all = join_vert(x,include);
   NumericMatrix fact_all;
   
@@ -198,9 +198,11 @@ objResult obj_fn(arma::mat x, NumericMatrix strata, arma::mat include, bool fact
   }
   
   //Rcout << "Hist values \n";
-  NumericVector temp = wrap(abs(hist_out - eta));
-  temp.attr("dim") = Dimension(num_obs-1,num_vars);
-  t2 = as<NumericMatrix>(temp);
+  arma::mat hist2 = as<arma::mat>(hist_out);
+  t2 = wrap(arma::abs(hist2 - etaMat));
+
+  // temp.attr("dim") = Dimension(num_obs-1,num_vars);
+  // t2 = as<NumericMatrix>(temp);
   obj_cont = rowSums(t2);
   obj_cont2 = as<std::vector<double>>(obj_cont);
   
@@ -233,8 +235,8 @@ objResult obj_fn(arma::mat x, NumericMatrix strata, arma::mat include, bool fact
 List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata, 
             arma::mat include, bool factors, arma::uvec i_fact, 
             int nsample, bool cost_mode, int iter, double wCont,
-            double wFact, double wCorr, double temperature = 1, 
-            double tdecrease = 0.95, int length_cycle = 8){
+            double wFact, double wCorr, arma::mat etaMat,
+            double temperature = 1, double tdecrease = 0.95, int length_cycle = 8){
   
   int ndata = xA.n_rows;
   double prev_obj;
@@ -289,7 +291,7 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
   }
   
   //Rcout << "cormat " << cor_full << "\n";
-  struct objResult res = obj_fn(x_curr,strata,include,factors,i_fact,cor_full,factTab,wCont,wFact,wCorr);
+  struct objResult res = obj_fn(x_curr,strata,include,factors,i_fact,cor_full,factTab,wCont,wFact,wCorr,etaMat);
   obj = res.objRes;
   delta_cont = res.obj_cont_res;
   //Rcout << "Finished function; obj = "<< obj << "\n";
@@ -340,7 +342,7 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
     //Rcout << "sending to function \n";
     arm_isamp = arma::conv_to<arma::uvec>::from(i_sampled);
     x_curr = xA.rows(arm_isamp); // is this efficient?
-    res = obj_fn(x_curr,strata,include,factors,i_fact,cor_full,factTab,wCont,wFact,wCorr); //test this
+    res = obj_fn(x_curr,strata,include,factors,i_fact,cor_full,factTab,wCont,wFact,wCorr,etaMat); //test this
     obj = res.objRes;
     delta_cont = res.obj_cont_res;
     NumericVector dcTemp = wrap(delta_cont);
