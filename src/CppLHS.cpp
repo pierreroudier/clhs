@@ -1,7 +1,10 @@
 /*
  * Kiri Daust, August 2020
- * C++ Version of clhs by Pierre Roudier
  * 
+ * This program contains the main function (and helper functions)
+ * used for the clhs optimisation if use.cpp = T
+ * 
+ * The method is based on the R code by Pierre Roudier
  */
 
 #include <stdio.h>
@@ -13,7 +16,7 @@
 using namespace Rcpp;
 using namespace std;
 
-//difference in vectors
+//difference in vectors (i.e. setdiff in R)
 std::vector<int> vector_diff( const std::vector<int>& model, const std::vector<int>& pattern ){
   std::set<int> s_model( model.begin(), model.end() );
   std::set<int> s_pattern( pattern.begin(), pattern.end() );
@@ -25,12 +28,12 @@ std::vector<int> vector_diff( const std::vector<int>& model, const std::vector<i
   return result;
 }
 
+//The following functions are used to quickly calculate the covariance matrix
+//Note that only the lower triangular part is returned
 struct asset_info {
   double sum, sum2, stdev;
 };
 
-//[correlation matrix](http://en.wikipedia.org/wiki/Correlation_and_dependence).
-// n,sX,sY,sXY,sX2,sY2
 // cor = ( n * sXY - sX * sY ) / ( sqrt(n * sX2 - sX^2) * sqrt(n * sY2 - sY^2) )
 inline asset_info compute_asset_info(const NumericMatrix& mat, 
                                      const int icol, const int rstart, const int rend) {
@@ -78,11 +81,12 @@ inline NumericMatrix c_cor_helper(const NumericMatrix& mat, const int rstart, co
   return rmat;
 }
 
+//c_cor is called to calculate the correlation matrix of mat
 NumericMatrix c_cor(NumericMatrix mat) {
   return c_cor_helper(mat, 0, mat.nrow());
 }
 
-//pair list
+//pair list to store frequency table for factors
 typedef std::pair<double, int>  ptype;
 
 NumericVector table_cpp(const Rcpp::NumericVector & v, const NumericVector full){
@@ -236,7 +240,7 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
             arma::mat include, bool factors, arma::uvec i_fact, 
             int nsample, bool cost_mode, int iter, double wCont,
             double wFact, double wCorr, arma::mat etaMat,
-            double temperature = 1, double tdecrease = 0.95, int length_cycle = 8){
+            double temperature, double tdecrease, int length_cycle){
   
   int ndata = xA.n_rows;
   double prev_obj;
@@ -316,7 +320,7 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
       prev_opCost = opCost;
     }
     
-    if(Rcpp::runif(1,0,1)[0] < 0.4){
+    if(Rcpp::runif(1,0,1)[0] < 0.5){
       //Rcout << "In Simple Swap \n";
       idx_removed = as<std::vector<int>>(Rcpp::sample(i_sampled.size()-1, 1, false));
       spl_removed = i_sampled[idx_removed[0]];
@@ -362,7 +366,7 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
     }
     
     //Revert Change
-    if(delta_obj > 0 && runif(1,0,1)[0] >= metropolis || runif(1,0,1)[1] >= metropolis_cost){
+    if((delta_obj > 0 && runif(1,0,1)[0] >= metropolis) || (runif(1,0,1)[1] >= metropolis_cost)){
       //Rcout << "In revert change \n";
       i_sampled = i_sampled_prev;
       i_unsampled = i_unsampled_prev;
@@ -384,7 +388,7 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
   x_curr = xA.rows(arm_isamp);
   Rcout << "vroom vroom \n";
   return List::create(_["sampled_data"] = x_curr,
-                      _["index_sampled"] = i_sampled,
+                      _["index_samples"] = i_sampled,
                       _["obj"] = obj_values,
                       _["cost"] = cost_values,
                       _["final_obj_continuous"] = delta_cont);

@@ -22,8 +22,13 @@ clhs.data.frame <- function(
   track = NULL # just to have the cost computed without having it guiding the process
 ) {
   
-  # Temperature decrease rate should be < 1
+  ##check input
   if (tdecrease >= 1) stop("tdecrease should be < 1")
+  if (!is.null(include)) {
+    if (size <= length(include)) {
+      stop(paste0("size (", size, ") should be larger than length of include (", length(include), ")"))
+    }
+  }
   
   if (use.cpp){
     x <- as.data.frame(x)
@@ -46,8 +51,8 @@ clhs.data.frame <- function(
     n_factor <- length(i_factor)
     if (n_factor > 0) {
       areFactors <- TRUE
-      data_continuous <- x[, -1*i_factor]
-      data_factor <- x[, i_factor]
+      data_continuous <- x[, -1*i_factor,drop = F]
+      data_factor <- x[, i_factor, drop = F]
       for(i in 1:ncol(data_factor)){
         data_factor[,i] <- as.numeric(data_factor[,i])
       }
@@ -82,18 +87,23 @@ clhs.data.frame <- function(
     if(is.null(include)){
       dat <- data
       inc <- dat[0,]
+      ssize <- size
     }else{
       dat <- data[-include,]
       inc <- data[include,]
+      ssize <- size - length(include)
     }
     res <- CppLHS(xA = dat, cost = costVec, strata = continuous_strata, include = inc,
-                  factors = areFactors, i_fact = factIdx-1, nsample = size, cost_mode = costFlag, iter = iter,
+                  factors = areFactors, i_fact = factIdx-1, nsample = ssize, cost_mode = costFlag, iter = iter,
                   wCont = weights$numeric, wFact = weights$factor, wCorr = weights$correlation, etaMat = eMat,
                   temperature = temp, tdecrease = tdecrease, length_cycle = length.cycle)
-    res$index_sampled <- res$index_sampled + 1 ##fix indexing difference
+    res$index_samples <- res$index_samples + 1 ##fix indexing difference
+    if(!is.null(include)){
+      res$index_samples <- c(res$index_samples,include)
+    }
     res$sampled_data <- x[res$index_sampled,]
     
-    if (simple) res <- res$index_sampled
+    if (simple) res <- res$index_samples
     else {
       # Making up the object to be returned
       class(res) = c("cLHS_result","list")
