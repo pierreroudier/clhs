@@ -89,11 +89,14 @@ NumericMatrix c_cor(NumericMatrix mat) {
 //pair list to store frequency table for factors
 typedef std::pair<double, int>  ptype;
 
+//this function creates a frequency table of sampled factor data
+//it takes a vector v of sampled data, and a frequency table for the full factor
+//it returns the absolute values of the original table - the sampled frequencies
 NumericVector table_cpp(const Rcpp::NumericVector & v, const NumericVector full){
   std::vector<double> data = as<std::vector<double>>(v);
   unsigned int nTot = v.size();
   // Create a map
-  Rcpp::CharacterVector tempLevs = full.attr("names");
+  Rcpp::CharacterVector tempLevs = full.attr("names");//need to made sure new vectors has same levels in same order
   std::vector<double> levels(tempLevs.size());
   for(int i = 0; i < tempLevs.size(); i++){
     levels[i] = std::strtod(tempLevs[i], NULL);
@@ -106,11 +109,10 @@ NumericVector table_cpp(const Rcpp::NumericVector & v, const NumericVector full)
   for (int i = 0; i != levels.size(); ++i) {
     Elt[levels[i]] = 0;
   }
-  //count
+  //count frequencies
   for (int i = 0; i != v.size(); ++i) {
     Elt[data[i]] += 1;
   }
-  // Get how many unique elements exist...
   unsigned int n_obs = Elt.size();
   
   std::vector<ptype> sorted_Elt(Elt.begin(), Elt.end());
@@ -118,7 +120,7 @@ NumericVector table_cpp(const Rcpp::NumericVector & v, const NumericVector full)
   
   unsigned int count = 0;
   double temp;
-  // Need to use iterators to access objects
+  //Use iterators to access objects in map
   for(std::vector<ptype>::iterator it = sorted_Elt.begin(); it != sorted_Elt.end(); ++it){
     temp = it->second;
     result_vals(count) = temp/nTot;
@@ -132,7 +134,8 @@ NumericVector table_cpp(const Rcpp::NumericVector & v, const NumericVector full)
   return (result_vals);
 }
 
-//bincount
+//bincount - basically just a histogram function
+//takes vector of data and breaks, returns a vector of counts
 IntegerVector hist(NumericVector x, NumericVector breaks){ //based on C_bincount from graphics package
     int n = x.length();
     int nb = breaks.length();
@@ -163,18 +166,21 @@ IntegerVector hist(NumericVector x, NumericVector breaks){ //based on C_bincount
     return(counts);
   }
 
+//structure to store objective function result
 struct objResult {
   double objRes;
   std::vector<double> obj_cont_res;
 };
 
-//objective function
+//objective function - calculates objective value for current sample
+//returns objResult struct
 objResult obj_fn(arma::mat x, NumericMatrix strata, arma::mat include, bool factors, 
                  arma::uvec i_fact, NumericMatrix cor_full, Rcpp::List fact_full, 
                  double wCont, double wFact, double wCorr, arma::mat etaMat){
-  arma::mat x_all = join_vert(x,include);
+  arma::mat x_all = join_vert(x,include);//join with include - does nothing if no include
   NumericMatrix fact_all;
   
+  //if there are factors, remove them from the continuous data
   if(factors){
     arma::mat tempMat = x_all.cols(i_fact);
     fact_all = wrap(tempMat);
@@ -193,7 +199,7 @@ objResult obj_fn(arma::mat x, NumericMatrix strata, arma::mat include, bool fact
   NumericMatrix t2;
   std::vector<double> obj_cont2;
   
-  //Rcout << "Hist continuous \n";
+  //send each column to bincount function
   for(int i = 0; i < num_vars; i++){
     //Rcout << "Hist idex is " << i << "\n";
     data = wrap(x_all.col(i));
@@ -201,16 +207,14 @@ objResult obj_fn(arma::mat x, NumericMatrix strata, arma::mat include, bool fact
     hist_out(_,i) = hist(data,strata_curr);
   }
   
-  //Rcout << "Hist values \n";
+  //convert to arma mat because subtraction is faster
   arma::mat hist2 = as<arma::mat>(hist_out);
-  t2 = wrap(arma::abs(hist2 - etaMat));
+  t2 = wrap(arma::abs(hist2 - etaMat));//subtract eta - either input matrix, or all 1
 
-  // temp.attr("dim") = Dimension(num_obs-1,num_vars);
-  // t2 = as<NumericMatrix>(temp);
   obj_cont = rowSums(t2);
   obj_cont2 = as<std::vector<double>>(obj_cont);
   
-  //Rcout << "Check factors \n";
+  //send factor data to get tabulated
   NumericVector factRes(num_vars);
   if(factors){
     int num_vars2 = fact_full.size();
@@ -224,16 +228,33 @@ objResult obj_fn(arma::mat x, NumericMatrix strata, arma::mat include, bool fact
     }
   }
   
+  //correlation matrix for current sample
   NumericMatrix cor_new = c_cor(wrap(x_all));
-  //Rcout << "cormat " << cor_new << "\n";
+
   double obj_cor = sum(abs(cor_full - cor_new));
+  //combined objective values - since corr_mat is lower tri, have to multiply by 2
   double objFinal = sum(obj_cont)*wCont + obj_cor*2*wCorr + sum(factRes)*wFact;
   struct objResult out = {objFinal, obj_cont2};
   return(out);
 }
 
 
-//Main Function
+/*Main function called from R
+ * Takes inputs:
+ * xA: matrix of data - must be numeric (factors are converted to numeric in R)
+ * cost: cost vector (0 if no cost)
+ * strata: matrix of continuous strata
+ * include: matrix of included data
+ * factors: boolean factor flag
+ * i_fact: indices of factors in xA
+ * nsample: number of samples
+ * cost_mode: bool cost flag
+ * iter: number of iterations
+ * wCont,wFact,wCorr: continuous, factor, and correlation weights
+ * etaMat: eta matrix - either all 1, or user input
+ * temperature: initial temperature
+ * tdecrease: temperature decrease every length_cycle iterations
+ */
 
 // [[Rcpp::export]]
 List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata, 
@@ -242,6 +263,7 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
             double wFact, double wCorr, arma::mat etaMat,
             double temperature, double tdecrease, int length_cycle){
   
+  //initialise objects
   int ndata = xA.n_rows;
   double prev_obj;
   double obj;
@@ -266,49 +288,51 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
   std::vector<int> i_unsampled;
   std::vector<int> i_unsampled_prev;
   std::vector<int> idx(ndata);
-  std::iota(idx.begin(),idx.end(),0);
+  std::iota(idx.begin(),idx.end(),0);//populate idx with seq(0:ndata)
   std::vector<double>::iterator it_worse;
   int i_worse;
   IntegerVector idx2;
   NumericVector temp;
   NumericVector obj_values(iter);
   
+  //initial sample
   i_sampled = as<std::vector<int>>(Rcpp::sample(ndata-1,nsample,false));
-  i_unsampled = vector_diff(idx,i_sampled);
-  arma::uvec arm_isamp = arma::conv_to<arma::uvec>::from(i_sampled);
+  i_unsampled = vector_diff(idx,i_sampled);//unsampled
+  arma::uvec arm_isamp = arma::conv_to<arma::uvec>::from(i_sampled);//index needs to be aram::uvec to extract rows
   x_curr = xA.rows(arm_isamp); // is this efficient?
   //Rcout << "Finish initial sample \n";
   arma::mat x_cont = xA;
   if(factors){
-    x_cont.shed_cols(i_fact);
+    x_cont.shed_cols(i_fact);// remove factors for correlation
   }
-  NumericMatrix cor_full = c_cor(wrap(x_cont));
+  NumericMatrix cor_full = c_cor(wrap(x_cont));//full correlation matrix
   
   //setup table list for factors
-  Rcpp::List factTab(i_fact.size());
+  Rcpp::List factTab(i_fact.size()); 
   if(factors){
     arma::mat xFact = xA.cols(i_fact);
     NumericMatrix xFact2 = wrap(xFact);
     for(int i = 0; i < i_fact.size(); i++){
-      factTab[i] = Rcpp::table(xFact2(_,i));
+      factTab[i] = Rcpp::table(xFact2(_,i));//we use Rcpp here because it gives us name attributes
     }
   }
   
-  //Rcout << "cormat " << cor_full << "\n";
+  //initial objective value
   struct objResult res = obj_fn(x_curr,strata,include,factors,i_fact,cor_full,factTab,wCont,wFact,wCorr,etaMat);
   obj = res.objRes;
   delta_cont = res.obj_cont_res;
   //Rcout << "Finished function; obj = "<< obj << "\n";
   
-  NumericVector cost_values(iter, NA_REAL);
+  NumericVector cost_values(iter, NA_REAL);//store cost
+  
   if(cost_mode){
     idx2 = wrap(i_sampled);
     temp = cost[idx2];
     opCost = sum(temp);
   }
   
+  //start metropolis hasting iterations
   for(int i = 0; i < iter; i++){
-    //Rcout << i << " ";
     if(i % 50 == 0)
       Rcpp::checkUserInterrupt();
     prev_obj = obj;
@@ -329,11 +353,10 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
       i_sampled.push_back(i_unsampled[idx_added[0]]);
       i_unsampled.erase(i_unsampled.begin()+idx_added[0]);
       i_unsampled.push_back(spl_removed);
-      //now ready for data
     }else{
       //Rcout << "In remove worst \n";
-      it_worse = std::max_element(delta_cont.begin(),delta_cont.end());
-      i_worse = std::distance(delta_cont.begin(), it_worse);
+      it_worse = std::max_element(delta_cont.begin(),delta_cont.end()); //returns max element
+      i_worse = std::distance(delta_cont.begin(), it_worse); //find location of worst
       spl_removed = i_sampled[i_worse];
       //Rcout << "spl_removed " << spl_removed << "\n";
       idx_added = as<std::vector<int>>(Rcpp::sample(i_unsampled.size()-1, 1, false));
@@ -341,21 +364,20 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
       i_sampled.push_back(i_unsampled[idx_added[0]]);
       i_unsampled.erase(i_unsampled.begin()+idx_added[0]);
       i_unsampled.push_back(spl_removed);
-      //ready for data
     }
     //Rcout << "sending to function \n";
     arm_isamp = arma::conv_to<arma::uvec>::from(i_sampled);
     x_curr = xA.rows(arm_isamp); // is this efficient?
+    //calculate objective value
     res = obj_fn(x_curr,strata,include,factors,i_fact,cor_full,factTab,wCont,wFact,wCorr,etaMat); //test this
     obj = res.objRes;
     delta_cont = res.obj_cont_res;
     NumericVector dcTemp = wrap(delta_cont);
-    //Rcout << "New delta obj cont is " << dcTemp << "\n";
     //update variables
     delta_obj = obj - prev_obj;
     metropolis = exp(-1*delta_obj/temperature);
     
-    if(cost_mode){
+    if(cost_mode){//update cost variables
       idx2 = wrap(i_sampled);
       temp = cost[idx2];
       opCost = sum(temp);
@@ -387,6 +409,7 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
   arm_isamp = arma::conv_to<arma::uvec>::from(i_sampled);
   x_curr = xA.rows(arm_isamp);
   Rcout << "vroom vroom \n";
+  //create list to return
   return List::create(_["sampled_data"] = x_curr,
                       _["index_samples"] = i_sampled,
                       _["obj"] = obj_values,
