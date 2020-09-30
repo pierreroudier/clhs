@@ -101,7 +101,7 @@ clhs.data.frame <- function(
     if(!is.null(include)){
       res$index_samples <- c(res$index_samples,include)
     }
-    res$sampled_data <- x[res$index_sampled,]
+    res$sampled_data <- x[res$index_samples,]
     
     if (simple) res <- res$index_samples
     else {
