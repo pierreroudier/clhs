@@ -9,6 +9,7 @@ clhs.data.frame <- function(
   size, # Number of samples you want
   include = NULL, # row index of data that must be in the final sample
   cost = NULL, # Number or name of the attribute used as a cost
+  possible.sample = 1:nrow(x), # Indexes from which sampling is allowed
   iter = 10000, # Number of max iterations
   use.cpp = T, # use C++ code for metropolis-hasting loop?
   temp = 1, # initial temperature
@@ -93,7 +94,7 @@ clhs.data.frame <- function(
       inc <- data[include,]
       ssize <- size - length(include)
     }
-    res <- CppLHS(xA = dat, cost = costVec, strata = continuous_strata, include = inc,
+    res <- CppLHS(xA = dat, cost = costVec, strata = continuous_strata, include = inc, poss_samp = possible.sample,
                   factors = areFactors, i_fact = factIdx-1, nsample = ssize, cost_mode = costFlag, iter = iter,
                   wCont = weights$numeric, wFact = weights$factor, wCorr = weights$correlation, etaMat = eMat,
                   temperature = temp, tdecrease = tdecrease, length_cycle = length.cycle)

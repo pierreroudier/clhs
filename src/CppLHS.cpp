@@ -258,7 +258,7 @@ objResult obj_fn(arma::mat x, NumericMatrix strata, arma::mat include, bool fact
 
 // [[Rcpp::export]]
 List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata, 
-            arma::mat include, bool factors, arma::uvec i_fact, 
+            arma::mat include, IntegerVector poss_samp, bool factors, arma::uvec i_fact, 
             int nsample, bool cost_mode, int iter, double wCont,
             double wFact, double wCorr, arma::mat etaMat,
             double temperature, double tdecrease, int length_cycle){
