@@ -7,8 +7,8 @@
 using namespace Rcpp;
 
 // CppLHS
-List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata, arma::mat include, bool factors, arma::uvec i_fact, int nsample, bool cost_mode, int iter, double wCont, double wFact, double wCorr, arma::mat etaMat, double temperature, double tdecrease, int length_cycle);
-RcppExport SEXP _clhs_CppLHS(SEXP xASEXP, SEXP costSEXP, SEXP strataSEXP, SEXP includeSEXP, SEXP factorsSEXP, SEXP i_factSEXP, SEXP nsampleSEXP, SEXP cost_modeSEXP, SEXP iterSEXP, SEXP wContSEXP, SEXP wFactSEXP, SEXP wCorrSEXP, SEXP etaMatSEXP, SEXP temperatureSEXP, SEXP tdecreaseSEXP, SEXP length_cycleSEXP) {
+List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata, arma::mat include, std::vector<int> idx, bool factors, arma::uvec i_fact, int nsample, bool cost_mode, int iter, double wCont, double wFact, double wCorr, arma::mat etaMat, double temperature, double tdecrease, int length_cycle);
+RcppExport SEXP _clhs_CppLHS(SEXP xASEXP, SEXP costSEXP, SEXP strataSEXP, SEXP includeSEXP, SEXP idxSEXP, SEXP factorsSEXP, SEXP i_factSEXP, SEXP nsampleSEXP, SEXP cost_modeSEXP, SEXP iterSEXP, SEXP wContSEXP, SEXP wFactSEXP, SEXP wCorrSEXP, SEXP etaMatSEXP, SEXP temperatureSEXP, SEXP tdecreaseSEXP, SEXP length_cycleSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -16,6 +16,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type cost(costSEXP);
     Rcpp::traits::input_parameter< NumericMatrix >::type strata(strataSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type include(includeSEXP);
+    Rcpp::traits::input_parameter< std::vector<int> >::type idx(idxSEXP);
     Rcpp::traits::input_parameter< bool >::type factors(factorsSEXP);
     Rcpp::traits::input_parameter< arma::uvec >::type i_fact(i_factSEXP);
     Rcpp::traits::input_parameter< int >::type nsample(nsampleSEXP);
@@ -28,13 +29,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type temperature(temperatureSEXP);
     Rcpp::traits::input_parameter< double >::type tdecrease(tdecreaseSEXP);
     Rcpp::traits::input_parameter< int >::type length_cycle(length_cycleSEXP);
-    rcpp_result_gen = Rcpp::wrap(CppLHS(xA, cost, strata, include, factors, i_fact, nsample, cost_mode, iter, wCont, wFact, wCorr, etaMat, temperature, tdecrease, length_cycle));
+    rcpp_result_gen = Rcpp::wrap(CppLHS(xA, cost, strata, include, idx, factors, i_fact, nsample, cost_mode, iter, wCont, wFact, wCorr, etaMat, temperature, tdecrease, length_cycle));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_clhs_CppLHS", (DL_FUNC) &_clhs_CppLHS, 16},
+    {"_clhs_CppLHS", (DL_FUNC) &_clhs_CppLHS, 17},
     {NULL, NULL, 0}
 };
 

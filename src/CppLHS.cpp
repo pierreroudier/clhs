@@ -11,10 +11,12 @@
 #include <math.h>
 #include <string.h>
 #include <RcppArmadillo.h>
+#include <random>
 //[[Rcpp::depends(RcppArmadillo)]]
 
 using namespace Rcpp;
 using namespace std;
+// [[Rcpp::plugins("cpp17")]]
 
 //difference in vectors (i.e. setdiff in R)
 std::vector<int> vector_diff( const std::vector<int>& model, const std::vector<int>& pattern ){
@@ -106,7 +108,7 @@ NumericVector table_cpp(const Rcpp::NumericVector & v, const NumericVector full)
   Elt.clear();
   
   // Initialize with all zero - this might be slow
-  for (int i = 0; i != levels.size(); ++i) {
+  for (unsigned int i = 0; i != levels.size(); ++i) {
     Elt[levels[i]] = 0;
   }
   //count frequencies
@@ -141,8 +143,6 @@ IntegerVector hist(NumericVector x, NumericVector breaks){ //based on C_bincount
     int nb = breaks.length();
     int nb1 = nb-1;
     int i,lo,hi,newVal;
-    bool right = true,include_border = true;
-    //R_xlen_t i, lo, hi, nb1 = nb - 1, new;
     
     IntegerVector counts(nb1);
     //Rcout << "In Hist function \n";
@@ -258,13 +258,12 @@ objResult obj_fn(arma::mat x, NumericMatrix strata, arma::mat include, bool fact
 
 // [[Rcpp::export]]
 List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata, 
-            arma::mat include, IntegerVector poss_samp, bool factors, arma::uvec i_fact, 
+            arma::mat include, std::vector<int> idx, bool factors, arma::uvec i_fact, 
             int nsample, bool cost_mode, int iter, double wCont,
             double wFact, double wCorr, arma::mat etaMat,
             double temperature, double tdecrease, int length_cycle){
   
   //initialise objects
-  int ndata = xA.n_rows;
   double prev_obj;
   double obj;
   double delta_obj;
@@ -280,15 +279,15 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
   
   std::vector<double> delta_cont;
   std::vector<double> delta_cont_prev;
-  std::vector<int> idx_removed;
+  IntegerVector idx_removed;
+  IntegerVector idx_added;
   int spl_removed;
-  std::vector<int> idx_added;
   std::vector<int> i_sampled;
   std::vector<int> i_sampled_prev;
   std::vector<int> i_unsampled;
   std::vector<int> i_unsampled_prev;
-  std::vector<int> idx(ndata);
-  std::iota(idx.begin(),idx.end(),0);//populate idx with seq(0:ndata)
+  //std::vector<int> idx(ndata);
+  //std::iota(idx.begin(),idx.end(),0);//populate idx with seq(0:ndata)
   std::vector<double>::iterator it_worse;
   int i_worse;
   IntegerVector idx2;
@@ -296,8 +295,9 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
   NumericVector obj_values(iter);
   
   //initial sample
-  i_sampled = as<std::vector<int>>(Rcpp::sample(ndata-1,nsample,false));
-  i_unsampled = vector_diff(idx,i_sampled);//unsampled
+  idx2 = wrap(idx);
+  i_sampled = as<std::vector<int>>(Rcpp::sample(idx2,nsample,false));
+  i_unsampled = vector_diff(idx,i_sampled);
   arma::uvec arm_isamp = arma::conv_to<arma::uvec>::from(i_sampled);//index needs to be aram::uvec to extract rows
   x_curr = xA.rows(arm_isamp); // is this efficient?
   //Rcout << "Finish initial sample \n";
@@ -312,7 +312,7 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
   if(factors){
     arma::mat xFact = xA.cols(i_fact);
     NumericMatrix xFact2 = wrap(xFact);
-    for(int i = 0; i < i_fact.size(); i++){
+    for(unsigned int i = 0; i < i_fact.size(); i++){
       factTab[i] = Rcpp::table(xFact2(_,i));//we use Rcpp here because it gives us name attributes
     }
   }
@@ -346,10 +346,10 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
     
     if(Rcpp::runif(1,0,1)[0] < 0.5){
       //Rcout << "In Simple Swap \n";
-      idx_removed = as<std::vector<int>>(Rcpp::sample(i_sampled.size()-1, 1, false));
+      idx_removed = Rcpp::sample(i_sampled.size()-1, 1, false);
       spl_removed = i_sampled[idx_removed[0]];
       i_sampled.erase(i_sampled.begin() + idx_removed[0]);
-      idx_added = as<std::vector<int>>(Rcpp::sample(i_unsampled.size()-1, 1, false));
+      idx_added = Rcpp::sample(i_unsampled.size()-1, 1, false);
       i_sampled.push_back(i_unsampled[idx_added[0]]);
       i_unsampled.erase(i_unsampled.begin()+idx_added[0]);
       i_unsampled.push_back(spl_removed);
@@ -359,7 +359,7 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
       i_worse = std::distance(delta_cont.begin(), it_worse); //find location of worst
       spl_removed = i_sampled[i_worse];
       //Rcout << "spl_removed " << spl_removed << "\n";
-      idx_added = as<std::vector<int>>(Rcpp::sample(i_unsampled.size()-1, 1, false));
+      idx_added = Rcpp::sample(i_unsampled.size()-1, 1, false);
       i_sampled.erase(i_sampled.begin()+i_worse);
       i_sampled.push_back(i_unsampled[idx_added[0]]);
       i_unsampled.erase(i_unsampled.begin()+idx_added[0]);

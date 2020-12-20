@@ -94,7 +94,8 @@ clhs.data.frame <- function(
       inc <- data[include,]
       ssize <- size - length(include)
     }
-    res <- CppLHS(xA = dat, cost = costVec, strata = continuous_strata, include = inc, poss_samp = possible.sample,
+    possible.sample <- possible.sample-1 ##convert to zero based for C
+    res <- CppLHS(xA = dat, cost = costVec, strata = continuous_strata, include = inc, idx = possible.sample,
                   factors = areFactors, i_fact = factIdx-1, nsample = ssize, cost_mode = costFlag, iter = iter,
                   wCont = weights$numeric, wFact = weights$factor, wCorr = weights$correlation, etaMat = eMat,
                   temperature = temp, tdecrease = tdecrease, length_cycle = length.cycle)
