@@ -93,6 +93,7 @@ clhs.data.frame <- function(
       dat <- data[-include,]
       inc <- data[include,]
       ssize <- size - length(include)
+      possible.sample <- 1:nrow(dat)
     }
     possible.sample <- possible.sample-1 ##convert to zero based for C
     res <- CppLHS(xA = dat, cost = costVec, strata = continuous_strata, include = inc, idx = possible.sample,

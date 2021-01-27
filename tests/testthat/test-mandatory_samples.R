@@ -32,7 +32,7 @@ test_that("Mandatory samples are actually selected (C++)", {
   mandatory_idx <- sample(1:nrow(df), size = 3)
   
   # no error
-  res <- clhs(df, size = 10, iter = 5000, include = mandatory_idx, progress = FALSE)
+  res <- clhs(df, size = 10, include = mandatory_idx)
   expect_true(all(mandatory_idx %in% res))
   
   # error : size <= length(include)
