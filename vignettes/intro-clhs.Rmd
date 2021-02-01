@@ -110,7 +110,7 @@ If you want to report on the cLHS results, e.g. plot the evolution of the object
 
 ```{r plot_clhs_1, echo=TRUE, fig=TRUE, fig.height=8, fig.width=8}
 res <- clhs(diamonds, size = 100,cost = "cost", simple = FALSE, progress = FALSE, iter = 2000)
-plot(res)
+plot(res,c("obj","cost"))
 ```
 
 The default plotting method plots the evolution of the objective function with the number of iterations. However, you can get more details using the `modes` option, which controls which indicators are plotted. Three `modes` can be simultaneously plotted:

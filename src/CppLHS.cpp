@@ -404,7 +404,7 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
     }
     
     //Revert Change
-    if((delta_obj > 0 && runif(1,0,1)[0] >= metropolis) || (runif(1,0,1)[1] >= metropolis_cost)){
+    if(delta_obj > 0 && runif(1,0,1)[0] >= metropolis || runif(1,0,1)[0] >= metropolis_cost){
       //Rcout << "In revert change \n";
       i_sampled = i_sampled_prev;
       i_unsampled = i_unsampled_prev;
