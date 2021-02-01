@@ -50,6 +50,7 @@ clhs.data.frame <- function(
     areFactors <- FALSE
     i_factor <- which(!sapply(x, is.numeric))
     n_factor <- length(i_factor)
+    
     if (n_factor > 0) {
       areFactors <- TRUE
       data_continuous <- x[, -1*i_factor,drop = F]
@@ -64,6 +65,7 @@ clhs.data.frame <- function(
       data <- as.matrix(x)
       factIdx <- 1:5
       ncont <- ncol(data)
+      data_continuous <- x
     }
     
     if(length(eta) == 1){
@@ -78,7 +80,7 @@ clhs.data.frame <- function(
     }
     
     continuous_strata <- apply(
-      data, 
+      data_continuous, 
       2, 
       function(x) {
         quantile(x, probs = seq(0, 1, length.out = size + 1), na.rm = TRUE)

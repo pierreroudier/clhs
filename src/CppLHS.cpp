@@ -131,6 +131,7 @@ NumericVector table_cpp(const Rcpp::NumericVector & v, const NumericVector full)
   // Rcout << "Names: " << tempLevs << "\n";
   // Rcout << "Small: " << result_vals << "\n";
   // Rcout << "Full: " << full << "\n";
+  //Rcout << "Curr Facts: " << result_vals << "\n" << "Orig: " << full << "\n";
   
   result_vals = abs(result_vals - full);
   return (result_vals);
@@ -177,6 +178,7 @@ struct objResult {
 objResult obj_fn(arma::mat x, NumericMatrix strata, arma::mat include, bool factors, 
                  arma::uvec i_fact, NumericMatrix cor_full, Rcpp::List fact_full, 
                  double wCont, double wFact, double wCorr, arma::mat etaMat){
+  int nsamps = x.n_rows;
   arma::mat x_all = join_vert(x,include);//join with include - does nothing if no include
   NumericMatrix fact_all;
   
@@ -207,12 +209,13 @@ objResult obj_fn(arma::mat x, NumericMatrix strata, arma::mat include, bool fact
     hist_out(_,i) = hist(data,strata_curr);
   }
   
+  //Rcout << "Histout: " << hist_out << "\n";
   //convert to arma mat because subtraction is faster
   arma::mat hist2 = as<arma::mat>(hist_out);
   t2 = wrap(arma::abs(hist2 - etaMat));//subtract eta - either input matrix, or all 1
 
   obj_cont = rowSums(t2);
-  obj_cont2 = as<std::vector<double>>(obj_cont);
+  //Rcout << "Full ObjCont: " << obj_cont << "\n";
   
   //send factor data to get tabulated
   NumericVector factRes(num_vars);
@@ -222,18 +225,22 @@ objResult obj_fn(arma::mat x, NumericMatrix strata, arma::mat include, bool fact
     double total;
     for(int i = 0; i < num_vars2; i++){
       temp = fact_full[i];
-      total = temp.size();
+      total = sum(temp);
       temp = temp/total;
       factRes[i] = sum(table_cpp(fact_all(_,i),temp));
     }
   }
   
+  //Rcout << "FactRes: " << factRes << "\n";
   //correlation matrix for current sample
   NumericMatrix cor_new = c_cor(wrap(x_all));
 
   double obj_cor = sum(abs(cor_full - cor_new));
   //combined objective values - since corr_mat is lower tri, have to multiply by 2
   double objFinal = sum(obj_cont)*wCont + obj_cor*2*wCorr + sum(factRes)*wFact;
+  //Rcout << "FinalObj" << objFinal << "\n";
+  obj_cont = obj_cont[Rcpp::Range(0,nsamps-1)];
+  obj_cont2 = as<std::vector<double>>(obj_cont);
   struct objResult out = {objFinal, obj_cont2};
   return(out);
 }
@@ -323,6 +330,7 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
   delta_cont = res.obj_cont_res;
   //Rcout << "Finished function; obj = "<< obj << "\n";
   
+  
   NumericVector cost_values(iter, NA_REAL);//store cost
   
   if(cost_mode){
@@ -339,6 +347,7 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
     i_sampled_prev = i_sampled;
     i_unsampled_prev = i_unsampled;
     delta_cont_prev = delta_cont;
+    //Rcout << "Deltacont: " << wrap(delta_cont) << "\n";
     
     if(cost_mode){
       prev_opCost = opCost;
@@ -357,13 +366,20 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
       //Rcout << "In remove worst \n";
       it_worse = std::max_element(delta_cont.begin(),delta_cont.end()); //returns max element
       i_worse = std::distance(delta_cont.begin(), it_worse); //find location of worst
-      spl_removed = i_sampled[i_worse];
+      //NumericVector temp42 = wrap(delta_cont);
+      //NumericVector temp43 = wrap(i_sampled);
+      // Rcout << "i_sampled: " << temp43 << "\n";
+      // Rcout << "Delta vec: " << temp42 << "\n";
+      // Rcout << "Delta Worst: " << i_worse << "\n";
+      spl_removed = i_sampled[i_worse]; //this is the problem
       //Rcout << "spl_removed " << spl_removed << "\n";
       idx_added = Rcpp::sample(i_unsampled.size()-1, 1, false);
       i_sampled.erase(i_sampled.begin()+i_worse);
       i_sampled.push_back(i_unsampled[idx_added[0]]);
       i_unsampled.erase(i_unsampled.begin()+idx_added[0]);
       i_unsampled.push_back(spl_removed);
+      // temp43 = wrap(i_sampled);
+      // Rcout << "i_samplednew: " << temp43 << "\n";
     }
     //Rcout << "sending to function \n";
     arm_isamp = arma::conv_to<arma::uvec>::from(i_sampled);
