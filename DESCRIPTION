@@ -22,8 +22,9 @@ Suggests: knitr,
     rmarkdown,
     testthat
 VignetteBuilder: knitr
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.1
 Collate: 
+    'RcppExports.R'
     'clhs-internal.R'
     'clhs-data.frame.R'
     'clhs-package.R'
@@ -33,4 +34,3 @@ Collate:
     'clhs-sp.R'
     'plot.R'
     'similarity.R'
-    'RcppExports.R'

@@ -6,21 +6,48 @@
 \alias{clhs.data.frame}
 \alias{clhs.Raster}
 \alias{clhs}
-\alias{clhs.data.frame}
-\alias{clhs.SpatialPointsDataFrame}
-\alias{clhs.Raster}
 \alias{clhs.SpatialPointsDataFrame}
 \title{Conditioned Latin Hypercube Sampling}
 \usage{
-\method{clhs}{data.frame}(x, size, include = NULL, cost = NULL,
-  iter = 10000, temp = 1, tdecrease = 0.95, weights = list(numeric = 1,
-  factor = 1, correlation = 1), eta = 1, obj.limit = -Inf,
-  length.cycle = 10, simple = TRUE, progress = TRUE, track = NULL)
+\method{clhs}{data.frame}(
+  x,
+  size,
+  include = NULL,
+  cost = NULL,
+  possible.sample = 1:nrow(x),
+  iter = 10000,
+  use.cpp = T,
+  temp = 1,
+  tdecrease = 0.95,
+  weights = list(numeric = 1, factor = 1, correlation = 1),
+  eta = 1,
+  obj.limit = -Inf,
+  length.cycle = 10,
+  simple = TRUE,
+  progress = TRUE,
+  track = NULL
+)
 
 \method{clhs}{Raster}(x, ...)
 
-clhs(x, size, include, cost, iter, temp, tdecrease, weights, eta, obj.limit,
-  length.cycle, simple, progress, track)
+clhs(
+  x,
+  size,
+  include,
+  possible.sample,
+  cost,
+  iter,
+  use.cpp,
+  temp,
+  tdecrease,
+  weights,
+  eta,
+  obj.limit,
+  length.cycle,
+  simple,
+  progress,
+  track
+)
 
 \method{clhs}{SpatialPointsDataFrame}(x, ...)
 }
@@ -43,8 +70,16 @@ the attribute in \code{x} that gives a cost that can be use to constrain the
 cLHS sampling. If NULL (default), the cost-constrained implementation is not
 used.}
 
+\item{possible.sample}{A numeric vector giving indices of the rows from \code{x} 
+that are allowed to be sampled from. The algorithm will use all of \code{x} as the reference
+distribution, but will only select samples from possible.sample.}
+
 \item{iter}{A positive number, giving the number of iterations for the
 Metropolis-Hastings annealing process. Defaults to 10000.}
+
+\item{use.cpp}{TRUE or FALSE. If set to TRUE, annealing process uses C++ code.
+This is ~ 150 times faster than the R version, but is less stable and currently 
+doesn't accept track, eta, or obj.limit parameters.}
 
 \item{temp}{The initial temperature at which the simulated annealing
 begins. Defaults to 1.}
@@ -122,11 +157,11 @@ df <- data.frame(
 )
 
 # Returning the indices of the sampled points
-res <- clhs(df, size = 50, iter = 100, progress = FALSE, simple = TRUE)
+res <- clhs(df, size = 50, progress = FALSE, simple = TRUE)
 str(res)
 
-# Returning a cLHS_result object for plotting
-res <- clhs(df, size = 50, iter = 100, progress = FALSE, simple = FALSE)
+# Returning a cLHS_result object for plotting using C++
+res <- clhs(df, size = 50, use.cpp = TRUE, iter = 5000, progress = FALSE, simple = FALSE)
 str(res)
 plot(res)
 

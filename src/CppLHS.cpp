@@ -246,22 +246,27 @@ objResult obj_fn(arma::mat x, NumericMatrix strata, arma::mat include, bool fact
 }
 
 
-/*Main function called from R
- * Takes inputs:
- * xA: matrix of data - must be numeric (factors are converted to numeric in R)
- * cost: cost vector (0 if no cost)
- * strata: matrix of continuous strata
- * include: matrix of included data
- * factors: boolean factor flag
- * i_fact: indices of factors in xA
- * nsample: number of samples
- * cost_mode: bool cost flag
- * iter: number of iterations
- * wCont,wFact,wCorr: continuous, factor, and correlation weights
- * etaMat: eta matrix - either all 1, or user input
- * temperature: initial temperature
- * tdecrease: temperature decrease every length_cycle iterations
- */
+//' This is the internal Cpp function used to run the metropolis hasting algorithm if use.cpp = T. 
+//' In general, it shouldn't be used as a stand alone function, because some preprocessing is done in R
+//' 
+//' @param xA matrix of data - must be numeric (factors are converted to numeric in R)
+//' @param cost cost vector (0 if no cost)
+//' @param strata matrix of continuous strata
+//' @param include matrix of included data
+//' @param idx integer vector of rows from which sampling is allowed
+//' @param factors boolean factor flag
+//' @param i_fact indices of factors in xA
+//' @param nsample number of samples
+//' @param cost_mode bool cost flag
+//' @param iter number of iterations
+//' @param wCont continuous weight
+//' @param wFact factor weights
+//' @param wCorr correlation weights
+//' @param etaMat eta matrix - either all 1, or user input
+//' @param temperature initial temperature
+//' @param tdecrease temperature decrease every length_cycle iterations
+//' @param length_cycle number of iterations between temperature decrease
+//' @return list with sampled data, indices, objective values, cost value, and final continuous objectives for each strata
 
 // [[Rcpp::export]]
 List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata, 

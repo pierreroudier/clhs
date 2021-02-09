@@ -34,6 +34,9 @@
 #' argument \code{size} must inlcude the total size of the final sample i.e. the
 #' size of mandatory samples given by \code{include} plus the size of the randomly
 #' chosen samples to pick.
+#' @param possible.sample A numeric vector giving indices of the rows from \code{x} 
+#' that are allowed to be sampled from. The algorithm will use all of \code{x} as the reference
+#' distribution, but will only select samples from possible.sample.
 #' @param cost A character giving the name or an integer giving the index of
 #' the attribute in \code{x} that gives a cost that can be use to constrain the
 #' cLHS sampling. If NULL (default), the cost-constrained implementation is not
@@ -110,7 +113,7 @@
 #' )
 #' 
 #' # Returning the indices of the sampled points
-#' res <- clhs(df, size = 50, iter = 100, progress = FALSE, simple = TRUE)
+#' res <- clhs(df, size = 50, progress = FALSE, simple = TRUE)
 #' str(res)
 #' 
 #' # Returning a cLHS_result object for plotting using C++
