@@ -27,6 +27,16 @@
 
   delta_obj_continuous <- rowSums(abs(cont_obj_sampled - eta))
 
+  ## cont_obj_sampled tells use which histogram bucket is most out of whack with
+  ## the target eta for each continuous covariate, adding across rows gets the
+  ## per-bucket today for buckets 1 to n_samples across all covariates
+  
+  ## Compute information about how much each sample contributes to each histogram
+  ## bucket across all features
+  covariate.weights <- lapply(cont_data_strata, function(x) hist(x[[1]], breaks = x[[2]], plot=FALSE)$counts[cut(x[[1]], breaks = x[[2]], labels=FALSE, include.lowest = TRUE)])
+  covariate.weights <- matrix(unlist(covariate.weights), ncol = n_cont_variables, byrow = FALSE)
+  sample.weights <- rowSums(covariate.weights - eta)
+
   # Factor variables
   #
   n_factor_variables <- ncol(data_factor_sampled)
@@ -54,5 +64,5 @@
 
   # Returning results
   #
-  list(obj = obj, delta_obj_continuous = delta_obj_continuous, delta_obj_factor = delta_obj_factor, delta_obj_cor = delta_obj_cor)
+  list(obj = obj, delta_obj_continuous = delta_obj_continuous, delta_obj_factor = delta_obj_factor, delta_obj_cor = delta_obj_cor, sample.weights = sample.weights)
 }
