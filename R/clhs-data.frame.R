@@ -131,7 +131,8 @@ clhs.data.frame <- function(
   
   obj <- res$obj # value of the objective function
   delta_obj_continuous <- res$delta_obj_continuous
-  
+  sample.weights <- res$sample.weights
+                           
   if (cost_mode) {
     # (initial) operational cost
     op_cost <- sum(cost[i_sampled, ])
@@ -179,8 +180,10 @@ clhs.data.frame <- function(
     }
     else {
       # remove the worse sampled & resample
-      worse <- max(delta_obj_continuous[!i_sampled %in% include])
-      i_worse <- which(delta_obj_continuous[!i_sampled %in% include] == worse)
+      sample.weights <- sample.weights + 1 ## to ensure all weights are positive
+      sample.weights[i_sampled %in% include] <- 0 ## to ensure we don't select any include samples as the worst
+      worse <- max(sample.weights)
+      i_worse <- which(sample.weights == worse)
       # If there's more than one worse candidate, we pick one at random
       if (length(i_worse) > 1) i_worse <- sample(i_worse, size = 1)
       
@@ -206,6 +209,7 @@ clhs.data.frame <- function(
     
     obj <- res$obj
     delta_obj_continuous <- res$delta_obj_continuous
+    sample.weights <- res$sample.weights
     # Compare with previous iterations
     delta_obj <- obj - previous$obj
     metropolis <- exp(-1*delta_obj/temp) #+ runif(1)*temp
