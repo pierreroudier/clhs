@@ -113,7 +113,7 @@ clhs.data.frame <- function(
       # Making up the object to be returned
       class(res) = c("cLHS_result","list")
     }
-    
+    return(res)
   }else{
     ## No cost taking into account during optimisation
     if (is.null(cost)) {
@@ -165,12 +165,6 @@ clhs.data.frame <- function(
       
     }
     
-    if (!is.null(include)) {
-      if (size <= length(include)) {
-        stop(paste0("size (", size, ") should be larger than length of include (", length(include), ")"))
-      }
-    }
-    
     # Detection of any factor data
     i_factor <- which(!sapply(x, is.numeric))
     n_factor <- length(i_factor)
@@ -203,9 +197,8 @@ clhs.data.frame <- function(
     
     # For object/class variable
     if (n_factor == 0) data_factor_sampled <- data.frame(stringsAsFactors = TRUE)
-    else factor_obj <- plyr::alply(data_factor, 2, function(x) table(x)/n_data)
+    else factor_obj <- alply(data_factor, 2, function(x) table(x)/n_data)
     
-
     # Mandatory data in the sample
     sampled_size <- size - length(include)
     not_included <- setdiff(1:n_data, include)
@@ -225,7 +218,7 @@ clhs.data.frame <- function(
     delta_obj_continuous <- res$delta_obj_continuous
     sample.weights <- res$sample.weights
     
-     if (cost_mode) {
+    if (cost_mode) {
       # (initial) operational cost
       op_cost <- sum(cost[i_sampled, ])
       # vector storing operational costs
@@ -382,3 +375,4 @@ clhs.data.frame <- function(
     
     res
   }
+}
