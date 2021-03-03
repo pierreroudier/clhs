@@ -31,5 +31,5 @@ test_that("basic clhs using C++ on a data.frame works", {
   
   res <- clhs(df, size = 5)
   
-  expect_equal(res, c(672, 174, 958, 104, 82))
+  expect_equal(res, c(326, 985, 519, 282, 142))
 })

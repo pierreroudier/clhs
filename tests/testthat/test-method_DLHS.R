@@ -35,5 +35,5 @@ test_that("DLHS method on a data.frame works (C++)", {
   eta <- matrix(c(3, 2, 1, 2, 3), ncol = 2, nrow = 5)
   res <- clhs(df, size = 5, iter = 5000, progress = FALSE, eta = eta)
   
-  expect_equal(res, c(737, 691, 93, 249, 405))
+  expect_equal(res, c(243, 270, 742, 220, 165))
 })

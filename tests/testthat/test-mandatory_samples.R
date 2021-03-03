@@ -37,7 +37,25 @@ test_that("Mandatory samples are actually selected (C++)", {
   expect_true(all(mandatory_idx %in% res))
   
   # error : size <= length(include)
-  expect_error(clhs(df, size = 3, iter = 5000, include = mandatory_idx, progress = FALSE))
+  expect_error(clhs(df, size = 3, iter = 5000, include = mandatory_idx))
   
 })
+
+test_that("Samples are only from possilbe.samples (C++)", {
+  
+  df <- data.frame(
+    a = runif(1000), 
+    b = rnorm(1000), 
+    c = sample(LETTERS[1:5], size = 1000, replace = TRUE),
+    stringsAsFactors = TRUE
+  )
+  
+  poss_idx <- sample(1:nrow(df), size = 600)
+  
+  # no error
+  res <- clhs(df, size = 10, possible.sample = poss_idx)
+  expect_true(all(res %in% poss_idx))
+
+})
+
 

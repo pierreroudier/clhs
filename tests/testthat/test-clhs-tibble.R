@@ -23,7 +23,7 @@ test_that("CLHS (C++) works for tibbles", {
   res <- clhs(diamonds, size = 3, use.cpp = T, iter = 5000, simple = FALSE)
   
   expect_equal(
-    res$index_samples, c(14322, 22380, 1920)
+    res$index_samples, c(15338, 6921, 30750)
   )
   
 })
