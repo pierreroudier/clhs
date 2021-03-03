@@ -137,18 +137,25 @@ NumericVector table_cpp(const Rcpp::NumericVector & v, const NumericVector full)
   return (result_vals);
 }
 
+//structure to store histogram results
+struct histResult {
+  IntegerVector counts;
+  IntegerVector position;
+};
+
 //bincount - basically just a histogram function
 //takes vector of data and breaks, returns a vector of counts
-IntegerVector hist(NumericVector x, NumericVector breaks){ //based on C_bincount from graphics package
+histResult hist(NumericVector x, NumericVector breaks){ //based on C_bincount from graphics package
     int n = x.length();
     int nb = breaks.length();
     int nb1 = nb-1;
     int i,lo,hi,newVal;
     
     IntegerVector counts(nb1);
+    IntegerVector binPos(nb1);
     //Rcout << "In Hist function \n";
     
-    for(i = 0 ; i < n ; i++){
+    for(i = 0; i < n; i++){
       lo = 0;
       hi = nb1;
       if(breaks[lo] <= x[i] &&
@@ -162,9 +169,11 @@ IntegerVector hist(NumericVector x, NumericVector breaks){ //based on C_bincount
           }
         }
         counts[lo]++;
+        binPos[i] = lo;
       }
     }
-    return(counts);
+    struct histResult out = {counts, binPos};
+    return(out);
   }
 
 //structure to store objective function result
@@ -193,11 +202,15 @@ objResult obj_fn(arma::mat x, NumericMatrix strata, arma::mat include, bool fact
   int num_obs = strata.nrow();
   NumericVector hist_cnt;
   IntegerMatrix hist_out(num_obs - 1, num_vars);
+  IntegerMatrix hist_pos(num_obs - 1, num_vars);
+  IntegerVector sample_pos(num_obs);
+  IntegerVector bin_counts(num_obs);
   NumericVector data;
   NumericVector data_orig;
   NumericVector strata_curr;
   NumericVector hist_temp;
   NumericVector obj_cont;
+  NumericVector obj_position;
   NumericMatrix t2;
   std::vector<double> obj_cont2;
   
@@ -206,15 +219,24 @@ objResult obj_fn(arma::mat x, NumericMatrix strata, arma::mat include, bool fact
     //Rcout << "Hist idex is " << i << "\n";
     data = wrap(x_all.col(i));
     strata_curr = strata(_,i);
-    hist_out(_,i) = hist(data,strata_curr);
+    struct histResult hRes = hist(data,strata_curr);
+    bin_counts = hRes.counts;
+    sample_pos = bin_counts[hRes.position];
+    hist_pos(_,i) = sample_pos;
+    hist_out(_,i) = bin_counts;
   }
   
   //Rcout << "Histout: " << hist_out << "\n";
   //convert to arma mat because subtraction is faster
   arma::mat hist2 = as<arma::mat>(hist_out);
   t2 = wrap(arma::abs(hist2 - etaMat));//subtract eta - either input matrix, or all 1
-
   obj_cont = rowSums(t2);
+  
+  //this is the sample.weights part in the R code
+  //basically the number of counts corresponding to each sample
+  arma::mat histPos2 = as<arma::mat>(hist_pos);
+  t2 = wrap(arma::abs(histPos2 - etaMat));
+  obj_position = rowSums(t2);
   //Rcout << "Full ObjCont: " << obj_cont << "\n";
   
   //send factor data to get tabulated
@@ -239,8 +261,10 @@ objResult obj_fn(arma::mat x, NumericMatrix strata, arma::mat include, bool fact
   //combined objective values - since corr_mat is lower tri, have to multiply by 2
   double objFinal = sum(obj_cont)*wCont + obj_cor*2*wCorr + sum(factRes)*wFact;
   //Rcout << "FinalObj" << objFinal << "\n";
-  obj_cont = obj_cont[Rcpp::Range(0,nsamps-1)];
-  obj_cont2 = as<std::vector<double>>(obj_cont);
+  obj_position = obj_position[Rcpp::Range(0,nsamps-1)]; //don't think I need this
+  //note that now the continuous objective is only used for calculating the objective value
+  //so we only return the objective_positions (i.e. sample.weights)
+  obj_cont2 = as<std::vector<double>>(obj_position);
   struct objResult out = {objFinal, obj_cont2};
   return(out);
 }
@@ -266,7 +290,7 @@ objResult obj_fn(arma::mat x, NumericMatrix strata, arma::mat include, bool fact
 //' @param temperature initial temperature
 //' @param tdecrease temperature decrease every length_cycle iterations
 //' @param length_cycle number of iterations between temperature decrease
-//' @return list with sampled data, indices, objective values, cost value, and final continuous objectives for each strata
+//' @return list with sampled data, indices, objective values, cost value, and final continuous weights for each sample
 
 // [[Rcpp::export]]
 List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata, 
