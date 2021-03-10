@@ -269,7 +269,7 @@ clhs.data.frame <- function(
   if (progress) close(pb)
   
   if (n_factor > 0) {
-    sampled_data <- data.frame(data_continuous_sampled, data_factor_sampled, stringsAsFactors = TRUE)
+    sampled_data <- data.frame(data_continuous_sampled, data_factor_sampled, stringsAsFactors = TRUE, check.names = FALSE)
     # reordering cols
     sampled_data <- sampled_data[, names(x)]
   } else sampled_data <- data_continuous_sampled
