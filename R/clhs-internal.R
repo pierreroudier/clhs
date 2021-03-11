@@ -39,6 +39,7 @@
 
   # Factor variables
   #
+                              browser()
   n_factor_variables <- ncol(data_factor_sampled)
   if (n_factor_variables > 0) {
     factor_obj_sampled <- lapply(1:n_factor_variables, function(x) table(data_factor_sampled[, x])/nrow(data_factor_sampled))
