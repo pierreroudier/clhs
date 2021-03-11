@@ -45,10 +45,17 @@
     delta_obj_factor <- lapply(1:n_factor_variables, function(x) sum(abs(factor_obj_sampled[[x]] - factor_obj[[x]])))
 
     delta_obj_factor <- unlist(delta_obj_factor)#/length(delta_obj_factor) # do we need to ponder w/ the number of factors?
+                               covariate.weights.factors <- lapply(1:n_factor_variables, function(x) abs(factor_obj_sampled[[x]][data_factor_sampled[,x]] - factor_obj[[x]][data_factor_sampled[,x]]))
+    covariate.weights.factors <- matrix(unlist(covariate.weights.factors), ncol = n_factor_variables, byrow = FALSE)
+    sample.weights.factors <- rowSums(covariate.weights.factors)
+    sample.weights.factors <- sample.weights.factors * nrow(data_factor_sampled) ## to put them on scale with continuous
+    
   }
-  else
+  else {
     delta_obj_factor <- 0
-
+    sample.weights.factors <- rep(0, length(sample.weights))
+  }
+  
   # Correlation of continuous data
   #
   cor_sampled <- suppressWarnings(cor(data_continuous_sampled))
@@ -64,5 +71,5 @@
 
   # Returning results
   #
-  list(obj = obj, delta_obj_continuous = delta_obj_continuous, delta_obj_factor = delta_obj_factor, delta_obj_cor = delta_obj_cor, sample.weights = sample.weights)
+  list(obj = obj, delta_obj_continuous = delta_obj_continuous, delta_obj_factor = delta_obj_factor, delta_obj_cor = delta_obj_cor, sample.weights = weights[[1]]*sample.weights + weights[[2]]*sample.weights.factors)
 }
