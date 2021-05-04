@@ -4,8 +4,15 @@
 \alias{similarity_buffer}
 \title{Gower similarity analysis}
 \usage{
-similarity_buffer(covs, pts, buffer, fac = NA, metric = "gower",
-  stand = FALSE, ...)
+similarity_buffer(
+  covs,
+  pts,
+  buffer,
+  fac = NA,
+  metric = "gower",
+  stand = FALSE,
+  ...
+)
 }
 \arguments{
 \item{covs}{raster stack of environmental covariates}
