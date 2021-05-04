@@ -7,15 +7,15 @@ test_that("Cost-constrained implementation works", {
   res <- clhs(mtcars, size = 3, cost = "mpg", iter = 250, simple = FALSE)
   
   expect_equal(
-    res$index_samples, c(31, 32, 15)
+    res$index_samples, c(18, 30, 15)
   )
   
   expect_equal(
-    round(min(res$obj), digits = 2), 30.92
+    round(min(res$obj), digits = 2), 26.65
   )
   
   expect_equal(
-    min(res$cost), 46.8
+    min(res$cost), 62.5
   )
   
 })
