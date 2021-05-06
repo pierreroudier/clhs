@@ -107,10 +107,12 @@
 #' )
 #' 
 #' # Returning the indices of the sampled points
+#' set.seed(1)
 #' res <- clhs(df, size = 50, iter = 100, progress = FALSE, simple = TRUE)
 #' str(res)
 #' 
 #' # Returning a cLHS_result object for plotting
+#' set.seed(1)
 #' res <- clhs(df, size = 50, iter = 100, progress = FALSE, simple = FALSE)
 #' str(res)
 #' plot(res)
@@ -119,6 +121,7 @@
 #' # from 1 for the middle starta to 3 for the edge of the distribution
 #' linear_increase <- 1+(2/24)*0:24
 #' eta <- matrix(c(rev(linear_increase), linear_increase), ncol = 2, nrow = 50)
+#' set.seed(1)
 #' res <- clhs(df, size = 50, iter = 100, eta = eta, progress = FALSE, simple = FALSE)
 #' str(res)
 #' plot(res)  
