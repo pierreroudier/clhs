@@ -128,4 +128,5 @@
 #' 
 #' @include clhs-data.frame.R
 #' @export
+#' 
 clhs <- function(x, size, include,  cost,  iter,  temp,  tdecrease,  weights, eta, obj.limit, length.cycle, simple, progress, track) UseMethod("clhs")

@@ -3,6 +3,7 @@
 #' @method clhs data.frame
 #' @importFrom stats quantile runif 
 #' @importFrom utils txtProgressBar setTxtProgressBar
+#' @noRd
 #' @export
 clhs.data.frame <- function(
   x, # data.frame
