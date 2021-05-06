@@ -15,7 +15,16 @@ URL: https://github.com/pierreroudier/clhs/
 BugReports: https://github.com/pierreroudier/clhs/issues
 Description: Conditioned Latin hypercube sampling, as published by Minasny and McBratney (2006) <DOI:10.1016/j.cageo.2005.12.009>. This method proposes to stratify sampling in presence of ancillary data. An extension of this method, which propose to associate a cost to each individual and take it into account during the optimisation process, is also proposed (Roudier et al., 2012, <DOI:10.1201/b12728>).
 Depends: R (>= 2.14.0)
-Imports: utils, methods, grid, ggplot2, sp, raster, reshape2, plyr, scales, cluster
+Imports: utils, 
+    methods, 
+    grid, 
+    ggplot2, 
+    sp, 
+    raster, 
+    reshape2, 
+    plyr, 
+    scales, 
+    cluster
 License: GPL (>= 2)
 Encoding: UTF-8
 LazyLoad: yes
