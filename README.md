@@ -1,4 +1,3 @@
-[![Travis-CI Build Status](https://travis-ci.org/pierreroudier/clhs.svg?branch=master)](https://travis-ci.org/pierreroudier/clhs)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/clhs)](https://cran.r-project.org/package=clhs)
 [![Total_Downloads](http://cranlogs.r-pkg.org/badges/grand-total/clhs)](https://cran.r-project.org/package=clhs)
 
