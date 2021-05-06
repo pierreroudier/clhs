@@ -1,3 +1,7 @@
+============ clhs_0.8-0 - 2021-05-06 ============
+* Implemented an improved logic to drop worse sample (thanks to David Clifford)
+* Various minor bug fixes to support R > 4.0
+
 ============ clhs_0.7-2 - 2018-06-05 ============
 * Maintenance version fixing new RNG sampler call.
 
