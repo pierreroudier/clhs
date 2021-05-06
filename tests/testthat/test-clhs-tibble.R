@@ -9,7 +9,7 @@ test_that("CLHS works for tibbles", {
   res <- clhs(diamonds[1:30,], size = 3, iter = 250, simple = FALSE)
   
   expect_equal(
-    res$index_samples, c(6, 14, 10)
+    res$index_samples, c(2, 9, 15)
   )
   
 })
