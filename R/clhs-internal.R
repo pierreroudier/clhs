@@ -65,8 +65,20 @@
   #
   n_factor_variables <- ncol(data_factor_sampled)
   if (n_factor_variables > 0) {
-    factor_obj_sampled <- lapply(1:n_factor_variables, function(x) table(data_factor_sampled[, x])/nrow(data_factor_sampled))
-    delta_obj_factor <- lapply(1:n_factor_variables, function(x) sum(abs(factor_obj_sampled[[x]] - factor_obj[[x]])))
+    factor_obj_sampled <- lapply(
+      1:n_factor_variables, 
+      function(x) {
+        table(
+          # Converting to factor to ensure all the levels in `factor obj` are
+          # accounted for -- otherwise table drops the levels with "0" counts 
+          factor(data_factor_sampled[, x], levels = names(factor_obj[[x]]))
+        ) / nrow(data_factor_sampled)
+    })
+    
+    delta_obj_factor <- lapply(
+      1:n_factor_variables, 
+      function(x) sum(abs(factor_obj_sampled[[x]] - factor_obj[[x]]))
+    )
 
     delta_obj_factor <- unlist(delta_obj_factor)#/length(delta_obj_factor) # do we need to ponder w/ the number of factors?
     covariate.weights.factors <- lapply(
