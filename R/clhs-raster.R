@@ -13,6 +13,8 @@ clhs.Raster <- function(
   dots <- list(...)
   simple <- dots$simple
   
+  if (length(simple) == 0) simple <- TRUE
+  
   if (!simple) {
     spl$initial_object <- x
   }
