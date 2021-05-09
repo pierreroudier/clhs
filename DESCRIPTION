@@ -19,7 +19,8 @@ Imports: utils,
     methods, 
     grid, 
     ggplot2, 
-    sp, 
+    sp,
+    sf,
     raster, 
     reshape2, 
     plyr, 
@@ -40,6 +41,7 @@ Collate:
     'clhs-raster.R'
     'utils.R'
     'clhs.R'
+    'clhs-sf.R'
     'clhs-sp.R'
     'plot.R'
     'similarity.R'
