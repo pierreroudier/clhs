@@ -15,10 +15,10 @@ test_that("clhs works a raster", {
   r <- raster::rasterFromXYZ(rdf)
   
   set.seed(1)
-  res <- clhs(r, size = 5, iter = 100, progress = FALSE)
+  res <- clhs(r, size = 5, iter = 100, progress = FALSE, simple = FALSE)
   
   expect_equal(
-    res@coords, 
+    res$sampled_data@coords, 
     structure(
       c(64, 78, 73, 47, 74, 51, 98, 78, 17, 60), 
       .Dim = c(5L, 2L), 

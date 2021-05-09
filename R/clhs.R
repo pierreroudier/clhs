@@ -19,12 +19,12 @@
 #' the distribution.
 #' 
 #' @name clhs
-#' @aliases clhs clhs.data.frame clhs.SpatialPointsDataFrame clhs.Raster
+#' @aliases clhs clhs.data.frame clhs.sf clhs.SpatialPointsDataFrame clhs.Raster
 #' clhs
 #' 
 #' @docType methods
 #' 
-#' @param x A \code{data.frame}, \code{SpatialPointsDataFrame} or \code{Raster}
+#' @param x A \code{data.frame}, \code{SpatialPointsDataFrame}, \code{sf}, or \code{Raster}
 #' object.
 #' @param size A non-negative integer giving the total number of items to select
 #' @param include A numeric vector giving the indices of the rows from \code{x} that must be 
@@ -38,6 +38,7 @@
 #' the attribute in \code{x} that gives a cost that can be use to constrain the
 #' cLHS sampling. If NULL (default), the cost-constrained implementation is not
 #' used.
+#' @param use.coords Logical, if TRUE the spatial coordinates of supported spatial objects (either a `SpatialPointsDataFrame` object if using `sp`, or a `sf` object if using `sf`) are included in the Latin hypercube calculations. DDEfaults to FALSE.
 #' @param track A character giving the name or an integer giving the index
 #' of the attribute in \code{x} that gives a cost associated with each
 #' individual. However, this method will only track the cost - the sampling
@@ -129,4 +130,4 @@
 #' @include clhs-data.frame.R
 #' @export
 #' 
-clhs <- function(x, size, include,  cost,  iter,  temp,  tdecrease,  weights, eta, obj.limit, length.cycle, simple, progress, track) UseMethod("clhs")
+clhs <- function(x, size, include,  cost,  iter,  temp,  tdecrease,  weights, eta, obj.limit, length.cycle, simple, progress, track, use.coords, ...) UseMethod("clhs")

@@ -3,6 +3,7 @@
 #' @importFrom raster rasterToPoints
 #' @method clhs Raster
 #' @export
+#' @noRd
 clhs.Raster <- function(
   x, # data
   ...
