@@ -30,25 +30,25 @@
 #' @param include A numeric vector giving the indices of the rows from \code{x} that must be 
 #' included in the selected items. For the cost-constrained cLHS method, cost of 
 #' these mandatory samples is set to 0. If NULL (default), all data are randomly 
-#' choosen according to the classic cLHS method. If \code{include} is not NULL,
-#' argument \code{size} must inlcude the total size of the final sample i.e. the
+#' chosen according to the classic cLHS method. If \code{include} is not NULL,
+#' argument \code{size} must include the total size of the final sample i.e. the
 #' size of mandatory samples given by \code{include} plus the size of the randomly
 #' chosen samples to pick.
 #' @param cost A character giving the name or an integer giving the index of
 #' the attribute in \code{x} that gives a cost that can be use to constrain the
 #' cLHS sampling. If NULL (default), the cost-constrained implementation is not
 #' used.
-#' @param use.coords Logical, if TRUE the spatial coordinates of supported spatial objects (either a `SpatialPointsDataFrame` object if using `sp`, or a `sf` object if using `sf`) are included in the Latin hypercube calculations. DDEfaults to FALSE.
+#' @param use.coords Logical, if TRUE the spatial coordinates of supported spatial objects (either a `SpatialPointsDataFrame` object if using `sp`, or a `sf` object if using `sf`) are included in the Latin hypercube calculations. Defaults to FALSE.
 #' @param track A character giving the name or an integer giving the index
 #' of the attribute in \code{x} that gives a cost associated with each
 #' individual. However, this method will only track the cost - the sampling
-#' prrocess will not be constrained by this attribute. If NULL (default), this
+#' process will not be constrained by this attribute. If NULL (default), this
 #' option is not used.
 #' @param iter A positive number, giving the number of iterations for the
 #' Metropolis-Hastings annealing process. Defaults to 10000.
 #' @param temp The initial temperature at which the simulated annealing
 #' begins. Defaults to 1.
-#' @param tdecrease A number betwen 0 and 1, giving the rate at which
+#' @param tdecrease A number between 0 and 1, giving the rate at which
 #' temperature decreases in the simulated annealing process. Defaults to 0.95.
 #' @param weights A list a length 3, giving the relative weights for
 #' continuous data, categorical data, and correlation between variables.
@@ -74,7 +74,7 @@
 #' \code{cLHS_result}, with the following elements: \item{index_samples}{a
 #' vector giving the indices of the chosen samples.} \item{sampled_data}{the
 #' sampled data.frame.} \item{obj}{a vector giving the evolution of the
-#' objective function throughout the Meropolis-Hastings iterations.}
+#' objective function throughout the Metropolis-Hastings iterations.}
 #' \item{cost}{a vector giving the evolution of the cost function throughout
 #' the Metropolis-Hastings iterations (if available).}
 #' @author Pierre Roudier
@@ -94,8 +94,8 @@
 #' *For the cost-constrained implementation:
 #' 
 #' Roudier, P., Beaudette, D.E. and Hewitt, A.E. 2012. A conditioned Latin
-#' hypercube sampling algorithm incorportaing operational constraints. In:
-#' Digital Soil Assessments and Beyond. Proceedings of the 5th Golobal Workshop
+#' hypercube sampling algorithm incorporating operational constraints. In:
+#' Digital Soil Assessments and Beyond. Proceedings of the 5th Global Workshop
 #' on Digital Soil Mapping, Sydney, Australia.
 #' 
 #' 

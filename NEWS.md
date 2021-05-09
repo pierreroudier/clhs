@@ -41,7 +41,7 @@
 
 # clhs_0.5-1
 - minor bugfix version fixing compatibility issues with ggplot2 >= 0.9.2
-- added ggplot2 in Suggests temporarly to fix bug in ggplot2_0.9.2
+- added ggplot2 in Suggests temporary to fix bug in ggplot2_0.9.2
 
 # clhs_0.5-0 
 - introduced cost and cost tracking modes
@@ -68,7 +68,7 @@ the plot method
 
 # clhs_0.4-0
 - Introduced cLHS_result S3 class with associated plot method
-- Introduced simple = ... option to the clhs() method. If set to true, returns only the indices of the selected samples, if set to FALSE, retuurns a cLHS_result object (eg if you want to plot the objective function behaviour).
+- Introduced simple = ... option to the clhs() method. If set to true, returns only the indices of the selected samples, if set to FALSE, returns a cLHS_result object (eg if you want to plot the objective function behaviour).
 - added a plot() method. For the moment, it just plots the objective function.
 
 # clhs_0.3-2

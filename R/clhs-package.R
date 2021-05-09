@@ -32,8 +32,8 @@
 #' * For the cost-constrained implementation:
 #' 
 #' Roudier, P., Beaudette, D.E. and Hewitt, A.E. 2012. A conditioned Latin
-#' hypercube sampling algorithm incorportaing operational constraints. In:
-#' Digital Soil Assessments and Beyond. Proceedings of the 5th Golobal Workshop
+#' hypercube sampling algorithm incorporating operational constraints. In:
+#' Digital Soil Assessments and Beyond. Proceedings of the 5th Global Workshop
 #' on Digital Soil Mapping, Sydney, Australia.
 #' 
 #' * For the similarity buffer prediction:
@@ -54,7 +54,7 @@ NULL
 #' @return An object of class \code{cLHS_result} contains the following slots:
 #' \item{index_samples }{a vector giving the indices of the chosen samples.}
 #' \item{sampled_data }{the sampled data.frame.} \item{obj}{a vector giving the
-#' evolution of the objective function throughout the Meropolis-Hastings
+#' evolution of the objective function throughout the Metropolis-Hastings
 #' iterations.} \item{cost}{a vector giving the evolution of the cost function
 #' throughout the Meropolis-Hastings iterations, if available, otherwise NULL.}
 #' @author Pierre Roudier
