@@ -31,8 +31,8 @@ Soil Sensing, Progress in Soil Science, pages 111-119.
 * For the cost-constrained implementation:
 
 Roudier, P., Beaudette, D.E. and Hewitt, A.E. 2012. A conditioned Latin
-hypercube sampling algorithm incorportaing operational constraints. In:
-Digital Soil Assessments and Beyond. Proceedings of the 5th Golobal Workshop
+hypercube sampling algorithm incorporating operational constraints. In:
+Digital Soil Assessments and Beyond. Proceedings of the 5th Global Workshop
 on Digital Soil Mapping, Sydney, Australia.
 
 * For the similarity buffer prediction:

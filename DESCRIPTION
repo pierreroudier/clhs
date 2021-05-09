@@ -23,8 +23,7 @@ Imports: utils,
     sf,
     raster, 
     reshape2, 
-    plyr, 
-    scales, 
+    plyr,  
     cluster
 License: GPL (>= 2)
 Encoding: UTF-8
