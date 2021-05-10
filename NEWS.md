@@ -1,5 +1,10 @@
 <!-- NEWS.md is maintained by https://cynkra.github.io/fledge, do not edit -->
 
+# clhs 0.8.1.9000
+
+- Same as previous version.
+
+
 # clhs 0.8.1
 
 - the behaviour of the `simple` option is now more consistent for spatial objects
