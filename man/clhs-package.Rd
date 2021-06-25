@@ -15,17 +15,6 @@ An extension of this method, which propose to associate a cost to each
 individual and take it into account during the optimisation process, is also
 proposed (Roudier et al., 2012).
 }
-\examples{
-
-df <- data.frame(
-  a = runif(1000), 
-  b = rnorm(1000), 
-  c = sample(LETTERS[1:5], size = 1000, replace = TRUE)
-)
-res <- clhs(df, size = 50, iter = 2000, progress = FALSE)
-str(res)
-
-}
 \references{
 * For the initial cLHS method:
 
@@ -42,8 +31,8 @@ Soil Sensing, Progress in Soil Science, pages 111-119.
 * For the cost-constrained implementation:
 
 Roudier, P., Beaudette, D.E. and Hewitt, A.E. 2012. A conditioned Latin
-hypercube sampling algorithm incorportaing operational constraints. In:
-Digital Soil Assessments and Beyond. Proceedings of the 5th Golobal Workshop
+hypercube sampling algorithm incorporating operational constraints. In:
+Digital Soil Assessments and Beyond. Proceedings of the 5th Global Workshop
 on Digital Soil Mapping, Sydney, Australia.
 
 * For the similarity buffer prediction:

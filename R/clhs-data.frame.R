@@ -3,6 +3,8 @@
 #' @method clhs data.frame
 #' @importFrom stats quantile runif 
 #' @importFrom utils txtProgressBar setTxtProgressBar
+#' @importFrom plyr alply
+#' @noRd
 #' @export
 clhs.data.frame <- function(
   x, # data.frame
@@ -20,7 +22,9 @@ clhs.data.frame <- function(
   length.cycle = 10, # Number of cycles done at each constant temperature value
   simple = TRUE, # only return selected indices (if false, return a more complex S3 object)
   progress = TRUE, # progress bar,
-  track = NULL # just to have the cost computed without having it guiding the process
+  track = NULL, # just to have the cost computed without having it guiding the process
+  use.coords = FALSE, # ignored by the `data.frame` method.
+  ... # ignored
 ) {
   
   ##check input

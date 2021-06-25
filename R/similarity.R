@@ -8,7 +8,7 @@
 #' @param fac numeric, can be > 1, (e.g., fac = c(2,3)). Raster layer(s) which are categorical variables. Set to NA if no factor is present
 #' @param metric character string specifying the similarity metric to be used. The currently available options are "euclidean", "manhattan" and "gower" (the default).  See \code{daisy} from the \code{cluster} package for more details
 #' @param stand logical flag: if TRUE, then the measurements in x are standardized before calculating the dissimilarities. 
-#' @param ... passed to plyr::alply
+#' @param ... passed to plyr::llply
 #' @return a RasterStack
 #' 
 #' @author Colby Brungard
@@ -20,7 +20,7 @@
 #' @importFrom stats complete.cases
 #' @importFrom raster extract cellFromXY raster stack nlayers
 #' @importFrom cluster daisy
-#' @importFrom plyr alply
+#' @importFrom plyr llply
 #' 
 #' @export
 #' 
@@ -36,17 +36,19 @@
 #' 
 #' suppressWarnings(RNGversion("3.5.0"))
 #' set.seed(1)
-#' pts <- clhs(ms, size = 3, iter = 100, progress = FALSE, simple = TRUE)
-#' gw <- similarity_buffer(ms, pts, buffer = 500)
+#' pts <- clhs(ms, size = 3, iter = 100, progress = FALSE, simple = FALSE)
+#' gw <- similarity_buffer(ms, pts$sampled_data, buffer = 500)
 #' plot(gw)
 #' 
 similarity_buffer <- function(covs, pts, buffer, fac = NA, metric = "gower", stand = FALSE, ...) {
 
   # Iterate over every point
-  res_l <- plyr::alply(pts, 1, function(coords) {
+  res_l <- plyr::llply(1:nrow(pts), function(i) {
+    
+    coords <- pts[i, ]
     
     # 2. Extract all cells within x m of the sampling points. 
-    buff_data <- extract(
+    buff_data <- raster::extract(
       x = covs, 
       y = coords, 
       buffer = buffer, 

@@ -1,21 +1,35 @@
 Package: clhs
 Type: Package
 Title: Conditioned Latin Hypercube Sampling
-Version: 0.7-3
-Date: 2020-03-26
+Version: 0.8.1.9000
+Date: 2021-05-10
 Authors@R: c(
     person("Pierre", "Roudier", email = "roudierp@landcareresearch.co.nz", role = c("aut", "cre")),
     person("Colby", "Brugnard", email = "cbrung@ad.nmsu.edu", role = "ctb"),
     person("Dylan", "Beaudette", email = "dylan.beaudette@ca.usda.gov", role = "ctb"),
-    person("Benjamin", "Louis", email = "contact@benjaminlouis-stat.fr", role = "ctb"))
+    person("Benjamin", "Louis", email = "contact@benjaminlouis-stat.fr", role = "ctb"),
+    person("Kiri", "Daust", email = "Kiri.Daust@gov.bc.ca", role = "ctb"),
+    person("David", "Clifford", email = "david.clifford@gmail.com", role = "ctb"))
 Maintainer: Pierre Roudier <roudierp@landcareresearch.co.nz>
 URL: https://github.com/pierreroudier/clhs/
 BugReports: https://github.com/pierreroudier/clhs/issues
 Description: Conditioned Latin hypercube sampling, as published by Minasny and McBratney (2006) <DOI:10.1016/j.cageo.2005.12.009>. This method proposes to stratify sampling in presence of ancillary data. An extension of this method, which propose to associate a cost to each individual and take it into account during the optimisation process, is also proposed (Roudier et al., 2012, <DOI:10.1201/b12728>).
 Depends: R (>= 2.14.0)
-Imports: utils, methods, grid, ggplot2, sp, raster, reshape2, plyr, scales, cluster, RcppArmadillo, Rcpp
+Imports: utils, 
+    methods, 
+    grid, 
+    ggplot2, 
+    sp,
+    sf,
+    raster, 
+    reshape2, 
+    plyr,  
+    cluster,
+    RcppArmadillo, 
+    Rcpp
 LinkingTo: RcppArmadillo, Rcpp
 License: GPL (>= 2)
+Encoding: UTF-8
 LazyLoad: yes
 Suggests: knitr,
     rmarkdown,
@@ -30,6 +44,7 @@ Collate:
     'clhs-raster.R'
     'utils.R'
     'clhs.R'
+    'clhs-sf.R'
     'clhs-sp.R'
     'plot.R'
     'similarity.R'
