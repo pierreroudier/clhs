@@ -27,14 +27,14 @@
 #' @param x A \code{data.frame}, \code{SpatialPointsDataFrame}, \code{sf}, or \code{Raster}
 #' object.
 #' @param size A non-negative integer giving the total number of items to select
-#' @param include A numeric vector giving the indices of the rows from \code{x} that must be 
+#' @param must.include A numeric vector giving the indices of the rows from \code{x} that must be 
 #' included in the selected items. For the cost-constrained cLHS method, cost of 
 #' these mandatory samples is set to 0. If NULL (default), all data are randomly 
 #' chosen according to the classic cLHS method. If \code{include} is not NULL,
 #' argument \code{size} must include the total size of the final sample i.e. the
 #' size of mandatory samples given by \code{include} plus the size of the randomly
 #' chosen samples to pick.
-#' @param possible.sample A numeric vector giving indices of the rows from \code{x} 
+#' @param can.include A numeric vector giving indices of the rows from \code{x} 
 #' that are allowed to be sampled from. The algorithm will use all of \code{x} as the reference
 #' distribution, but will only select samples from possible.sample.
 #' @param cost A character giving the name or an integer giving the index of
@@ -133,4 +133,4 @@
 #' 
 #' @include clhs-data.frame.R
 #' @export
-clhs <- function(x, size, include, possible.sample, cost,  iter, temp,  tdecrease,  weights, eta, obj.limit, length.cycle, simple, use.cpp, progress, track, use.coords, ...) UseMethod("clhs")
+clhs <- function(x, size, can.include, must.include, cost,  iter, temp,  tdecrease,  weights, eta, obj.limit, length.cycle, simple, use.cpp, progress, track, use.coords, ...) UseMethod("clhs")

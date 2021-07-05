@@ -9,9 +9,9 @@
 clhs.data.frame <- function(
   x, # data.frame
   size, # Number of samples you want
-  include = NULL, # row index of data that must be in the final sample
+  must.include = NULL, # row index of data that must be in the final sample
   cost = NULL, # Number or name of the attribute used as a cost
-  possible.sample = 1:nrow(x), # Indexes from which sampling is allowed
+  can.include = NULL, # Indexes from which sampling is allowed
   iter = 10000, # Number of max iterations
   use.cpp = T, # use C++ code for metropolis-hasting loop?
   temp = 1, # initial temperature
@@ -29,6 +29,11 @@ clhs.data.frame <- function(
   
   ##check input
   if (tdecrease >= 1) stop("tdecrease should be < 1")
+  if(!is.null(can.include) & !use.cpp) warning("can.include is not implimented in the R version and will be ignored")
+  include <- must.include
+  if(is.null(can.include)){
+    can.include <- 1:nrow(x)
+  }
   if (!is.null(include)) {
     if (size <= length(include)) {
       stop(paste0("size (", size, ") should be larger than length of include (", length(include), ")"))
@@ -99,10 +104,10 @@ clhs.data.frame <- function(
       dat <- data[-include,]
       inc <- data[include,]
       ssize <- size - length(include)
-      possible.sample <- 1:nrow(dat)
+      can.include <- 1:nrow(dat)
     }
-    possible.sample <- possible.sample-1 ##convert to zero based for C
-    res <- CppLHS(xA = dat, cost = costVec, strata = continuous_strata, include = inc, idx = possible.sample,
+    can.include <- can.include-1 ##convert to zero based for C
+    res <- CppLHS(xA = dat, cost = costVec, strata = continuous_strata, include = inc, idx = can.include,
                   factors = areFactors, i_fact = factIdx-1, nsample = ssize, cost_mode = costFlag, iter = iter,
                   wCont = weights$numeric, wFact = weights$factor, wCorr = weights$correlation, etaMat = eMat,
                   temperature = temp, tdecrease = tdecrease, length_cycle = length.cycle)

@@ -21,7 +21,7 @@
 #' @param temperature initial temperature
 #' @param tdecrease temperature decrease every length_cycle iterations
 #' @param length_cycle number of iterations between temperature decrease
-#' @return list with sampled data, indices, objective values, cost value, and final continuous objectives for each strata
+#' @return list with sampled data, indices, objective values, cost value, and final continuous weights for each sample
 NULL
 
 CppLHS <- function(xA, cost, strata, include, idx, factors, i_fact, nsample, cost_mode, iter, wCont, wFact, wCorr, etaMat, temperature, tdecrease, length_cycle) {

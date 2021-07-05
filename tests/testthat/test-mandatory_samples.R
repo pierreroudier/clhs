@@ -12,11 +12,11 @@ test_that("Mandatory samples are actually selected (R)", {
   mandatory_idx <- sample(1:nrow(df), size = 3)
   
   # no error
-  res <- clhs(df, size = 10, iter = 100, use.cpp = F, include = mandatory_idx, progress = FALSE)
+  res <- clhs(df, size = 10, iter = 100, use.cpp = F, must.include = mandatory_idx, progress = FALSE)
   expect_true(all(mandatory_idx %in% res))
   
   # error : size <= length(include)
-  expect_error(clhs(df, size = 3, iter = 100, use.cpp = F,include = mandatory_idx, progress = FALSE))
+  expect_error(clhs(df, size = 3, iter = 100, use.cpp = F, must.include = mandatory_idx, progress = FALSE))
   
 })
 
@@ -33,15 +33,14 @@ test_that("Mandatory samples are actually selected (C++)", {
   
   
   # no error
-  res <- clhs(df, size = 10, include = mandatory_idx)
+  res <- clhs(df, size = 10, must.include = mandatory_idx)
   expect_true(all(mandatory_idx %in% res))
   
   # error : size <= length(include)
-  expect_error(clhs(df, size = 3, iter = 5000, include = mandatory_idx))
-  
-})
+  expect_error(clhs(df, size = 3, iter = 5000, must.include = mandatory_idx))
+  })
 
-test_that("Samples are only from possilbe.samples (C++)", {
+test_that("Samples are only from can.include (C++)", {
   
   df <- data.frame(
     a = runif(1000), 
@@ -53,7 +52,7 @@ test_that("Samples are only from possilbe.samples (C++)", {
   poss_idx <- sample(1:nrow(df), size = 600)
   
   # no error
-  res <- clhs(df, size = 10, possible.sample = poss_idx)
+  res <- clhs(df, size = 10, can.include = poss_idx)
   expect_true(all(res %in% poss_idx))
 
 })
