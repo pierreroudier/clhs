@@ -273,6 +273,7 @@ objResult obj_fn(arma::mat x, NumericMatrix strata, arma::mat include, bool fact
 //' This is the internal Cpp function used to run the metropolis hasting algorithm if use.cpp = T. 
 //' In general, it shouldn't be used as a stand alone function, because some preprocessing is done in R
 //' 
+//' @name CppLHS
 //' @param xA matrix of data - must be numeric (factors are converted to numeric in R)
 //' @param cost cost vector (0 if no cost)
 //' @param strata matrix of continuous strata

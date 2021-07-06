@@ -25,8 +25,8 @@ Imports: utils,
     reshape2, 
     plyr,  
     cluster,
-    RcppArmadillo, 
-    Rcpp
+    Rcpp,
+    RcppArmadillo
 LinkingTo: RcppArmadillo, Rcpp
 License: GPL (>= 2)
 Encoding: UTF-8
