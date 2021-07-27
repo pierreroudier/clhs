@@ -13,7 +13,7 @@ clhs.data.frame <- function(
   can.include = NULL, # Indexes from which sampling is allowed
   cost = NULL, # Number or name of the attribute used as a cost
   iter = 10000, # Number of max iterations
-  use.cpp = T, # use C++ code for metropolis-hasting loop?
+  use.cpp = TRUE, # use C++ code for metropolis-hasting loop?
   temp = 1, # initial temperature
   tdecrease = 0.95, # temperature decrease rate
   weights = list(numeric = 1, factor = 1, correlation = 1), # weight for continuous data , weight for correlation among data, weight for object data
@@ -44,7 +44,7 @@ clhs.data.frame <- function(
     x <- as.data.frame(x)
     if(is.null(cost)){
       costVec <- rep(0,5)
-      costFlag <- F
+      costFlag <- FALSE
     }else{
       if (is.numeric(cost)) i_cost <- cost
       else i_cost <- which(names(x) == cost)
@@ -53,7 +53,7 @@ clhs.data.frame <- function(
       costVec = x[,i_cost, drop = T]
       costVec[is.infinite(costVec)] <- 1000
       x <- x[,-i_cost]
-      costFlag = T
+      costFlag = TRUE
     }
     
     areFactors <- FALSE
@@ -83,7 +83,7 @@ clhs.data.frame <- function(
       etaDim <- dim(eta)
       if(!all(c(size,ncont) == etaDim)){
         stop("eta matrix is incorrect dimension")
-      }else{
+      } else {
         eMat <- eta
       }
     }

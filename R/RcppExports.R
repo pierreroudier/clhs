@@ -26,6 +26,6 @@
 NULL
 
 CppLHS <- function(xA, cost, strata, include, idx, factors, i_fact, nsample, cost_mode, iter, wCont, wFact, wCorr, etaMat, temperature, tdecrease, length_cycle) {
-    .Call(`_clhs_CppLHS`, xA, cost, strata, include, idx, factors, i_fact, nsample, cost_mode, iter, wCont, wFact, wCorr, etaMat, temperature, tdecrease, length_cycle)
+    .Call('_clhs_CppLHS', PACKAGE = 'clhs', xA, cost, strata, include, idx, factors, i_fact, nsample, cost_mode, iter, wCont, wFact, wCorr, etaMat, temperature, tdecrease, length_cycle)
 }
 

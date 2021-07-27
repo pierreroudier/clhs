@@ -27,7 +27,7 @@ In this example we sample the `diamonds` data set and pick a subset of 100 indiv
 
 ```{r simple_clhs, echo=TRUE, eval=TRUE}
 library(clhs)
-res <- clhs(diamonds, size = 100)
+res <- clhs(diamonds, size = 100, use.cpp = TRUE)
 str(res)
 ```
 
@@ -37,7 +37,7 @@ str(res)
 
 # Including existing samples in the sampling routine
 
-This functionality is controlled by the `include` option, which can be used to specify the row indices oif samples that needs to be included in the final sampled set.
+This functionality is controlled by the `include` option, which can be used to specify the row indices of samples that needs to be included in the final sampled set.
 
 ```{r existing_samples, echo=TRUE, eval=TRUE}
 suppressWarnings(RNGversion("3.5.0"))
