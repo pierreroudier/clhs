@@ -24,7 +24,10 @@ Imports: utils,
     raster, 
     reshape2, 
     plyr,  
-    cluster
+    cluster,
+    Rcpp,
+    RcppArmadillo
+LinkingTo: RcppArmadillo, Rcpp
 License: GPL (>= 2)
 Encoding: UTF-8
 LazyLoad: yes
@@ -34,6 +37,7 @@ Suggests: knitr,
 VignetteBuilder: knitr
 RoxygenNote: 7.1.1
 Collate: 
+    'RcppExports.R'
     'clhs-internal.R'
     'clhs-data.frame.R'
     'clhs-package.R'

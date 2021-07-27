@@ -27,7 +27,7 @@ In this example we sample the `diamonds` data set and pick a subset of 100 indiv
 
 ```{r simple_clhs, echo=TRUE, eval=TRUE}
 library(clhs)
-res <- clhs(diamonds, size = 100, progress = FALSE, iter = 1000)
+res <- clhs(diamonds, size = 100)
 str(res)
 ```
 
@@ -56,9 +56,7 @@ existing_samples <- data.frame(
 res <- clhs(
   x = rbind(existing_samples, candidates_samples), 
   size = 10, 
-  iter = 100, 
-  include = 1:5, 
-  progress = FALSE
+  include = 1:5
 )
 ```
 
@@ -111,8 +109,8 @@ res_cost <- clhs(diamonds, size = 100, progress = FALSE, iter = 1000, cost = 'co
 If you want to report on the cLHS results, e.g. plot the evolution of the objective function, or compare the distribution of attributes in the initial object and in the sampled subset, you need to switch the `simple` option to `FALSE`. Instead f simply returning a numeric vector giving the index of the sampled individuals in the original object, a specific, more complex will be returned. This object can be handled by a specific `plot` method:
 
 ```{r plot_clhs_1, echo=TRUE, fig=TRUE, fig.height=8, fig.width=8}
-res <- clhs(diamonds, size = 100, simple = FALSE, progress = FALSE, iter = 1000)
-plot(res)
+res <- clhs(diamonds, size = 100,cost = "cost", simple = FALSE, progress = FALSE, iter = 2000)
+plot(res,c("obj","cost"))
 ```
 
 The default plotting method plots the evolution of the objective function with the number of iterations. However, you can get more details using the `modes` option, which controls which indicators are plotted. Three `modes` can be simultaneously plotted:
@@ -124,7 +122,7 @@ The default plotting method plots the evolution of the objective function with t
 These modes should be given as a vector of characters.
 
 ```{r plot_clhs_3, echo=TRUE, fig=TRUE, fig.height=8, fig.width=12}
-res_cost <- clhs(diamonds, size = 100, progress = FALSE, iter = 1000, cost = 'cost', simple = FALSE)
+res_cost <- clhs(diamonds, size = 100, progress = FALSE, iter = 1000, cost = 'cost', simple = FALSE, use.cpp = F)
 plot(res_cost, c('obj', 'cost'))
 ```
 

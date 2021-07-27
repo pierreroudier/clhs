@@ -22,6 +22,6 @@ test_that("clhs on a SpatialPointsDataFrame works", {
   res1 <- clhs(spdf, size = 5, iter = 100, progress = FALSE, simple = TRUE)
   res2 <- clhs(spdf, size = 5, iter = 100, progress = FALSE, simple = TRUE, use.coords = TRUE)
   
-  expect_equal(res1, c(809, 559, 264, 898, 891))
-  expect_equal(res2, c(618, 547, 123, 230, 233))
+  expect_equal(res1, c(960, 96, 304, 670, 174))
+  expect_equal(res2, c(452, 251, 292, 922, 599))
 })

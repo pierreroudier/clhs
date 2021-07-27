@@ -27,13 +27,17 @@
 #' @param x A \code{data.frame}, \code{SpatialPointsDataFrame}, \code{sf}, or \code{Raster}
 #' object.
 #' @param size A non-negative integer giving the total number of items to select
-#' @param include A numeric vector giving the indices of the rows from \code{x} that must be 
+#' @param must.include A numeric vector giving the indices of the rows from \code{x} that must be 
 #' included in the selected items. For the cost-constrained cLHS method, cost of 
 #' these mandatory samples is set to 0. If NULL (default), all data are randomly 
-#' chosen according to the classic cLHS method. If \code{include} is not NULL,
+#' chosen according to the classic cLHS method. If \code{must.include} is not NULL,
 #' argument \code{size} must include the total size of the final sample i.e. the
-#' size of mandatory samples given by \code{include} plus the size of the randomly
+#' size of mandatory samples given by \code{must.include} plus the size of the randomly
 #' chosen samples to pick.
+#' @param can.include A numeric vector giving indices of the rows from \code{x} 
+#' that are allowed to be sampled from. The algorithm will use all of \code{x} as the reference
+#' distribution, but will only select samples from possible.sample. The option is only available in the
+#' C++ version; if \code{use.cpp == F}, this parameter will be ignored.
 #' @param cost A character giving the name or an integer giving the index of
 #' the attribute in \code{x} that gives a cost that can be use to constrain the
 #' cLHS sampling. If NULL (default), the cost-constrained implementation is not
@@ -46,6 +50,9 @@
 #' option is not used.
 #' @param iter A positive number, giving the number of iterations for the
 #' Metropolis-Hastings annealing process. Defaults to 10000.
+#' @param use.cpp TRUE or FALSE. If set to TRUE, annealing process uses C++ code.
+#' This is ~ 150 times faster than the R version, but is less stable and currently 
+#' doesn't accept track or obj.limit parameters. Default to TRUE.
 #' @param temp The initial temperature at which the simulated annealing
 #' begins. Defaults to 1.
 #' @param tdecrease A number between 0 and 1, giving the rate at which
@@ -108,13 +115,11 @@
 #' )
 #' 
 #' # Returning the indices of the sampled points
-#' set.seed(1)
-#' res <- clhs(df, size = 50, iter = 100, progress = FALSE, simple = TRUE)
+#' res <- clhs(df, size = 50, progress = FALSE, simple = TRUE)
 #' str(res)
 #' 
-#' # Returning a cLHS_result object for plotting
-#' set.seed(1)
-#' res <- clhs(df, size = 50, iter = 100, progress = FALSE, simple = FALSE)
+#' # Returning a cLHS_result object for plotting using C++
+#' res <- clhs(df, size = 50, use.cpp = TRUE, iter = 5000, progress = FALSE, simple = FALSE)
 #' str(res)
 #' plot(res)
 #' 
@@ -129,5 +134,4 @@
 #' 
 #' @include clhs-data.frame.R
 #' @export
-#' 
-clhs <- function(x, size, include,  cost,  iter,  temp,  tdecrease,  weights, eta, obj.limit, length.cycle, simple, progress, track, use.coords, ...) UseMethod("clhs")
+clhs <- function(x, size, must.include, can.include, cost,  iter, use.cpp, temp,  tdecrease,  weights, eta, obj.limit, length.cycle, simple, progress, track, use.coords, ...) UseMethod("clhs")
