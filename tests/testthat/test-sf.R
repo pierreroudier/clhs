@@ -22,6 +22,6 @@ test_that("clhs on a sf works", {
   res1 <- clhs(sf, size = 5, iter = 100, progress = FALSE, simple = TRUE)
   res2 <- clhs(sf, size = 5, iter = 100, progress = FALSE, simple = TRUE, use.coords = TRUE)
   
-  expect_equal(res1, c(960, 96, 304, 670, 174))
-  expect_equal(res2, c(452, 251, 292, 922, 599))
+  expect_equal(res1, c(573, 127, 939, 848, 171))
+  expect_equal(res2, c(398, 475, 826, 4, 650))
 })
