@@ -102,7 +102,7 @@ clhs.data.frame <- function(
       ssize <- size
     }else{
       dat <- data[-include,]
-      inc <- data[include,]
+      inc <- data[include,,drop = FALSE] ##keep as matrix if just one row
       ssize <- size - length(include)
       can.include <- 1:nrow(dat)
     }
