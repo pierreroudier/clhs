@@ -37,7 +37,7 @@ df <- data.frame(
   c = sample(LETTERS[1:5], size = 1000, replace = TRUE)
 )
 
-res <- clhs(df, size = 50, iter = 2000, use.cpp = FALSE, progress = FALSE, simple = FALSE)
+res <- clhs(df, size = 50, iter = 1000, use.cpp = FALSE, progress = FALSE, simple = FALSE)
 
 # You can plot only the objective function
 plot(res, mode = "obj")
