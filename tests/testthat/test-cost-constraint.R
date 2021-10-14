@@ -27,7 +27,7 @@ test_that("Cost-constrained implementation (C++) works", {
   res <- clhs(mtcars, size = 3, use.cpp = T, cost = "mpg", simple = FALSE)
   
   expect_equal(
-    res$index_samples, c(16, 32, 31)
+    res$index_samples, c(16, 31, 32)
   )
   
   expect_equal(

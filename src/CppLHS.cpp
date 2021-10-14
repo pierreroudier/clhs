@@ -315,8 +315,8 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
   
   std::vector<double> delta_cont;
   std::vector<double> delta_cont_prev;
-  IntegerVector idx_removed;
-  IntegerVector idx_added;
+  int idx_removed;
+  int idx_added;
   int spl_removed;
   std::vector<int> i_sampled;
   std::vector<int> i_sampled_prev;
@@ -384,12 +384,14 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
     
     if(Rcpp::runif(1,0,1)[0] < 0.5){
       //Rcout << "In Simple Swap \n";
-      idx_removed = Rcpp::sample(i_sampled.size()-1, 1, false);
-      spl_removed = i_sampled[idx_removed[0]];
-      i_sampled.erase(i_sampled.begin() + idx_removed[0]);
-      idx_added = Rcpp::sample(i_unsampled.size()-1, 1, false);
-      i_sampled.push_back(i_unsampled[idx_added[0]]);
-      i_unsampled.erase(i_unsampled.begin()+idx_added[0]);
+      idx_removed = Rcpp::sample(i_sampled.size(), 1, false)[0];
+      idx_removed--;
+      spl_removed = i_sampled[idx_removed];
+      i_sampled.erase(i_sampled.begin() + idx_removed);
+      idx_added = Rcpp::sample(i_unsampled.size(), 1, false)[0];
+      idx_added--;
+      i_sampled.push_back(i_unsampled[idx_added]);
+      i_unsampled.erase(i_unsampled.begin()+idx_added);
       i_unsampled.push_back(spl_removed);
     }else{
       //Rcout << "In remove worst \n";
@@ -402,10 +404,11 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
       // Rcout << "Delta Worst: " << i_worse << "\n";
       spl_removed = i_sampled[i_worse]; //this is the problem
       //Rcout << "spl_removed " << spl_removed << "\n";
-      idx_added = Rcpp::sample(i_unsampled.size()-1, 1, false);
+      idx_added = Rcpp::sample(i_unsampled.size(), 1, false)[0];
+      idx_added--;
       i_sampled.erase(i_sampled.begin()+i_worse);
-      i_sampled.push_back(i_unsampled[idx_added[0]]);
-      i_unsampled.erase(i_unsampled.begin()+idx_added[0]);
+      i_sampled.push_back(i_unsampled[idx_added]);
+      i_unsampled.erase(i_unsampled.begin()+idx_added);
       i_unsampled.push_back(spl_removed);
       // temp43 = wrap(i_sampled);
       // Rcout << "i_samplednew: " << temp43 << "\n";
