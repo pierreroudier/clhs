@@ -12,7 +12,7 @@ clhs.data.frame <- function(
   must.include = NULL, # row index of data that must be in the final sample
   can.include = NULL, # Indexes from which sampling is allowed
   cost = NULL, # Number or name of the attribute used as a cost
-  iter = 10000, # Number of max iterations
+  iter = 10000, # Number of iterations
   use.cpp = TRUE, # use C++ code for metropolis-hasting loop?
   temp = 1, # initial temperature
   tdecrease = 0.95, # temperature decrease rate

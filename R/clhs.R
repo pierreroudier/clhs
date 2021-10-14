@@ -14,7 +14,7 @@
 #' vector (b, 1, ..., 1, b) in order to give the edge of the distribution a 
 #' probability b times higher to be sampled. In our function, instead of define 
 #' the \code{b} parameter, users can defined their own \code{eta} matrix so that they 
-#' can give more complex probabilty design of sampling each strata of the 
+#' can give more complex probability design of sampling each strata of the 
 #' distribution instead of just be able to give more importance to both edges of 
 #' the distribution.
 #' 
@@ -37,7 +37,7 @@
 #' @param can.include A numeric vector giving indices of the rows from \code{x} 
 #' that are allowed to be sampled from. The algorithm will use all of \code{x} as the reference
 #' distribution, but will only select samples from possible.sample. The option is only available in the
-#' C++ version; if \code{use.cpp == F}, this parameter will be ignored.
+#' C++ version; if \code{use.cpp == FALSE}, this parameter will be ignored.
 #' @param cost A character giving the name or an integer giving the index of
 #' the attribute in \code{x} that gives a cost that can be use to constrain the
 #' cLHS sampling. If NULL (default), the cost-constrained implementation is not
