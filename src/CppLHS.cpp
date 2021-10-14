@@ -12,7 +12,6 @@
 #include <string.h>
 #include <RcppArmadillo.h>
 #include <random>
-//[[Rcpp::depends(RcppArmadillo)]]
 
 using namespace Rcpp;
 using namespace std;
@@ -454,7 +453,10 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
   }
   arm_isamp = arma::conv_to<arma::uvec>::from(i_sampled);
   x_curr = xA.rows(arm_isamp);
-  Rcout << "vroom vroom \n";
+  
+  // Keeping this in the source to remember the good times ;-)
+  // Rcout << "vroom vroom \n";
+  
   //create list to return
   return List::create(_["sampled_data"] = x_curr,
                       _["index_samples"] = i_sampled,

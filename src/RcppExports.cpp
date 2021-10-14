@@ -6,6 +6,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // CppLHS
 List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata, arma::mat include, std::vector<int> idx, bool factors, arma::uvec i_fact, int nsample, bool cost_mode, int iter, double wCont, double wFact, double wCorr, arma::mat etaMat, double temperature, double tdecrease, int length_cycle);
 RcppExport SEXP _clhs_CppLHS(SEXP xASEXP, SEXP costSEXP, SEXP strataSEXP, SEXP includeSEXP, SEXP idxSEXP, SEXP factorsSEXP, SEXP i_factSEXP, SEXP nsampleSEXP, SEXP cost_modeSEXP, SEXP iterSEXP, SEXP wContSEXP, SEXP wFactSEXP, SEXP wCorrSEXP, SEXP etaMatSEXP, SEXP temperatureSEXP, SEXP tdecreaseSEXP, SEXP length_cycleSEXP) {
