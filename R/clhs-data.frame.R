@@ -28,32 +28,43 @@ clhs.data.frame <- function(
 ) {
   
   ##check input
+  
   if (tdecrease >= 1) stop("tdecrease should be < 1")
-  if(!is.null(can.include) & !use.cpp) warning("can.include is not implimented in the R version and will be ignored")
+  
+  if(!is.null(can.include) & !use.cpp) warning("can.include is not implemented in the R version and will be ignored")
+  
   include <- must.include
+  
+  # Unless restricted by can.include, all the rows in x can potentially be sampled
   if(is.null(can.include)){
     can.include <- 1:nrow(x)
   }
+  
   if (!is.null(include)) {
     if (size <= length(include)) {
       stop(paste0("size (", size, ") should be larger than length of include (", length(include), ")"))
     }
   }
   
-  if (use.cpp){
+  # C++ version
+  if (use.cpp) {
+    
     x <- as.data.frame(x)
-    if(is.null(cost)){
+    
+    if (is.null(cost)) {
       costVec <- rep(0,5)
       costFlag <- FALSE
-    }else{
+    } else {
+      
       if (is.numeric(cost)) i_cost <- cost
       else i_cost <- which(names(x) == cost)
       
       if (!length(i_cost)) stop("Could not find the cost attribute.") 
-      costVec = x[,i_cost, drop = T]
+      
+      costVec <- x[, i_cost, drop = T]
       costVec[is.infinite(costVec)] <- 1000
-      x <- x[,-i_cost]
-      costFlag = TRUE
+      x <- x[, -i_cost]
+      costFlag <- TRUE
     }
     
     areFactors <- FALSE
@@ -62,26 +73,30 @@ clhs.data.frame <- function(
     
     if (n_factor > 0) {
       areFactors <- TRUE
-      data_continuous <- x[, -1*i_factor,drop = F]
-      data_factor <- x[, i_factor, drop = F]
-      for(i in 1:ncol(data_factor)){
-        data_factor[,i] <- as.numeric(data_factor[,i])
-      }
-      data <- as.matrix(cbind(data_factor,data_continuous))
+      data_continuous <- x[, -1*i_factor, drop = FALSE]
+      data_factor <- x[, i_factor, drop = FALSE]
+      
+      # for(i in 1:ncol(data_factor)){
+      #   data_factor[,i] <- as.numeric(as.factor(data_factor[,i]))
+      # }
+      data_factor <- apply(data_factor, 2, function(x) as.numeric(as.factor(x)))
+      
+      data <- as.matrix(cbind(data_factor, data_continuous))
+      
       factIdx <- 1:n_factor
       ncont <- ncol(data_continuous)
     } else {
       data <- as.matrix(x)
-      factIdx <- 1:5
+      factIdx <- 1:5 # why five??
       ncont <- ncol(data)
       data_continuous <- x
     }
     
-    if(length(eta) == 1){
+    if (length(eta) == 1) {
       eMat <- matrix(data = eta, nrow = size, ncol = ncont)
-    }else{
+    } else {
       etaDim <- dim(eta)
-      if(!all(c(size,ncont) == etaDim)){
+      if (!all(c(size, ncont) == etaDim)){
         stop("eta matrix is incorrect dimension")
       } else {
         eMat <- eta
@@ -100,18 +115,22 @@ clhs.data.frame <- function(
       dat <- data
       inc <- dat[0,]
       ssize <- size
-    }else{
+    } else{
       dat <- data[-include,]
       inc <- data[include,,drop = FALSE] ##keep as matrix if just one row
       ssize <- size - length(include)
       can.include <- 1:nrow(dat)
     }
-    can.include <- can.include-1 ##convert to zero based for C
+    
+    can.include <- can.include - 1 # convert to zero based for C
+    
     res <- CppLHS(xA = dat, cost = costVec, strata = continuous_strata, include = inc, idx = can.include,
                   factors = areFactors, i_fact = factIdx-1, nsample = ssize, cost_mode = costFlag, iter = iter,
                   wCont = weights$numeric, wFact = weights$factor, wCorr = weights$correlation, etaMat = eMat,
                   temperature = temp, tdecrease = tdecrease, length_cycle = length.cycle)
+    
     res$index_samples <- res$index_samples + 1 ##fix indexing difference
+    
     if(!is.null(include)){
       res$index_samples <- c(res$index_samples,include)
     }
