@@ -180,13 +180,14 @@ histResult hist(NumericVector x, NumericVector breaks){ //based on C_bincount fr
 struct objResult {
   double objRes;
   std::vector<double> obj_cont_res;
+  std::vector<int> obj_distance; //store distance
 };
 
 //objective function - calculates objective value for current sample
 //returns objResult struct
-objResult obj_fn(arma::mat x, NumericMatrix strata, arma::mat include, bool factors, 
+objResult obj_fn(arma::mat x, arma::mat ll_curr, NumericMatrix strata, arma::mat include, bool factors, 
                  arma::uvec i_fact, NumericMatrix cor_full, Rcpp::List fact_full, 
-                 double wCont, double wFact, double wCorr, arma::mat etaMat){
+                 double wCont, double wFact, double wCorr, double min_dist, arma::mat etaMat){
   int nsamps = x.n_rows;
   arma::mat x_all = join_vert(x,include);//join with include - does nothing if no include
   NumericMatrix fact_all;
@@ -256,16 +257,38 @@ objResult obj_fn(arma::mat x, NumericMatrix strata, arma::mat include, bool fact
   //Rcout << "FactRes: " << factRes << "\n";
   //correlation matrix for current sample
   NumericMatrix cor_new = c_cor(wrap(x_all));
+  
+  //Now calculate distances if applicable 
+  double xdist, ydist;
+  double totdist;
+  //int numOver;
+  int ll_len = ll_curr.n_rows;
+  std::vector<int> dist_all(ll_len,0);
+  //Rcout << "Length: " << ll_len << "\n";
+  if(ll_len > 1){
+    for(int i = 0; i < ll_len; i++){
+      for(int j = i+1; j < ll_len; j++){
+        //Rcout << "i: " << i << " j: " << j << "\n";
+        xdist = ll_curr(i,0) - ll_curr(j,0);
+        ydist = ll_curr(i,1) - ll_curr(j,1);
+        totdist = sqrt(pow(xdist,2) + pow(ydist,2));
+        if(totdist < min_dist){
+          dist_all[i]++;
+        }
+      }
+    }
+  }
 
   double obj_cor = sum(abs(cor_full - cor_new));
   //combined objective values - since corr_mat is lower tri, have to multiply by 2
   double objFinal = sum(obj_cont)*wCont + obj_cor*2*wCorr + sum(factRes)*wFact;
   //Rcout << "FinalObj" << objFinal << "\n";
   obj_position = obj_position[Rcpp::Range(0,nsamps-1)]; //don't think I need this
+  
   //note that now the continuous objective is only used for calculating the objective value
   //so we only return the objective_positions (i.e. sample.weights)
   obj_cont2 = as<std::vector<double>>(obj_position);
-  struct objResult out = {objFinal, obj_cont2};
+  struct objResult out = {objFinal, obj_cont2, dist_all};
   return(out);
 }
 
@@ -294,9 +317,9 @@ objResult obj_fn(arma::mat x, NumericMatrix strata, arma::mat include, bool fact
 //' @return list with sampled data, indices, objective values, cost value, and final continuous weights for each sample
 
 // [[Rcpp::export]]
-List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata, 
+List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata, arma::mat latlon,
             arma::mat include, std::vector<int> idx, bool factors, arma::uvec i_fact, 
-            int nsample, bool cost_mode, int iter, double wCont,
+            int nsample, double min_dist, bool cost_mode, int iter, double wCont,
             double wFact, double wCorr, arma::mat etaMat,
             double temperature, double tdecrease, int length_cycle){
   
@@ -313,9 +336,12 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
   IntegerVector prev_unsampled;
   NumericVector prev_contObj;
   arma::mat x_curr;
+  arma::mat ll_curr;
   
   std::vector<double> delta_cont;
   std::vector<double> delta_cont_prev;
+  std::vector<int> bad_dist;
+  std::vector<int> bad_dist_prev;
   int idx_removed;
   int idx_added;
   int spl_removed;
@@ -326,6 +352,7 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
   //std::vector<int> idx(ndata);
   //std::iota(idx.begin(),idx.end(),0);//populate idx with seq(0:ndata)
   std::vector<double>::iterator it_worse;
+  std::vector<int>::iterator it_worse_int;
   int i_worse;
   IntegerVector idx2;
   NumericVector temp;
@@ -337,6 +364,12 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
   i_unsampled = vector_diff(idx,i_sampled);
   arma::uvec arm_isamp = arma::conv_to<arma::uvec>::from(i_sampled);//index needs to be aram::uvec to extract rows
   x_curr = xA.rows(arm_isamp); // is this efficient?
+  
+  if(latlon.n_rows > 1){
+    ll_curr = latlon.rows(arm_isamp);
+  }else{
+    ll_curr = latlon.row(0); //does this work
+  }
   //Rcout << "Finish initial sample \n";
   arma::mat x_cont = xA;
   if(factors){
@@ -355,9 +388,11 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
   }
   
   //initial objective value
-  struct objResult res = obj_fn(x_curr,strata,include,factors,i_fact,cor_full,factTab,wCont,wFact,wCorr,etaMat);
+  struct objResult res = obj_fn(x_curr,ll_curr,strata,include,factors,i_fact,
+                                cor_full,factTab,wCont,wFact,wCorr,min_dist,etaMat);
   obj = res.objRes;
   delta_cont = res.obj_cont_res;
+  bad_dist = res.obj_distance;
   //Rcout << "Finished function; obj = "<< obj << "\n";
   
   
@@ -377,6 +412,7 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
     i_sampled_prev = i_sampled;
     i_unsampled_prev = i_unsampled;
     delta_cont_prev = delta_cont;
+    bad_dist_prev = bad_dist;
     //Rcout << "Deltacont: " << wrap(delta_cont) << "\n";
     
     if(cost_mode){
@@ -412,15 +448,34 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
       i_unsampled.erase(i_unsampled.begin()+idx_added);
       i_unsampled.push_back(spl_removed);
       // temp43 = wrap(i_sampled);
-      // Rcout << "i_samplednew: " << temp43 << "\n";
+      // now remove worst for distance
+      if(latlon.n_rows > 1){//if using lat long
+        it_worse_int = std::max_element(bad_dist.begin(),bad_dist.end()); //returns max element
+        i_worse = std::distance(bad_dist.begin(), it_worse_int); //find location of worst
+        spl_removed = i_sampled[i_worse]; //this is the problem
+        //Rcout << "spl_removed " << spl_removed << "\n";
+        idx_added = Rcpp::sample(i_unsampled.size(), 1, false)[0];
+        idx_added--;
+        i_sampled.erase(i_sampled.begin()+i_worse);
+        i_sampled.push_back(i_unsampled[idx_added]);
+        i_unsampled.erase(i_unsampled.begin()+idx_added);
+        i_unsampled.push_back(spl_removed);
+      }
     }
     //Rcout << "sending to function \n";
     arm_isamp = arma::conv_to<arma::uvec>::from(i_sampled);
     x_curr = xA.rows(arm_isamp); // is this efficient?
+    if(latlon.n_rows > 1){
+      ll_curr = latlon.rows(arm_isamp);
+    }else{
+      ll_curr = latlon.row(0); //does this work
+    }
     //calculate objective value
-    res = obj_fn(x_curr,strata,include,factors,i_fact,cor_full,factTab,wCont,wFact,wCorr,etaMat); //test this
+    res = obj_fn(x_curr,ll_curr,strata,include,factors,i_fact,
+                 cor_full,factTab,wCont,wFact,wCorr,min_dist,etaMat);
     obj = res.objRes;
     delta_cont = res.obj_cont_res;
+    bad_dist = res.obj_distance;
     NumericVector dcTemp = wrap(delta_cont);
     //update variables
     delta_obj = obj - prev_obj;
@@ -443,6 +498,7 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
       i_unsampled = i_unsampled_prev;
       obj = prev_obj;
       delta_cont = delta_cont_prev;
+      bad_dist = bad_dist_prev;
       if(cost_mode){
         opCost = prev_opCost;
       }
@@ -463,5 +519,6 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata,
                       _["index_samples"] = i_sampled,
                       _["obj"] = obj_values,
                       _["cost"] = cost_values,
-                      _["final_obj_continuous"] = delta_cont);
+                      _["final_obj_continuous"] = delta_cont,
+                      _["final_obj_distance"] = bad_dist);
 }

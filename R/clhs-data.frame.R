@@ -14,6 +14,8 @@ clhs.data.frame <- function(
   cost = NULL, # Number or name of the attribute used as a cost
   iter = 10000, # Number of max iterations
   use.cpp = TRUE, # use C++ code for metropolis-hasting loop?
+  latlon = NULL,
+  min.dist = NULL,
   temp = 1, # initial temperature
   tdecrease = 0.95, # temperature decrease rate
   weights = list(numeric = 1, factor = 1, correlation = 1), # weight for continuous data , weight for correlation among data, weight for object data
@@ -96,6 +98,13 @@ clhs.data.frame <- function(
       }
     )
     
+    if(is.null(latlon)){
+      latlon <- matrix(c(0,0),nrow = 1, ncol = 2)
+      min.dist = 0
+    }else{
+      latlon <- as.matrix(latlon)
+    }
+    
     if(is.null(include)){
       dat <- data
       inc <- dat[0,]
@@ -107,8 +116,8 @@ clhs.data.frame <- function(
       can.include <- 1:nrow(dat)
     }
     can.include <- can.include-1 ##convert to zero based for C
-    res <- CppLHS(xA = dat, cost = costVec, strata = continuous_strata, include = inc, idx = can.include,
-                  factors = areFactors, i_fact = factIdx-1, nsample = ssize, cost_mode = costFlag, iter = iter,
+    res <- CppLHS(xA = dat, cost = costVec, strata = continuous_strata, latlon = latlon, include = inc, idx = can.include,
+                  factors = areFactors, i_fact = factIdx-1, nsample = ssize, min_dist = min.dist, cost_mode = costFlag, iter = iter,
                   wCont = weights$numeric, wFact = weights$factor, wCorr = weights$correlation, etaMat = eMat,
                   temperature = temp, tdecrease = tdecrease, length_cycle = length.cycle)
     res$index_samples <- res$index_samples + 1 ##fix indexing difference
