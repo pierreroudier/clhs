@@ -185,7 +185,8 @@ struct objResult {
 
 //objective function - calculates objective value for current sample
 //returns objResult struct
-objResult obj_fn(arma::mat x, arma::mat ll_curr, NumericMatrix strata, arma::mat include, bool factors, 
+objResult obj_fn(arma::mat x, arma::mat ll_curr, NumericMatrix strata, arma::mat include, 
+                 arma::mat latlon_inc,bool factors, 
                  arma::uvec i_fact, NumericMatrix cor_full, Rcpp::List fact_full, 
                  double wCont, double wFact, double wCorr, double min_dist, arma::mat etaMat){
   int nsamps = x.n_rows;
@@ -277,6 +278,18 @@ objResult obj_fn(arma::mat x, arma::mat ll_curr, NumericMatrix strata, arma::mat
         }
       }
     }
+    if(latlon_inc.n_rows > 1){//if there is latlon data for must.include
+      for(int i = 0; i < ll_len; i++){
+        for(int j = 0; j < latlon_inc.n_rows; j++){
+          xdist = ll_curr(i,0) - latlon_inc(j,0);
+          ydist = ll_curr(i,1) - latlon_inc(j,1);
+          totdist = sqrt(pow(xdist,2) + pow(ydist,2));
+          if(totdist < min_dist){
+            dist_all[i]++;
+          }
+        }
+      }
+    }
   }
 
   double obj_cor = sum(abs(cor_full - cor_new));
@@ -318,7 +331,7 @@ objResult obj_fn(arma::mat x, arma::mat ll_curr, NumericMatrix strata, arma::mat
 
 // [[Rcpp::export]]
 List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata, arma::mat latlon,
-            arma::mat include, std::vector<int> idx, bool factors, arma::uvec i_fact, 
+            arma::mat include, arma::mat latlon_inc, std::vector<int> idx, bool factors, arma::uvec i_fact, 
             int nsample, double min_dist, bool cost_mode, int iter, double wCont,
             double wFact, double wCorr, arma::mat etaMat,
             double temperature, double tdecrease, int length_cycle){
@@ -388,7 +401,7 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata, arma::mat la
   }
   
   //initial objective value
-  struct objResult res = obj_fn(x_curr,ll_curr,strata,include,factors,i_fact,
+  struct objResult res = obj_fn(x_curr,ll_curr,strata,include,latlon_inc,factors,i_fact,
                                 cor_full,factTab,wCont,wFact,wCorr,min_dist,etaMat);
   obj = res.objRes;
   delta_cont = res.obj_cont_res;
@@ -471,7 +484,7 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata, arma::mat la
       ll_curr = latlon.row(0); //does this work
     }
     //calculate objective value
-    res = obj_fn(x_curr,ll_curr,strata,include,factors,i_fact,
+    res = obj_fn(x_curr,ll_curr,strata,include,latlon_inc,factors,i_fact,
                  cor_full,factTab,wCont,wFact,wCorr,min_dist,etaMat);
     obj = res.objRes;
     delta_cont = res.obj_cont_res;

@@ -109,14 +109,20 @@ clhs.data.frame <- function(
       dat <- data
       inc <- dat[0,]
       ssize <- size
+      spat_inc <- matrix(c(0,0),nrow = 1, ncol = 2)
+      spat <- latlon
     }else{
+      if(nrow(latlon) > 1){
+        spat <- latlon[-include,]
+        spat_inc <- latlon[include,,drop = FALSE]
+      }
       dat <- data[-include,]
       inc <- data[include,,drop = FALSE] ##keep as matrix if just one row
       ssize <- size - length(include)
       can.include <- 1:nrow(dat)
     }
     can.include <- can.include-1 ##convert to zero based for C
-    res <- CppLHS(xA = dat, cost = costVec, strata = continuous_strata, latlon = latlon, include = inc, idx = can.include,
+    res <- CppLHS(xA = dat, cost = costVec, strata = continuous_strata, latlon = spat, include = inc, latlon_inc = spat_inc, idx = can.include,
                   factors = areFactors, i_fact = factIdx-1, nsample = ssize, min_dist = min.dist, cost_mode = costFlag, iter = iter,
                   wCont = weights$numeric, wFact = weights$factor, wCorr = weights$correlation, etaMat = eMat,
                   temperature = temp, tdecrease = tdecrease, length_cycle = length.cycle)
