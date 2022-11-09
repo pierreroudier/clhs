@@ -6,20 +6,28 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // CppLHS
-List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata, arma::mat include, std::vector<int> idx, bool factors, arma::uvec i_fact, int nsample, bool cost_mode, int iter, double wCont, double wFact, double wCorr, arma::mat etaMat, double temperature, double tdecrease, int length_cycle);
-RcppExport SEXP _clhs_CppLHS(SEXP xASEXP, SEXP costSEXP, SEXP strataSEXP, SEXP includeSEXP, SEXP idxSEXP, SEXP factorsSEXP, SEXP i_factSEXP, SEXP nsampleSEXP, SEXP cost_modeSEXP, SEXP iterSEXP, SEXP wContSEXP, SEXP wFactSEXP, SEXP wCorrSEXP, SEXP etaMatSEXP, SEXP temperatureSEXP, SEXP tdecreaseSEXP, SEXP length_cycleSEXP) {
+List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata, arma::mat latlon, arma::mat include, arma::mat latlon_inc, std::vector<int> idx, bool factors, arma::uvec i_fact, int nsample, double min_dist, bool cost_mode, int iter, double wCont, double wFact, double wCorr, arma::mat etaMat, double temperature, double tdecrease, int length_cycle);
+RcppExport SEXP _clhs_CppLHS(SEXP xASEXP, SEXP costSEXP, SEXP strataSEXP, SEXP latlonSEXP, SEXP includeSEXP, SEXP latlon_incSEXP, SEXP idxSEXP, SEXP factorsSEXP, SEXP i_factSEXP, SEXP nsampleSEXP, SEXP min_distSEXP, SEXP cost_modeSEXP, SEXP iterSEXP, SEXP wContSEXP, SEXP wFactSEXP, SEXP wCorrSEXP, SEXP etaMatSEXP, SEXP temperatureSEXP, SEXP tdecreaseSEXP, SEXP length_cycleSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::mat >::type xA(xASEXP);
     Rcpp::traits::input_parameter< NumericVector >::type cost(costSEXP);
     Rcpp::traits::input_parameter< NumericMatrix >::type strata(strataSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type latlon(latlonSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type include(includeSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type latlon_inc(latlon_incSEXP);
     Rcpp::traits::input_parameter< std::vector<int> >::type idx(idxSEXP);
     Rcpp::traits::input_parameter< bool >::type factors(factorsSEXP);
     Rcpp::traits::input_parameter< arma::uvec >::type i_fact(i_factSEXP);
     Rcpp::traits::input_parameter< int >::type nsample(nsampleSEXP);
+    Rcpp::traits::input_parameter< double >::type min_dist(min_distSEXP);
     Rcpp::traits::input_parameter< bool >::type cost_mode(cost_modeSEXP);
     Rcpp::traits::input_parameter< int >::type iter(iterSEXP);
     Rcpp::traits::input_parameter< double >::type wCont(wContSEXP);
@@ -29,13 +37,26 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type temperature(temperatureSEXP);
     Rcpp::traits::input_parameter< double >::type tdecrease(tdecreaseSEXP);
     Rcpp::traits::input_parameter< int >::type length_cycle(length_cycleSEXP);
-    rcpp_result_gen = Rcpp::wrap(CppLHS(xA, cost, strata, include, idx, factors, i_fact, nsample, cost_mode, iter, wCont, wFact, wCorr, etaMat, temperature, tdecrease, length_cycle));
+    rcpp_result_gen = Rcpp::wrap(CppLHS(xA, cost, strata, latlon, include, latlon_inc, idx, factors, i_fact, nsample, min_dist, cost_mode, iter, wCont, wFact, wCorr, etaMat, temperature, tdecrease, length_cycle));
+    return rcpp_result_gen;
+END_RCPP
+}
+// calc_dist
+std::vector<int> calc_dist(double min_dist, arma::mat ll_curr);
+RcppExport SEXP _clhs_calc_dist(SEXP min_distSEXP, SEXP ll_currSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type min_dist(min_distSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type ll_curr(ll_currSEXP);
+    rcpp_result_gen = Rcpp::wrap(calc_dist(min_dist, ll_curr));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_clhs_CppLHS", (DL_FUNC) &_clhs_CppLHS, 17},
+    {"_clhs_CppLHS", (DL_FUNC) &_clhs_CppLHS, 20},
+    {"_clhs_calc_dist", (DL_FUNC) &_clhs_calc_dist, 2},
     {NULL, NULL, 0}
 };
 

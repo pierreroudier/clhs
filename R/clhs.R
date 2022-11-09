@@ -53,6 +53,8 @@
 #' @param use.cpp TRUE or FALSE. If set to TRUE, annealing process uses C++ code.
 #' This is ~ 150 times faster than the R version, but is less stable and currently 
 #' doesn't accept track or obj.limit parameters. Default to TRUE.
+#' @param latlon A dataframe or matrix with two columns containing the spatial coordinates, if minimum distance between points is required. Default to NULL.
+#' @param min.dist Numeric value of minimum distance between sample points.
 #' @param temp The initial temperature at which the simulated annealing
 #' begins. Defaults to 1.
 #' @param tdecrease A number between 0 and 1, giving the rate at which
@@ -134,4 +136,5 @@
 #' 
 #' @include clhs-data.frame.R
 #' @export
-clhs <- function(x, size, must.include, can.include, cost,  iter, use.cpp, temp,  tdecrease,  weights, eta, obj.limit, length.cycle, simple, progress, track, use.coords, ...) UseMethod("clhs")
+clhs <- function(x, size, must.include, can.include, cost,  iter, use.cpp, latlon, min.dist, temp,  tdecrease,  weights, eta, obj.limit, length.cycle, simple, progress, track, use.coords, ...) UseMethod("clhs")
+

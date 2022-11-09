@@ -17,6 +17,8 @@ clhs(
   cost,
   iter,
   use.cpp,
+  latlon,
+  min.dist,
   temp,
   tdecrease,
   weights,
@@ -60,6 +62,10 @@ Metropolis-Hastings annealing process. Defaults to 10000.}
 \item{use.cpp}{TRUE or FALSE. If set to TRUE, annealing process uses C++ code.
 This is ~ 150 times faster than the R version, but is less stable and currently 
 doesn't accept track or obj.limit parameters. Default to TRUE.}
+
+\item{latlon}{A dataframe or matrix with two columns containing the spatial coordinates, if minimum distance between points is required. Default to NULL.}
+
+\item{min.dist}{Numeric value of minimum distance between sample points.}
 
 \item{temp}{The initial temperature at which the simulated annealing
 begins. Defaults to 1.}
