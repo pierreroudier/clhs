@@ -293,8 +293,9 @@ objResult obj_fn(arma::mat x, arma::mat ll_curr, NumericMatrix strata, arma::mat
   }
 
   double obj_cor = sum(abs(cor_full - cor_new));
+  int total_dist = accumulate(dist_all.begin(), dist_all.end(),0);
   //combined objective values - since corr_mat is lower tri, have to multiply by 2
-  double objFinal = sum(obj_cont)*wCont + obj_cor*2*wCorr + sum(factRes)*wFact;
+  double objFinal = sum(obj_cont)*wCont + obj_cor*2*wCorr + sum(factRes)*wFact + total_dist;
   //Rcout << "FinalObj" << objFinal << "\n";
   obj_position = obj_position[Rcpp::Range(0,nsamps-1)]; //don't think I need this
   
