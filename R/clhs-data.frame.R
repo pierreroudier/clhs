@@ -133,7 +133,7 @@ clhs.data.frame <- function(
       samples2 <- idx_new[res$index_samples]
       res$index_samples <- c(samples2,include) ##this is the problem
     }
-    res$sampled_data <- x[c(samples2,include),]
+    res$sampled_data <- x[res$index_samples,]
     
     if (simple) res <- res$index_samples
     else {
