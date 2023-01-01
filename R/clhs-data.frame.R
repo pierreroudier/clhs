@@ -116,6 +116,8 @@ clhs.data.frame <- function(
         spat <- latlon[-include,]
         spat_inc <- latlon[include,,drop = FALSE]
       }
+      idx <- 1:nrow(data)
+      idx_new <- idx[-include]
       dat <- data[-include,]
       inc <- data[include,,drop = FALSE] ##keep as matrix if just one row
       ssize <- size - length(include)
@@ -128,9 +130,10 @@ clhs.data.frame <- function(
                   temperature = temp, tdecrease = tdecrease, length_cycle = length.cycle)
     res$index_samples <- res$index_samples + 1 ##fix indexing difference
     if(!is.null(include)){
-      res$index_samples <- c(res$index_samples,include)
+      samples2 <- idx_new[res$index_samples]
+      res$index_samples <- c(samples2,include) ##this is the problem
     }
-    res$sampled_data <- x[res$index_samples,]
+    res$sampled_data <- x[c(samples2,include),]
     
     if (simple) res <- res$index_samples
     else {

@@ -265,6 +265,7 @@ objResult obj_fn(arma::mat x, arma::mat ll_curr, NumericMatrix strata, arma::mat
   //int numOver;
   int ll_len = ll_curr.n_rows;
   std::vector<int> dist_all(ll_len,0);
+  double totalBad = 0.0;
   //Rcout << "Length: " << ll_len << "\n";
   if(ll_len > 1){
     for(int i = 0; i < ll_len; i++){
@@ -273,9 +274,12 @@ objResult obj_fn(arma::mat x, arma::mat ll_curr, NumericMatrix strata, arma::mat
         xdist = ll_curr(i,0) - ll_curr(j,0);
         ydist = ll_curr(i,1) - ll_curr(j,1);
         totdist = sqrt(pow(xdist,2) + pow(ydist,2));
+        //Rcout << "Reg distance: " << totdist << "\n";
         if(totdist < min_dist){
           dist_all[i]++;
+          totalBad += min_dist - totdist;
         }
+        //Rcout << "Regular: " << dist_all << "\n";
       }
     }
     if(latlon_inc.n_rows > 1){//if there is latlon data for must.include
@@ -284,9 +288,16 @@ objResult obj_fn(arma::mat x, arma::mat ll_curr, NumericMatrix strata, arma::mat
           xdist = ll_curr(i,0) - latlon_inc(j,0);
           ydist = ll_curr(i,1) - latlon_inc(j,1);
           totdist = sqrt(pow(xdist,2) + pow(ydist,2));
+          //Rcout << "Include distance: " << totdist << "\n";
           if(totdist < min_dist){
+            //Rcout << "Adding to dist_all \n";
             dist_all[i]++;
+            totalBad += min_dist - totdist;
           }
+          // Rcout << "Include: ";
+          // for(int i: dist_all)
+          //   Rcout << i << " ";
+          // Rcout << "\n";
         }
       }
     }
@@ -295,7 +306,7 @@ objResult obj_fn(arma::mat x, arma::mat ll_curr, NumericMatrix strata, arma::mat
   double obj_cor = sum(abs(cor_full - cor_new));
   int total_dist = accumulate(dist_all.begin(), dist_all.end(),0);
   //combined objective values - since corr_mat is lower tri, have to multiply by 2
-  double objFinal = sum(obj_cont)*wCont + obj_cor*2*wCorr + sum(factRes)*wFact + total_dist;
+  double objFinal = sum(obj_cont)*wCont + obj_cor*2*wCorr + sum(factRes)*wFact + totalBad;
   //Rcout << "FinalObj" << objFinal << "\n";
   obj_position = obj_position[Rcpp::Range(0,nsamps-1)]; //don't think I need this
   
