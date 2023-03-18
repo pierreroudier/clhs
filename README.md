@@ -1,17 +1,11 @@
-[![R build status](https://github.com/pierreroudier/clhs/workflows/R-CMD-check/badge.svg)](https://github.com/pierreroudier/clhs/actions)
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/clhs)](https://cran.r-project.org/package=clhs)
-[![Total_Downloads](http://cranlogs.r-pkg.org/badges/grand-total/clhs)](https://cran.r-project.org/package=clhs)
+# clhs development
 
-# clhs
-
-A faster (C++) implementation of the conditioned Latin Hypercube Sampling method
-
-## Scope
+This repo is a fork of the main clhs package, used for development (especially of the C++ functions). The original C++ version is on CRAN, but there are multiple updates to the development version, including bug fixes and specification of minimum distance between points. 
 
 ## Installation
 
-The C++ method is not yet on CRAN. 
+The CRAN package currently contains a bug if the C++ version is used along with `must.include`.
 
-You can install it using the `devtools` package to install `clhs`:
+You can install the development version using the `devtools` package:
 
-`devtools::install_github("pierreroudier/clhs")`
+`devtools::install_github("kdaust/clhs")`
