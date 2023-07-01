@@ -91,10 +91,15 @@ NumericMatrix c_cor(NumericMatrix mat) {
 //pair list to store frequency table for factors
 typedef std::pair<double, int>  ptype;
 
+//structure to store histogram results
+struct tableResult {
+  NumericVector values;
+  IntegerVector oversampled;
+};
 //this function creates a frequency table of sampled factor data
 //it takes a vector v of sampled data, and a frequency table for the full factor
 //it returns the absolute values of the original table - the sampled frequencies
-NumericVector table_cpp(const Rcpp::NumericVector & v, const NumericVector full){
+tableResult table_cpp(const Rcpp::NumericVector & v, const NumericVector full){
   std::vector<double> data = as<std::vector<double>>(v);
   unsigned int nTot = v.size();
   // Create a map
@@ -133,8 +138,21 @@ NumericVector table_cpp(const Rcpp::NumericVector & v, const NumericVector full)
   // Rcout << "Full: " << full << "\n";
   //Rcout << "Curr Facts: " << result_vals << "\n" << "Orig: " << full << "\n";
   
-  result_vals = abs(result_vals - full);
-  return (result_vals);
+  //result_vals = abs(result_vals - full);
+  result_vals = result_vals - full;
+  int maxv = which_max(result_vals);
+  double oversampled = strtod(tempLevs[maxv], NULL);
+  
+  IntegerVector isbad (v.size());
+  for (int i = 0; i < v.size(); i++) {
+    if(data[i] == oversampled){
+      isbad[i] = 1;
+    }
+  }
+  
+  struct tableResult out = {abs(result_vals), isbad};
+  //which samples contribute to oversampled values?
+  return (out);
 }
 
 //structure to store histogram results
@@ -186,7 +204,7 @@ struct objResult {
 //objective function - calculates objective value for current sample
 //returns objResult struct
 objResult obj_fn(arma::mat x, arma::mat ll_curr, NumericMatrix strata, arma::mat include, 
-                 arma::mat latlon_inc,bool factors, 
+                 arma::mat latlon_inc,bool factors, bool continuous,
                  arma::uvec i_fact, NumericMatrix cor_full, Rcpp::List fact_full, 
                  double wCont, double wFact, double wCorr, double min_dist, arma::mat etaMat){
   int nsamps = x.n_rows;
@@ -202,6 +220,7 @@ objResult obj_fn(arma::mat x, arma::mat ll_curr, NumericMatrix strata, arma::mat
   
   int num_vars = x_all.n_cols;
   int num_obs = strata.nrow();
+  double obj_corr = 0.0;
   NumericVector hist_cnt;
   IntegerMatrix hist_out(num_obs - 1, num_vars);
   IntegerMatrix hist_pos(num_obs - 1, num_vars);
@@ -212,52 +231,67 @@ objResult obj_fn(arma::mat x, arma::mat ll_curr, NumericMatrix strata, arma::mat
   NumericVector strata_curr;
   NumericVector hist_temp;
   NumericVector obj_cont;
-  NumericVector obj_position;
+  NumericVector obj_position (nsamps);
   NumericMatrix t2;
   std::vector<double> obj_cont2;
   
-  //send each column to bincount function
-  for(int i = 0; i < num_vars; i++){
-    //Rcout << "Hist idex is " << i << "\n";
-    data = wrap(x_all.col(i));
-    strata_curr = strata(_,i);
-    struct histResult hRes = hist(data,strata_curr);
-    bin_counts = hRes.counts;
-    sample_pos = bin_counts[hRes.position];
-    hist_pos(_,i) = sample_pos;
-    hist_out(_,i) = bin_counts;
+  if(continuous){
+    //send each column to bincount function
+    for(int i = 0; i < num_vars; i++){
+      //Rcout << "Hist idex is " << i << "\n";
+      data = wrap(x_all.col(i));
+      strata_curr = strata(_,i);
+      struct histResult hRes = hist(data,strata_curr);
+      bin_counts = hRes.counts;
+      sample_pos = bin_counts[hRes.position];
+      hist_pos(_,i) = sample_pos;
+      hist_out(_,i) = bin_counts;
+    }
+    //Rcout << "Histout: " << hist_out << "\n";
+    //convert to arma mat because subtraction is faster
+    arma::mat hist2 = as<arma::mat>(hist_out);
+    t2 = wrap(arma::abs(hist2 - etaMat));//subtract eta - either input matrix, or all 1
+    obj_cont = rowSums(t2);
+    
+    //this is the sample.weights part in the R code
+    //basically the number of counts corresponding to each sample
+    arma::mat histPos2 = as<arma::mat>(hist_pos);
+    t2 = wrap(arma::abs(histPos2 - etaMat));
+    obj_position = rowSums(t2);
+    //Rcout << "Full ObjCont: " << obj_cont << "\n";
+    //correlation matrix for current sample
+    NumericMatrix cor_new = c_cor(wrap(x_all));
+    obj_corr = sum(abs(cor_full - cor_new));
   }
   
-  //Rcout << "Histout: " << hist_out << "\n";
-  //convert to arma mat because subtraction is faster
-  arma::mat hist2 = as<arma::mat>(hist_out);
-  t2 = wrap(arma::abs(hist2 - etaMat));//subtract eta - either input matrix, or all 1
-  obj_cont = rowSums(t2);
-  
-  //this is the sample.weights part in the R code
-  //basically the number of counts corresponding to each sample
-  arma::mat histPos2 = as<arma::mat>(hist_pos);
-  t2 = wrap(arma::abs(histPos2 - etaMat));
-  obj_position = rowSums(t2);
-  //Rcout << "Full ObjCont: " << obj_cont << "\n";
-  
   //send factor data to get tabulated
-  NumericVector factRes(num_vars);
+  
+  NumericVector totalbad_fact (nsamps);
+  int num_vars2 = fact_full.size();
+  NumericVector factRes(num_vars2);
   if(factors){
-    int num_vars2 = fact_full.size();
-    NumericVector temp(x_all.n_rows);
+    
+    NumericVector temp(fact_all.rows());
     double total;
+    
     for(int i = 0; i < num_vars2; i++){
       temp = fact_full[i];
       total = sum(temp);
       temp = temp/total;
-      factRes[i] = sum(table_cpp(fact_all(_,i),temp));
+      struct tableResult tRes = table_cpp(fact_all(_,i),temp);
+      total = sum(tRes.values);
+      //Rcout << "CurrIt: " << total << "\n";
+      factRes[i] = total;
+      
+      for(int j = 0; j < totalbad_fact.size(); j++){ //sum up variables - if oversampled in all vars, will be higher
+        totalbad_fact[j] += tRes.oversampled[j];
+      }
     }
+    //Rcout << "Factor Vector: " << factRes << "\n";
   }
   
+  
   //Rcout << "FactRes: " << factRes << "\n";
-  //correlation matrix for current sample
-  NumericMatrix cor_new = c_cor(wrap(x_all));
   
   //Now calculate distances if applicable 
   double xdist, ydist;
@@ -303,16 +337,16 @@ objResult obj_fn(arma::mat x, arma::mat ll_curr, NumericMatrix strata, arma::mat
     }
   }
 
-  double obj_cor = sum(abs(cor_full - cor_new));
   int total_dist = accumulate(dist_all.begin(), dist_all.end(),0);
+  //Rcout << "Factor final: " << factRes << "\n";
   //combined objective values - since corr_mat is lower tri, have to multiply by 2
-  double objFinal = sum(obj_cont)*wCont + obj_cor*2*wCorr + sum(factRes)*wFact + totalBad;
+  double objFinal = sum(obj_cont)*wCont + obj_corr*2*wCorr + sum(factRes)*wFact + totalBad;
   //Rcout << "FinalObj" << objFinal << "\n";
-  obj_position = obj_position[Rcpp::Range(0,nsamps-1)]; //don't think I need this
-  
+  //obj_position = obj_position[Rcpp::Range(0,nsamps-1)]; //don't think I need this
+  obj_position = obj_position + totalbad_fact; //add factor positions to continuous
   //note that now the continuous objective is only used for calculating the objective value
   //so we only return the objective_positions (i.e. sample.weights)
-  obj_cont2 = as<std::vector<double>>(obj_position);
+  obj_cont2 = as<std::vector<double>>(obj_position); //maybe add here?
   struct objResult out = {objFinal, obj_cont2, dist_all};
   return(out);
 }
@@ -343,7 +377,7 @@ objResult obj_fn(arma::mat x, arma::mat ll_curr, NumericMatrix strata, arma::mat
 
 // [[Rcpp::export]]
 List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata, arma::mat latlon,
-            arma::mat include, arma::mat latlon_inc, std::vector<int> idx, bool factors, arma::uvec i_fact, 
+            arma::mat include, arma::mat latlon_inc, std::vector<int> idx, bool factors, bool continuous, arma::uvec i_fact, 
             int nsample, double min_dist, bool cost_mode, int iter, double wCont,
             double wFact, double wCorr, arma::mat etaMat,
             double temperature, double tdecrease, int length_cycle){
@@ -400,7 +434,10 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata, arma::mat la
   if(factors){
     x_cont.shed_cols(i_fact);// remove factors for correlation
   }
-  NumericMatrix cor_full = c_cor(wrap(x_cont));//full correlation matrix
+  NumericMatrix cor_full;
+  if(continuous){
+    cor_full = c_cor(wrap(x_cont));//full correlation matrix
+  }
   
   //setup table list for factors
   Rcpp::List factTab(i_fact.size()); 
@@ -412,13 +449,14 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata, arma::mat la
     }
   }
   
+  //Rcout << "Starting function \n";
   //initial objective value
-  struct objResult res = obj_fn(x_curr,ll_curr,strata,include,latlon_inc,factors,i_fact,
+  struct objResult res = obj_fn(x_curr,ll_curr,strata,include,latlon_inc,factors,continuous,i_fact,
                                 cor_full,factTab,wCont,wFact,wCorr,min_dist,etaMat);
   obj = res.objRes;
   delta_cont = res.obj_cont_res;
   bad_dist = res.obj_distance;
-  //Rcout << "Finished function; obj = "<< obj << "\n";
+  
   
   
   NumericVector cost_values(iter, NA_REAL);//store cost
@@ -496,10 +534,12 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata, arma::mat la
       ll_curr = latlon.row(0); //does this work
     }
     //calculate objective value
-    res = obj_fn(x_curr,ll_curr,strata,include,latlon_inc,factors,i_fact,
+    res = obj_fn(x_curr,ll_curr,strata,include,latlon_inc,factors,continuous,i_fact,
                  cor_full,factTab,wCont,wFact,wCorr,min_dist,etaMat);
     obj = res.objRes;
+    //Rcout << "Finished function; obj = "<< obj << "\n";
     delta_cont = res.obj_cont_res;
+    //Rcout << "Badsamples = "<< wrap(delta_cont) << "\n";
     bad_dist = res.obj_distance;
     NumericVector dcTemp = wrap(delta_cont);
     //update variables
@@ -538,12 +578,13 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata, arma::mat la
   }
   arm_isamp = arma::conv_to<arma::uvec>::from(i_sampled);
   x_curr = xA.rows(arm_isamp);
+  Rcout << "Finished function; obj = "<< obj << "\n";
   Rcout << "vroom vroom \n";
   //create list to return
   return List::create(_["sampled_data"] = x_curr,
                       _["index_samples"] = i_sampled,
                       _["obj"] = obj_values,
                       _["cost"] = cost_values,
-                      _["final_obj_continuous"] = delta_cont,
+                      _["final_quality"] = delta_cont,
                       _["final_obj_distance"] = bad_dist);
 }

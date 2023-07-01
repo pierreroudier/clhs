@@ -38,7 +38,7 @@
 #' 
 #' 	
 #' @import ggplot2 
-#' @importFrom reshape2 melt
+#' @importFrom data.table melt
 #' @importFrom plyr dlply ddply
 #' @importFrom grid pushViewport viewport grid.newpage grid.layout
 #' @importFrom utils packageVersion

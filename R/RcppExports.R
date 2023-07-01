@@ -25,11 +25,7 @@
 #' @return list with sampled data, indices, objective values, cost value, and final continuous weights for each sample
 NULL
 
-CppLHS <- function(xA, cost, strata, latlon, include, latlon_inc, idx, factors, i_fact, nsample, min_dist, cost_mode, iter, wCont, wFact, wCorr, etaMat, temperature, tdecrease, length_cycle) {
-    .Call('_clhs_CppLHS', PACKAGE = 'clhs', xA, cost, strata, latlon, include, latlon_inc, idx, factors, i_fact, nsample, min_dist, cost_mode, iter, wCont, wFact, wCorr, etaMat, temperature, tdecrease, length_cycle)
-}
-
-calc_dist <- function(min_dist, ll_curr) {
-    .Call('_clhs_calc_dist', PACKAGE = 'clhs', min_dist, ll_curr)
+CppLHS <- function(xA, cost, strata, latlon, include, latlon_inc, idx, factors, continuous, i_fact, nsample, min_dist, cost_mode, iter, wCont, wFact, wCorr, etaMat, temperature, tdecrease, length_cycle) {
+    .Call('_clhs_CppLHS', PACKAGE = 'clhs', xA, cost, strata, latlon, include, latlon_inc, idx, factors, continuous, i_fact, nsample, min_dist, cost_mode, iter, wCont, wFact, wCorr, etaMat, temperature, tdecrease, length_cycle)
 }
 

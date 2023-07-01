@@ -69,7 +69,7 @@ clhs.data.frame <- function(
       for(i in 1:ncol(data_factor)){
         data_factor[,i] <- as.numeric(data_factor[,i])
       }
-      data <- as.matrix(cbind(data_factor,data_continuous))
+      data <- as.matrix(cbind(data_factor,data_continuous))##here's the bug
       factIdx <- 1:n_factor
       ncont <- ncol(data_continuous)
     } else {
@@ -123,9 +123,15 @@ clhs.data.frame <- function(
       ssize <- size - length(include)
       can.include <- 1:nrow(dat)
     }
+    
+    areContinuous = TRUE
+    if(length(continuous_strata) == 0){
+      continuous_strata = matrix(c(0,0),nrow = 1, ncol = 2)
+      areContinuous = FALSE
+    }
     can.include <- can.include-1 ##convert to zero based for C
     res <- CppLHS(xA = dat, cost = costVec, strata = continuous_strata, latlon = spat, include = inc, latlon_inc = spat_inc, idx = can.include,
-                  factors = areFactors, i_fact = factIdx-1, nsample = ssize, min_dist = min.dist, cost_mode = costFlag, iter = iter,
+                  factors = areFactors, continuous = areContinuous, i_fact = factIdx-1, nsample = ssize, min_dist = min.dist, cost_mode = costFlag, iter = iter,
                   wCont = weights$numeric, wFact = weights$factor, wCorr = weights$correlation, etaMat = eMat,
                   temperature = temp, tdecrease = tdecrease, length_cycle = length.cycle)
     res$index_samples <- res$index_samples + 1 ##fix indexing difference

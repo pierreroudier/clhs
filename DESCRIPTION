@@ -22,7 +22,7 @@ Imports: utils,
     sp,
     sf,
     raster, 
-    reshape2, 
+    data.table,
     plyr,  
     cluster,
     Rcpp,
@@ -35,7 +35,7 @@ Suggests: knitr,
     rmarkdown,
     testthat
 VignetteBuilder: knitr
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.3
 Collate: 
     'RcppExports.R'
     'clhs-internal.R'
