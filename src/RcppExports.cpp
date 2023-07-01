@@ -12,8 +12,8 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // CppLHS
-List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata, arma::mat latlon, arma::mat include, arma::mat latlon_inc, std::vector<int> idx, bool factors, bool continuous, arma::uvec i_fact, int nsample, double min_dist, bool cost_mode, int iter, double wCont, double wFact, double wCorr, arma::mat etaMat, double temperature, double tdecrease, int length_cycle);
-RcppExport SEXP _clhs_CppLHS(SEXP xASEXP, SEXP costSEXP, SEXP strataSEXP, SEXP latlonSEXP, SEXP includeSEXP, SEXP latlon_incSEXP, SEXP idxSEXP, SEXP factorsSEXP, SEXP continuousSEXP, SEXP i_factSEXP, SEXP nsampleSEXP, SEXP min_distSEXP, SEXP cost_modeSEXP, SEXP iterSEXP, SEXP wContSEXP, SEXP wFactSEXP, SEXP wCorrSEXP, SEXP etaMatSEXP, SEXP temperatureSEXP, SEXP tdecreaseSEXP, SEXP length_cycleSEXP) {
+List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata, arma::mat latlon, arma::mat include, arma::mat latlon_inc, std::vector<int> idx, bool factors, bool continuous, arma::uvec i_fact, int nsample, double min_dist, bool cost_mode, int iter, double wCont, double wFact, double wCorr, double wDist, arma::mat etaMat, double temperature, double tdecrease, int length_cycle);
+RcppExport SEXP _clhs_CppLHS(SEXP xASEXP, SEXP costSEXP, SEXP strataSEXP, SEXP latlonSEXP, SEXP includeSEXP, SEXP latlon_incSEXP, SEXP idxSEXP, SEXP factorsSEXP, SEXP continuousSEXP, SEXP i_factSEXP, SEXP nsampleSEXP, SEXP min_distSEXP, SEXP cost_modeSEXP, SEXP iterSEXP, SEXP wContSEXP, SEXP wFactSEXP, SEXP wCorrSEXP, SEXP wDistSEXP, SEXP etaMatSEXP, SEXP temperatureSEXP, SEXP tdecreaseSEXP, SEXP length_cycleSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -34,17 +34,18 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type wCont(wContSEXP);
     Rcpp::traits::input_parameter< double >::type wFact(wFactSEXP);
     Rcpp::traits::input_parameter< double >::type wCorr(wCorrSEXP);
+    Rcpp::traits::input_parameter< double >::type wDist(wDistSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type etaMat(etaMatSEXP);
     Rcpp::traits::input_parameter< double >::type temperature(temperatureSEXP);
     Rcpp::traits::input_parameter< double >::type tdecrease(tdecreaseSEXP);
     Rcpp::traits::input_parameter< int >::type length_cycle(length_cycleSEXP);
-    rcpp_result_gen = Rcpp::wrap(CppLHS(xA, cost, strata, latlon, include, latlon_inc, idx, factors, continuous, i_fact, nsample, min_dist, cost_mode, iter, wCont, wFact, wCorr, etaMat, temperature, tdecrease, length_cycle));
+    rcpp_result_gen = Rcpp::wrap(CppLHS(xA, cost, strata, latlon, include, latlon_inc, idx, factors, continuous, i_fact, nsample, min_dist, cost_mode, iter, wCont, wFact, wCorr, wDist, etaMat, temperature, tdecrease, length_cycle));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_clhs_CppLHS", (DL_FUNC) &_clhs_CppLHS, 21},
+    {"_clhs_CppLHS", (DL_FUNC) &_clhs_CppLHS, 22},
     {NULL, NULL, 0}
 };
 

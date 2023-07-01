@@ -206,7 +206,7 @@ struct objResult {
 objResult obj_fn(arma::mat x, arma::mat ll_curr, NumericMatrix strata, arma::mat include, 
                  arma::mat latlon_inc,bool factors, bool continuous,
                  arma::uvec i_fact, NumericMatrix cor_full, Rcpp::List fact_full, 
-                 double wCont, double wFact, double wCorr, double min_dist, arma::mat etaMat){
+                 double wCont, double wFact, double wCorr, double wDist, double min_dist, arma::mat etaMat){
   int nsamps = x.n_rows;
   arma::mat x_all = join_vert(x,include);//join with include - does nothing if no include
   NumericMatrix fact_all;
@@ -340,7 +340,7 @@ objResult obj_fn(arma::mat x, arma::mat ll_curr, NumericMatrix strata, arma::mat
   int total_dist = accumulate(dist_all.begin(), dist_all.end(),0);
   //Rcout << "Factor final: " << factRes << "\n";
   //combined objective values - since corr_mat is lower tri, have to multiply by 2
-  double objFinal = sum(obj_cont)*wCont + obj_corr*2*wCorr + sum(factRes)*wFact + totalBad;
+  double objFinal = sum(obj_cont)*wCont + obj_corr*2*wCorr + sum(factRes)*wFact + totalBad*wDist;
   //Rcout << "FinalObj" << objFinal << "\n";
   //obj_position = obj_position[Rcpp::Range(0,nsamps-1)]; //don't think I need this
   obj_position = obj_position + totalbad_fact; //add factor positions to continuous
@@ -379,7 +379,7 @@ objResult obj_fn(arma::mat x, arma::mat ll_curr, NumericMatrix strata, arma::mat
 List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata, arma::mat latlon,
             arma::mat include, arma::mat latlon_inc, std::vector<int> idx, bool factors, bool continuous, arma::uvec i_fact, 
             int nsample, double min_dist, bool cost_mode, int iter, double wCont,
-            double wFact, double wCorr, arma::mat etaMat,
+            double wFact, double wCorr, double wDist, arma::mat etaMat,
             double temperature, double tdecrease, int length_cycle){
   
   //initialise objects
@@ -452,7 +452,7 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata, arma::mat la
   //Rcout << "Starting function \n";
   //initial objective value
   struct objResult res = obj_fn(x_curr,ll_curr,strata,include,latlon_inc,factors,continuous,i_fact,
-                                cor_full,factTab,wCont,wFact,wCorr,min_dist,etaMat);
+                                cor_full,factTab,wCont,wFact,wCorr,wDist,min_dist,etaMat);
   obj = res.objRes;
   delta_cont = res.obj_cont_res;
   bad_dist = res.obj_distance;
@@ -535,7 +535,7 @@ List CppLHS(arma::mat xA, NumericVector cost, NumericMatrix strata, arma::mat la
     }
     //calculate objective value
     res = obj_fn(x_curr,ll_curr,strata,include,latlon_inc,factors,continuous,i_fact,
-                 cor_full,factTab,wCont,wFact,wCorr,min_dist,etaMat);
+                 cor_full,factTab,wCont,wFact,wCorr,wDist,min_dist,etaMat);
     obj = res.objRes;
     //Rcout << "Finished function; obj = "<< obj << "\n";
     delta_cont = res.obj_cont_res;

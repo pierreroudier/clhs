@@ -18,7 +18,7 @@ clhs.data.frame <- function(
   min.dist = NULL,
   temp = 1, # initial temperature
   tdecrease = 0.95, # temperature decrease rate
-  weights = list(numeric = 1, factor = 1, correlation = 1), # weight for continuous data , weight for correlation among data, weight for object data
+  weights = list(numeric = 1, factor = 1, correlation = 1, distance = 0.1), # weight for continuous data , weight for correlation among data, weight for object data
   eta = 1,
   obj.limit = -Inf, # Stopping criterion
   length.cycle = 10, # Number of cycles done at each constant temperature value
@@ -132,7 +132,7 @@ clhs.data.frame <- function(
     can.include <- can.include-1 ##convert to zero based for C
     res <- CppLHS(xA = dat, cost = costVec, strata = continuous_strata, latlon = spat, include = inc, latlon_inc = spat_inc, idx = can.include,
                   factors = areFactors, continuous = areContinuous, i_fact = factIdx-1, nsample = ssize, min_dist = min.dist, cost_mode = costFlag, iter = iter,
-                  wCont = weights$numeric, wFact = weights$factor, wCorr = weights$correlation, etaMat = eMat,
+                  wCont = weights$numeric, wFact = weights$factor, wCorr = weights$correlation, wDist = weights$distance, etaMat = eMat,
                   temperature = temp, tdecrease = tdecrease, length_cycle = length.cycle)
     res$index_samples <- res$index_samples + 1 ##fix indexing difference
     if(!is.null(include)){
