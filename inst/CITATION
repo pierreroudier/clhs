@@ -1,10 +1,13 @@
-citHeader("To cite the clhs package in publications use:")
-
-citEntry(entry="Manual",
-         title = "clhs: a R package for conditioned Latin hypercube sampling.",
-         author = "Pierre Roudier",
-         journal = "",
-         year         = 2011,
-         volume       = '',
-         pages        = '',
-        textVersion = "Roudier, P. clhs: a R package for conditioned Latin hypercube sampling. 2011." )
+bibentry(
+  bibtype = "InProceedings",
+  title = "A conditioned Latin hypercube sampling algorithm incorporating operational constraints.",
+  author = c(
+       person("Pierre", "Roudier"),
+       person("Dylan","Beaudette"),
+       person("Allan", "Hewitt")
+     ),
+  year = "2012",
+  booktitle = "Digital Soil Assessments and Beyond",
+  publisher = "CRC Press",
+  pages = "227--232"
+)
