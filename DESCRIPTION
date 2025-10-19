@@ -1,8 +1,8 @@
 Package: clhs
 Type: Package
 Title: Conditioned Latin Hypercube Sampling
-Version: 0.9.1
-Date: 2025-05-29
+Version: 0.9.2
+Date: 2025-10-20
 Authors@R: c(
     person("Pierre", "Roudier", email = "roudierp@landcareresearch.co.nz", role = c("aut", "cre")),
     person("Colby", "Brugnard", email = "cbrung@ad.nmsu.edu", role = "ctb"),
