@@ -1,13 +1,12 @@
+citHeader("To cite clhs in publications, please use the follwoing reference:")
+
 bibentry(
   bibtype = "InProceedings",
-  title = "A conditioned Latin hypercube sampling algorithm incorporating operational constraints.",
-  author = c(
-       person("Pierre", "Roudier"),
-       person("Dylan","Beaudette"),
-       person("Allan", "Hewitt")
-     ),
+  title = "A conditioned Latin hypercube sampling algorithm incorporating operational constraints",
+  author = "Roudier, P., Beaudette, D.E., Hewitt, A.",
   year = "2012",
   booktitle = "Digital Soil Assessments and Beyond",
   publisher = "CRC Press",
-  pages = "227--232"
+  pages = "227--232",
+  url = "https://doi.org/10.1201/b12728-48",
 )
