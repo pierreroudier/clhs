@@ -4,14 +4,18 @@
 
 # clhs
 
-A faster (C++) implementation of the conditioned Latin Hypercube Sampling method
-
-## Scope
+A fast implementation of the conditioned Latin Hypercube Sampling method
 
 ## Installation
 
-The C++ method is not yet on CRAN. 
+### Stable(-ish) version 
 
-You can install it using the `devtools` package to install `clhs`:
+The easiest way to install the `clhs`package is from CRAN:
+
+`install.packages("clhs")`
+
+### Development version 
+
+You can install the latest development version using the `devtools` package to install `clhs`:
 
 `devtools::install_github("pierreroudier/clhs")`
